@@ -13,13 +13,23 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 
 Never extrude data (chart bars, table rows, stat cards) or containers. If a thing is neither pressed nor filled, it is plane.
 
-State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row (any checked checkbox in its cells) sinks to `housing-down` with a recessed top edge and ignores the hover tint; a latched `.key[aria-pressed=true]` stays pressed. Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
+State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row (any checked checkbox in its cells) sinks to `housing-down` with a recessed top edge and ignores the hover tint; a latched `.key` or `.btn` (`aria-pressed="true"`) stays down and lights a lamp (see Latching). Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
 
 One sanctioned exception: the showcase hero unit is a raised housing because it depicts a physical device. Product screens never raise a container.
 
 LCD rule: the LCD is a material. As a readout set into the housing (KPI band, meter, empty-state counter) it is recessed. Toasts and tooltips are LCD labels cut as separate floating parts, so they take `--k-float`; nothing raised ever sits on LCD glass (use `.lcd-action`).
 
-Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined. A latched `.key[aria-pressed=true]` sits in that darker well in both themes and lights a 6px lamp at its top edge (`--k-ok`, or set `--lamp`). The well alone is only 1.1:1 against the surface, so the lamp is what marks the state: 5.0:1 in light and 9.2:1 in dark against the well.
+Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined.
+
+## Latching
+
+A press and a latch are different states and never look the same.
+
+- **Press** (`:active`, momentary): the part drops 1px, shrinks to 0.985 and its shadow turns to `--k-pressed` on its own plastic (`housing` for neutral parts, the cap color for `.btn-signal` and `.btn-go`). It comes back up on release.
+- **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, sits in the darker well (`--btn-latched-bg`, `housing-down` by default; colored caps keep their color) with an edge ring, and lights a lamp. Pressing a latched part shrinks it while the well and lamp stay.
+- **Chosen** (`.seg`, exclusive choice): the chosen item is the one raised part of its recessed channel, with its own lighter body (`--k-chosen-top` to `--k-chosen`) and ink label; the others sit flat in the channel. It does not travel and has no lamp, because picking one option is a selection, not a toggle.
+
+The lamp is a 6px dot with a bright core, a dark rim (`--k-lamp-rim`) and a soft glow, colored `--k-lamp-lit` (green, never orange, so orange stays the one primary action). Set `--lamp` to change it. It sits in the top-left of a `.key` (24% in from each edge, at most 10px from the left on wide keys) and in the left end of a pill `.btn`, so it never sits over the label. On a disabled latched part it turns `--k-ink-off`. It appears at once: an indicator light switches on, it does not fade.
 
 Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per theme, so one recipe works in both themes. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-theme]`, `.depth-soft` and `.depth-deep` so they resolve locally.
 
@@ -62,7 +72,12 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | LCD labels (11px caps) | 6.9:1 | 62 | 8.6:1 | 67 |
 | Focus ring vs housing | 11.8:1 | 81 | 12.3:1 | 92 |
 | Latched key label (ink on the `housing-down` well) | 10.5:1 | 74 | 13.9:1 | 94 |
-| Latched key lamp vs its well (non-text, 3:1 target) | 5.0:1 | 58 | 9.2:1 | 68 |
+| Latched lamp: rim vs well (light), core vs well (dark); non-text, 3:1 target | 5.1:1 | 59 | 9.9:1 | 72 |
+| Latched lamp core vs its rim (light) | 3.4:1 | 40 | n/a | n/a |
+| Chosen `.seg` label (ink on `--k-chosen`) | 12.9:1 | 86 | 6.2–7.7:1 | 78–83 |
+| Chosen `.seg` body vs its channel (non-text) | 1.2–1.4:1 plus its shadow | 11–21 | 1.8–2.3:1 | 10–15 |
+| Switch slot on vs off (`--k-switch-on` vs `housing-down`) | 4.0:1 | 52 | 4.3:1 | 34 |
+| Switch thumb vs on slot | 5.0:1 | 69 | 3.8:1 | 34 |
 
 Disabled text (`--k-ink-off`) is deliberately below these (about 3:1); WCAG exempts disabled controls.
 
@@ -74,7 +89,7 @@ Pressing a coloured button keeps its colour: variants set `--btn-pressed-bg` / `
 
 ## Components
 
-Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`. A busy `.btn-icon` hides its icon and shows only the spinner, at the same size. A `.key` takes `:disabled` the same way as a button: no body, a dashed outline, faded ink, and it no longer presses or lifts on hover. Hover never outranks a press: a pressed or latched button or key always shows `--k-pressed`.
+Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`. A busy `.btn-icon` hides its icon and shows only the spinner, at the same size. A `.key` takes `:disabled` or `aria-disabled="true"` the same way as a button: no body, a dashed outline, faded ink, and it no longer presses or lifts on hover. Hover never outranks a press: a pressed or latched button or key always shows `--k-pressed`. Variant hovers (`.btn-signal` lights its own cap, `.btn-quiet` shows its seam) outrank the base `.btn` hover, whose exclusions sit in `:where()`.
 Fields `.field`, `.field-select`, `.field-area`, `.label`, `.hint`, `.hint-error`, invalid via `aria-invalid="true"`.
 Input groups `.input-group` is one recessed well around a bare `<input>`: a leading or trailing icon, `.input-affix` text (a seam divides it from the value), a `.kbd` hint, or a `.btn` set into the well like the raised item in a `.seg` channel, with concentric corners (the well's radius minus the 4px inset) rather than a pill. Focus, invalid and disabled are read from the input. Wrap it in a `<label>` when it holds no button; with a button, use a `<div>` and a separate `<label for>`.
 Tabs `.tabs` switch the panels of one page (`role="tablist"` with `aria-selected`) or the sections of a page (links with `aria-current="page"`): plane, on a seam, with an ink indicator under the current tab. Filters and view modes inside a panel stay `.seg`.
@@ -105,8 +120,8 @@ Newsletter sign-up is a composition: an `.input-group` with an icon, an email in
 Sample content: on a sample marketing page, every logo strip, quote and figure carries a visible note that it is made up.
 Marketing pages are compositions, not new materials: the reference landing page (`site/src/pages/screens/landing.astro`) builds its hero, feature rows, pricing, questions, call to action and footer from the classes above. Each feature is illustrated with a live part of the kit rather than an icon card. Sample proof (logos, quotes, figures) is allowed only on the sample product's pages and must say on the page that it is made up; the library's own showcase never carries any. The marketing pages live one per file in `site/src/pages/screens/` and share a header, an optional announcement `.banner` and a footer through the `Marketing` layout in `site/src/layouts/Marketing.astro`.
 Empty states `.empty` centre an LCD `.lcd.readout` (`.readout-value`, `.readout-unit`), a heading, a short reason and `.empty-actions`. Say why it is empty and what to do next; the copy depends on the cause (no data yet, a filter, a search).
-Selection `.check`, `.radio` (20px, 24px on coarse pointers), `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`). `.check` and `.radio` take `aria-invalid="true"` with the same 2px danger ring as a field. Hover is deliberately absent on fields, input groups, checks, radios, switches and ranges.
-Disabled follows one grammar everywhere: faded ink (`--k-ink-off`), a `not-allowed` cursor, and no hover or press response. Raised parts lose their body for a dashed outline (`.btn`, `.key`, the chosen `.seg` item, the `.range` thumb); recessed parts drop their well for a seam ring (`.field`, `.input-group`, a whole `.seg`, the `.range` track, `.dropzone`); flat items only fade (`.tabs` items, `.menu` items, `.nav-item`, listbox options); a `.choice-card` takes the dashed outline and fades everything inside it. Use `:disabled` on form controls and `aria-disabled="true"` elsewhere: `.seg` and its items, `.tabs` items, `.menu` items, `.nav-item`, `.dropzone` and `.choice-card` accept both, and the drop zone and choice card also read a disabled input inside them. `.dropzone` takes invalid from `aria-invalid="true"` on its input.
+Selection `.check`, `.radio` (20px, 24px on coarse pointers), `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`; the input is a 24px hit area, 44px on coarse pointers, with negative margins so it takes the 10px of the track in the layout; the track, fill and focus ring are drawn on the track). `.check` and `.radio` take `aria-invalid="true"` with the same 2px danger ring as a field. Hover is deliberately absent on fields, input groups, checks, radios, switches and ranges.
+Disabled follows one grammar everywhere: faded ink (`--k-ink-off`), a `not-allowed` cursor, and no hover or press response. Raised parts lose their body for a dashed outline (`.btn`, `.key`, the chosen `.seg` item, the `.range` thumb); recessed parts drop their well for a seam ring (`.field`, `.input-group`, a whole `.seg`, the `.range` track, `.dropzone`); flat items only fade (`.tabs` items, `.menu` items, `.nav-item`, listbox options); a `.choice-card` takes the dashed outline and fades everything inside it. Use `:disabled` on form controls and `aria-disabled="true"` elsewhere: `.btn`, `.key`, `.seg` and its items, `.tabs` items, `.menu` items, `.nav-item`, `.dropzone` and `.choice-card` accept both, and the drop zone and choice card also read a disabled input inside them. `.dropzone` takes invalid from `aria-invalid="true"` on its input or itself; `data-dragover` outranks invalid, so a new drag after a rejected file still shows its ring.
 Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`; add `.dialog-full` for a 90vw × 90vh dialog that holds a full view, nearly edge to edge on phones), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
 Selection also `.choice-card`. Code `.code`. Tables `.table-scroll` (edge fade on narrow screens).
 Display `.panel`, `.raised`, `.recessed`, `.seam`, `.float`, `.lcd`, `.meter`, `.badge` + `.lamp-ok|warn|danger|signal|off`, `.tag`, `.avatar`, `.alert`, `.banner`, `.ktable` (`.num` cells), `.nav-item`, `.menu`, `.dialog`, `.toast`, `.kbd`, `.key`.
@@ -118,6 +133,7 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | What | Timing | Notes |
 |---|---|---|
 | Press (`.btn`, `.key`, `.pressable`) | 80ms down, 160ms up | 1px drop, scale 0.985, shadow reverses to `--k-pressed`. Asymmetric: the `:active` state carries the shorter duration. No bounce. |
+| Latch (`aria-pressed` on `.btn`, `.key`) | 160ms into the well; lamp at once | The body settles into the well on the press-up timing. The lamp has no transition. Reduced motion: no 1px drop, the well and lamp still change. |
 | Hover | 160ms | Gated to `(hover: hover) and (pointer: fine)`. Light catches the top edge (`--k-raised-hover`); geometry does not move. |
 | Toggles (switch, check, radio, choice card, seg) | 160–200ms | Marks scale from 0.5, never from 0. Seg selection latches without travel. |
 | Menu (`[popover]`) | 180ms in, 120ms out | Opacity + scale 0.96 from the trigger corner. When it flips above its trigger, the origin flips with it (the reference script sets `transform-origin` on `toggle`). Native popover: Esc and outside click close it. Items are plain buttons (no `role=menu`), so Tab works and nothing promises arrow keys. |
@@ -132,6 +148,12 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Tooltip | 125ms, 400ms hover delay | Hover is gated to fine pointers, so a tap never leaves it stuck open; keyboard focus shows it at once. Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
 | Banner dismiss | 220ms | Collapses its height and fades, so the page closes the gap instead of jumping. Reduced motion: a 120ms fade. |
 | Pricing toggle | 180ms | Changed figures fade in from a 2px blur and a 4px drop. Reduced motion: fade only. |
+| In-page links (homepage only) | browser smooth scroll | `html{scroll-behavior:smooth}` on `index.astro`, so jumps from the header and the Cmd/Ctrl+K menu glide to their section. Reduced motion: `scroll-behavior:auto`, the page jumps. |
+| Invoice totals tick (`LightDark.astro`) | 180ms, `--ease-out` | A changed line total, subtotal, tax or total fades in from a 2px blur and a 4px drop, through the Web Animations API. It skips while one is still running, so held keys never queue animations. Reduced motion: fade only. |
+| Class name labels (`.annot`, homepage) | 240ms height and margin, 180ms opacity | "Show class names" opens each label's height from 0 with `interpolate-size`, so the panes grow instead of jumping. Reduced motion: opacity only, the height changes at once. |
+| Screen viewer (`ScreenViewer.astro`) | 200ms fade in, none out | The iframe hides while a page loads (`data-loading`, no transition) and fades in once it has loaded, so a half-painted page never shows. Opacity only, so reduced motion keeps it. |
+| Chart legend dimming (`StatusShare`) | none | Hovering or focusing a legend row dims the other segments and rows to 35% at once. It follows the pointer across rows, so any fade would lag behind it. |
+| Accordion hover tint | 120ms, `ease` | A summary tints to `housing-up`, like a table row. Color only, so reduced motion keeps it. |
 
 Nothing in the library or the app screens animates on scroll. Reduced motion keeps fades and colour changes and drops translate/scale; the sheet fades instead of sliding; the busy spinner slows to 1.6s instead of stopping.
 
@@ -139,7 +161,9 @@ One sanctioned exception, on the marketing showcase only: scroll-linked motion t
 
 ## Showcase
 
-`site/src/pages/index.astro` builds the showcase (`index.html`). The hero's primary action downloads `plastc.css`, which the build copies from `src/plastc.css`, with the version from `package.json` and the file size beside it; Install links the same download and the file on GitHub, and the header and footer link the repository. The Components section opens with a jump list of every group, and each group has a stable id that the Cmd/Ctrl+K menu also lists (searchable by class name). Under each group, View HTML (a native `<details>`) shows clean markup that the build derives from the live demo's rendered HTML (`site/src/lib/clean-html.ts`): demo-only `data-*` hooks and notes are stripped, the `data-*` attributes the library styles are kept, dialog triggers become `commandfor`/`command`, and a script-built calendar is written out as a static month. Copy HTML copies exactly that text, keeps its icon (a check once copied) and holds its width. Where a part needs your own script, one line above the code says what and links `plastc.js`.
+The homepage (`/`, `site/src/pages/index.astro`) runs in order: the hero with the wall of screens, the anatomy section, light and dark (the tuning deck and the two invoice panes), contrast, and install. The hero's primary action downloads `plastc.css`, which the build copies from `src/plastc.css`, with the version from `package.json` and the file size beside it; Install links the same download and the file on GitHub, and the header and footer link the repository. The Cmd/Ctrl+K menu lists the screens, the marketing pages, the sections of the homepage, the components index and the component pages (searchable by class name).
+
+Components live at `/components/` (an index of the groups) and one page per group at `/components/<slug>/` (`site/src/pages/components/[slug].astro`, content in `site/src/components/components/pages.ts`). Each page has Examples (the live parts), Tokens where the group has its own, States (a state matrix from `matrices.ts`: every part in default, hover, focus, pressed, on, disabled, invalid and busy, with hover, focus and pressed held on by the site-only `data-force` attribute whose rules in `state-matrix.css` copy the library's), and Classes. Under each example, View HTML (a native `<details>`) shows clean markup that the build derives from the live demo's rendered HTML (`site/src/lib/clean-html.ts`): demo-only `data-*` hooks and notes are stripped, the `data-*` attributes the library styles are kept, dialog triggers become `commandfor`/`command`, and a script-built calendar is written out as a static month. Copy HTML copies exactly that text, keeps its icon (a check once copied) and holds its width. Where a part needs your own script, one line above the code says what and links `plastc.js`.
 
 The homepage's tuning deck sets the depth (Soft, Normal, Deep) and an LCD tint (green, amber, blue) for the whole page; the theme stays on the header switch. The tint is a showcase control, not a library token: green is the shipped `--k-lcd` set, and the contrast readout recomputes its LCD text figures (WCAG 2 and APCA 0.0.98G) for whichever tint is showing.
 
