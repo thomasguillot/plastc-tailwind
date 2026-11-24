@@ -730,8 +730,8 @@
 @utility seg {
   display: inline-flex; gap: 2px; padding: 3px;
   border-radius: 999px;
-  background: var(--k-housing-down);
-  box-shadow: var(--k-recessed);
+  background: var(--k-well);
+  box-shadow: var(--k-latched);
   max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
