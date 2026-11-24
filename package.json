@@ -1,0 +1,17 @@
+{
+  "name": "plastc",
+  "version": "1.0.0",
+  "description": "Neumorphic UI library for Tailwind CSS v4, cast as moulded appliance plastic.",
+  "scripts": {
+    "build": "cd site && python3 build.py && tailwindcss -i app.css -o dist.css --minify",
+    "serve": "cd site && python3 -m http.server 8765"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "tailwindcss": "^4.3.5"
+  },
+  "private": true
+}

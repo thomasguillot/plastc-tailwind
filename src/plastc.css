@@ -1,0 +1,850 @@
+/*
+ * Plastc: molded-plastic neumorphism for Tailwind CSS v4.
+ *
+ *   @import "tailwindcss";
+ *   @import "./plastc.css";
+ *
+ * Class names are unprefixed (btn, field, panel…), the same convention as
+ * other Tailwind component libraries. Every class is an @utility, so Tailwind
+ * variants work on all of them (hover:, md:, …).
+ *
+ * Depth grammar (the whole library follows it):
+ *   plane    the housing and every layout container. Flush. Separated by a
+ *            moulded seam (hairline + highlight lip), never by shadow.
+ *   raised   only parts you press: buttons, keys, thumbs, the chosen segment.
+ *   recessed only parts that hold input or output: fields, tracks, wells,
+ *            readouts, and a choice card while it is chosen.
+ *   float    only overlays: menus, dialogs, sheets, toasts, tooltips.
+ *
+ * Shadows are built from physical light, top-left: a tight contact shadow,
+ * a soft ambient falloff, a specular top edge and a lower lip. All alpha, so
+ * they sit correctly on either housing.
+ *
+ * Housings: light by default. data-housing="dark" on any ancestor for dark,
+ * data-housing="light" to switch back inside a dark region. .depth-soft / .depth-deep scale every shadow in a region.
+ *
+ * Motion: presses go down fast and return slower; overlays enter with
+ * @starting-style and leave faster than they arrive; nothing animates on
+ * scroll. prefers-reduced-motion keeps fades and colour, drops movement.
+ */
+
+/* ---------------------------------------------------------------- tokens */
+
+:root,
+[data-housing="light"] {
+  --k-housing: #dcd8cf;
+  --k-housing-up: #e7e4dc;
+  --k-housing-down: #d1ccc2;
+  --k-ink: #1f1d1a;
+  --k-ink-2: #36332e;
+  --k-ink-3: #56514a;
+  --k-ink-off: #827c73;
+  --k-sh: 48 38 24;
+  --k-hl: 255 253 248;
+  --k-sh-a: 1;
+  --k-hl-a: 1;
+  --k-seam: rgb(48 38 24 / 0.11);
+  --k-edge: rgb(48 38 24 / 0.3);
+  --k-lcd: #bcc4ab;
+  --k-lcd-ink: #1b2416;
+  --k-lcd-dim: #2e3727;
+  --k-signal: #b23c0a;
+  --k-signal-up: #c4470e;
+  --k-signal-ink: #ffffff;
+  --k-signal-text: #87290a;
+  --k-go: #3d6a38;
+  --k-go-up: #4f7f49;
+  --k-go-ink: #ffffff;
+  --k-danger: #8f1f15;
+  --k-warn: #8a5200;
+  --k-ok: #2f5a2b;
+  --k-focus: #1f1d1a;
+  --k-lamp-warn: #d98a14;
+  --k-lamp-danger: #d33a2c;
+  --k-scrim: rgb(48 38 24 / 0.28);
+  --k-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%234d4943' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+
+[data-housing="dark"] {
+  --k-housing: #2b2a27;
+  --k-housing-up: #343330;
+  --k-housing-down: #21201c;
+  --k-ink: #f0ede6;
+  --k-ink-2: #dbd7cf;
+  --k-ink-3: #a9a398;
+  --k-ink-off: #7a746c;
+  --k-sh: 0 0 0;
+  --k-hl: 255 248 235;
+  --k-sh-a: 2.6;
+  --k-hl-a: 0.16;
+  --k-seam: rgb(0 0 0 / 0.42);
+  --k-edge: rgb(0 0 0 / 0.55);
+  --k-lcd: #1f281a;
+  --k-lcd-ink: #c8e2a4;
+  --k-lcd-dim: #b3ca97;
+  --k-signal: #b23c0a;
+  --k-signal-up: #c4470e;
+  --k-signal-ink: #ffffff;
+  --k-signal-text: #ffa877;
+  --k-go: #3d6a38;
+  --k-go-up: #4f7f49;
+  --k-go-ink: #ffffff;
+  --k-danger: #fbbcb2;
+  --k-warn: #f0b35c;
+  --k-ok: #9fd08f;
+  --k-focus: #f0ede6;
+  --k-lamp-warn: #e9a23a;
+  --k-lamp-danger: #ef5a4a;
+  --k-scrim: rgb(0 0 0 / 0.5);
+  --k-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23c4bfb5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-housing: var(--k-housing);
+  --color-housing-up: var(--k-housing-up);
+  --color-housing-down: var(--k-housing-down);
+  --color-ink: var(--k-ink);
+  --color-ink-2: var(--k-ink-2);
+  --color-ink-3: var(--k-ink-3);
+  --color-lcd: var(--k-lcd);
+  --color-lcd-ink: var(--k-lcd-ink);
+  --color-lcd-dim: var(--k-lcd-dim);
+  --color-signal: var(--k-signal);
+  --color-signal-ink: var(--k-signal-ink);
+  --color-signal-text: var(--k-signal-text);
+  --color-go: var(--k-go);
+  --color-go-ink: var(--k-go-ink);
+  --color-danger: var(--k-danger);
+  --color-warn: var(--k-warn);
+  --color-ok: var(--k-ok);
+}
+
+@theme {
+  --color-gray-25: #fcfbf9;
+  --color-gray-50: #f6f4f0;
+  --color-gray-100: #ebe8e2;
+  --color-gray-200: #dcd8cf;
+  --color-gray-300: #c6c0b5;
+  --color-gray-400: #9c968b;
+  --color-gray-500: #78726a;
+  --color-gray-600: #5c5750;
+  --color-gray-700: #4d4943;
+  --color-gray-800: #34312d;
+  --color-gray-900: #1f1d1a;
+  --color-gray-950: #141311;
+  --color-brand-25: #fffaf6;
+  --color-brand-50: #fff3eb;
+  --color-brand-100: #ffe2cf;
+  --color-brand-200: #fec3a0;
+  --color-brand-300: #fb9c6a;
+  --color-brand-400: #f47a40;
+  --color-brand-500: #e2581d;
+  --color-brand-600: #c4470e;
+  --color-brand-700: #b23c0a;
+  --color-brand-800: #8a300c;
+  --color-brand-900: #642610;
+  --color-brand-950: #3a1104;
+  --color-success-50: #f1f7ef;
+  --color-success-100: #dcebd7;
+  --color-success-300: #9fd08f;
+  --color-success-500: #4f7f49;
+  --color-success-600: #3d6a38;
+  --color-success-700: #2f5a2b;
+  --color-warning-50: #fdf6e9;
+  --color-warning-100: #f9e6c3;
+  --color-warning-300: #f0b35c;
+  --color-warning-500: #d98a14;
+  --color-warning-600: #b06d06;
+  --color-warning-700: #8a5200;
+  --color-error-50: #fdf1ef;
+  --color-error-100: #f9dcd7;
+  --color-error-300: #f19084;
+  --color-error-500: #d33a2c;
+  --color-error-600: #b42b1f;
+  --color-error-700: #a3261b;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-part: 12px;
+  --radius-panel: 20px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root {
+  --k-depth: 1;
+  --dur-press-down: 80ms;
+  --dur-press-up: 160ms;
+  --dur-toggle: 200ms;
+  --dur-overlay-in: 180ms;
+  --dur-overlay-out: 120ms;
+  --dur-dialog-in: 240ms;
+  --dur-dialog-out: 160ms;
+  --dur-sheet-in: 300ms;
+  --dur-sheet-out: 220ms;
+  --dur-toast-in: 360ms;
+  --dur-toast-out: 240ms;
+}
+
+/* Shadow recipes, re-declared wherever housing or depth can change so they
+   resolve against the local values. */
+:root, [data-housing], .depth-soft, .depth-deep {
+  --d: var(--k-depth, 1);
+  --k-raised:
+    inset 0 1px 0 rgb(var(--k-hl) / calc(0.85 * var(--k-hl-a))),
+    inset 0 -1px 0 rgb(var(--k-sh) / calc(0.07 * var(--k-sh-a))),
+    0 1px 1px rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a))),
+    0 calc(2px * var(--d)) calc(4px * var(--d)) calc(-1px * var(--d)) rgb(var(--k-sh) / calc(0.12 * var(--k-sh-a))),
+    calc(2px * var(--d)) calc(7px * var(--d)) calc(16px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.2 * var(--k-sh-a))),
+    calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.55 * var(--k-hl-a)));
+  --k-raised-hover:
+    inset 0 1px 0 rgb(var(--k-hl) / calc(1 * var(--k-hl-a))),
+    inset 0 -1px 0 rgb(var(--k-sh) / calc(0.07 * var(--k-sh-a))),
+    0 1px 1px rgb(var(--k-sh) / calc(0.18 * var(--k-sh-a))),
+    0 calc(2px * var(--d)) calc(5px * var(--d)) calc(-1px * var(--d)) rgb(var(--k-sh) / calc(0.14 * var(--k-sh-a))),
+    calc(2px * var(--d)) calc(8px * var(--d)) calc(18px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.24 * var(--k-sh-a))),
+    calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.7 * var(--k-hl-a)));
+  --k-pressed:
+    inset 0 calc(2px * var(--d)) calc(3px * var(--d)) rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a))),
+    inset 0 1px 1px rgb(var(--k-sh) / calc(0.14 * var(--k-sh-a))),
+    0 1px 0 rgb(var(--k-hl) / calc(0.7 * var(--k-hl-a)));
+  --k-recessed:
+    inset 0 0 0 1px var(--k-edge),
+    inset 0 1px 2px rgb(var(--k-sh) / calc(0.14 * var(--k-sh-a))),
+    inset calc(1px * var(--d)) calc(3px * var(--d)) calc(7px * var(--d)) calc(-2px * var(--d)) rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a))),
+    0 1px 0 rgb(var(--k-hl) / calc(0.8 * var(--k-hl-a)));
+  /* Seam = a real 1px border (var(--k-seam)) + these lips: light catching the
+     inside top edge, and the outside lower edge. Kept off the border's own pixels
+     so the parting line reads evenly on all four sides. */
+  --k-seam-line:
+    inset 0 1px 0 rgb(var(--k-hl) / calc(0.6 * var(--k-hl-a))),
+    0 1px 0 rgb(var(--k-hl) / calc(0.55 * var(--k-hl-a)));
+  --k-float:
+    inset 0 1px 0 rgb(var(--k-hl) / calc(0.8 * var(--k-hl-a))),
+    0 0 0 1px rgb(var(--k-sh) / calc(0.08 * var(--k-sh-a))),
+    0 2px 4px rgb(var(--k-sh) / calc(0.08 * var(--k-sh-a))),
+    0 12px 28px -6px rgb(var(--k-sh) / calc(0.22 * var(--k-sh-a))),
+    0 32px 64px -24px rgb(var(--k-sh) / calc(0.28 * var(--k-sh-a)));
+  --k-cast: linear-gradient(180deg, var(--k-housing-up), var(--k-housing) 70%, var(--k-housing-down));
+}
+
+/* ---------------------------------------------------------------- base */
+
+@layer base {
+  html { background: var(--k-housing); color: var(--k-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { background: var(--k-housing); }
+  p, li { text-wrap: pretty; }
+  [hidden] { display: none !important; }
+  ::selection { background: color-mix(in oklab, var(--k-ink) 22%, transparent); color: var(--k-ink); }
+  :focus-visible { outline: 2px solid var(--k-focus); outline-offset: 3px; box-shadow: var(--k-focus-gap, none); }
+  html { scrollbar-color: color-mix(in oklab, var(--k-ink) 28%, var(--k-housing)) var(--k-housing); }
+  input, textarea, select { caret-color: var(--k-signal); }
+  a { text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+  table { font-variant-numeric: tabular-nums; }
+}
+
+/* ---------------------------------------------------------------- primitives */
+
+@utility depth-soft { --k-depth: 0.5; }
+@utility depth-deep { --k-depth: 1.7; }
+
+@utility raised { background: var(--k-cast); box-shadow: var(--k-raised); }
+@utility recessed { background: var(--k-housing-down); box-shadow: var(--k-recessed); }
+@utility seam { border: 1px solid var(--k-seam); box-shadow: var(--k-seam-line); }
+@utility float { background: var(--k-housing-up); box-shadow: var(--k-float); }
+
+@utility panel {
+  border-radius: var(--radius-panel);
+  background: var(--k-housing);
+  border: 1px solid var(--k-seam);
+  box-shadow: var(--k-seam-line);
+}
+
+/* Press physics for any raised part: down fast, back up slower. */
+@utility pressable {
+  transition-property: box-shadow, translate, scale, background-color;
+  transition-duration: var(--dur-press-up);
+  transition-timing-function: var(--ease-out);
+  &:active:not(:disabled) { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
+}
+
+/* Recessed readout window. Contents stay flat; nothing raised goes inside. */
+@utility lcd {
+  background: var(--k-lcd);
+  color: var(--k-lcd-ink);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.14),
+    inset 0 2px 3px rgb(0 0 0 / 0.22),
+    inset 0 6px 14px -6px rgb(0 0 0 / 0.25),
+    0 1px 0 rgb(var(--k-hl) / calc(0.8 * var(--k-hl-a)));
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%);
+}
+
+/* Code block: a recessed well for source text. */
+@utility code {
+  display: block;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-part);
+  font: 500 13px/1.6 var(--font-mono);
+  color: var(--k-ink);
+  white-space: pre;
+  overflow-x: auto;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+}
+
+@utility engraved {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--k-ink-2);
+}
+
+@utility display {
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+@utility btn {
+  --btn-h: 42px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: var(--btn-h);
+  padding: 0 calc(var(--btn-h) * 0.46);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit; font-weight: 700; font-size: 14px; white-space: nowrap; text-decoration: none;
+  color: var(--k-ink);
+  cursor: pointer; user-select: none;
+  background: var(--k-cast);
+  box-shadow: var(--k-raised);
+  transition-property: box-shadow, translate, scale, background-color, color;
+  transition-duration: var(--dur-press-up);
+  transition-timing-function: var(--ease-out);
+  & svg { width: 17px; height: 17px; flex: none; }
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled):not([aria-disabled="true"]) { box-shadow: var(--k-raised-hover); }
+  }
+  &:active:not(:disabled):not([aria-disabled="true"]), &[aria-pressed="true"] {
+    transition-duration: var(--dur-press-down);
+    translate: 0 1px; scale: 0.985;
+    background: var(--btn-pressed-bg, var(--k-housing)); box-shadow: var(--btn-pressed-shadow, var(--k-pressed));
+  }
+  /* Disabled: no body, no seam, dashed outline, faded text. Reads as unavailable, not as a tag.
+     A busy button keeps its body: it is working, not unavailable. */
+  &:disabled:not([aria-busy="true"]), &[aria-disabled="true"]:not([aria-busy="true"]) {
+    cursor: not-allowed; color: var(--k-ink-off);
+    background: transparent; box-shadow: none;
+    border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
+  }
+  &[aria-busy="true"] { cursor: progress; }
+  &[aria-busy="true"]::before {
+    content: ""; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid currentColor; border-right-color: transparent;
+    animation: plastc-spin 700ms linear infinite;
+  }
+}
+
+/* Coloured caps: tinted plastic, same light model. */
+@utility btn-signal {
+  color: var(--k-signal-ink);
+  background: linear-gradient(180deg, var(--k-signal-up), var(--k-signal) 75%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.24),
+    inset 0 -1px 0 rgb(0 0 0 / 0.12),
+    0 1px 1px rgb(var(--k-sh) / calc(0.2 * var(--k-sh-a))),
+    0 calc(2px * var(--d)) calc(4px * var(--d)) calc(-1px * var(--d)) rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a))),
+    calc(2px * var(--d)) calc(7px * var(--d)) calc(16px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.24 * var(--k-sh-a))),
+    calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a)));
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.34),
+        inset 0 -1px 0 rgb(0 0 0 / 0.12),
+        0 1px 1px rgb(var(--k-sh) / calc(0.22 * var(--k-sh-a))),
+        0 calc(2px * var(--d)) calc(5px * var(--d)) calc(-1px * var(--d)) rgb(var(--k-sh) / calc(0.18 * var(--k-sh-a))),
+        calc(2px * var(--d)) calc(8px * var(--d)) calc(18px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.28 * var(--k-sh-a))),
+        calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.6 * var(--k-hl-a)));
+    }
+  }
+  --btn-pressed-bg: var(--k-signal);
+  --btn-pressed-shadow: inset 0 2px 4px rgb(0 0 0 / 0.3), 0 1px 0 rgb(var(--k-hl) / calc(0.7 * var(--k-hl-a)));
+  &:disabled:not([aria-busy="true"]) { background: transparent; box-shadow: none; color: var(--k-ink-off); }
+}
+
+@utility btn-go {
+  color: var(--k-go-ink);
+  background: linear-gradient(180deg, var(--k-go-up), var(--k-go) 75%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 -1px 0 rgb(0 0 0 / 0.12),
+    0 1px 1px rgb(var(--k-sh) / calc(0.2 * var(--k-sh-a))),
+    0 calc(2px * var(--d)) calc(4px * var(--d)) calc(-1px * var(--d)) rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a))),
+    calc(2px * var(--d)) calc(7px * var(--d)) calc(16px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.24 * var(--k-sh-a))),
+    calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a)));
+  --btn-pressed-bg: var(--k-go);
+  --btn-pressed-shadow: inset 0 2px 4px rgb(0 0 0 / 0.3), 0 1px 0 rgb(var(--k-hl) / calc(0.7 * var(--k-hl-a)));
+  &:disabled:not([aria-busy="true"]) { background: transparent; box-shadow: none; color: var(--k-ink-off); }
+}
+
+/* No body until touched: tertiary actions in dense UI. */
+@utility btn-quiet {
+  background: transparent; box-shadow: none; color: var(--k-ink-2);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
+  }
+  --btn-pressed-bg: var(--k-housing-down);
+}
+
+@utility btn-danger { color: var(--k-danger); }
+@utility btn-sm { --btn-h: 32px; font-size: 13px; }
+@utility btn-md { --btn-h: 40px; font-size: 14px; }
+@utility btn-lg { --btn-h: 46px; font-size: 15px; }
+@utility btn-xl { --btn-h: 50px; font-size: 16px; }
+@utility btn-2xl { --btn-h: 58px; font-size: 18px; }
+@utility btn-icon { padding: 0; width: var(--btn-h); }
+
+/* Round calculator key: for hardware-like controls only. aria-pressed latches it down. */
+@utility key {
+  display: inline-grid; place-items: center;
+  aspect-ratio: 1;
+  border: 0; border-radius: 50%;
+  font: inherit; font-weight: 700; color: var(--k-ink);
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 30%, var(--k-housing-up), var(--k-housing) 55%, var(--k-housing-down));
+  box-shadow: var(--k-raised);
+  transition-property: box-shadow, translate, scale, background-color;
+  transition-duration: var(--dur-press-up);
+  transition-timing-function: var(--ease-out);
+  @media (hover: hover) and (pointer: fine) { &:hover:not([aria-pressed="true"]) { box-shadow: var(--k-raised-hover); } }
+  &:active, &[aria-pressed="true"] { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
+}
+
+/* ---------------------------------------------------------------- fields */
+
+@utility field {
+  width: 100%; height: 42px; padding: 0 14px;
+  border: 0; border-radius: var(--radius-part);
+  font: inherit; font-size: 15px; color: var(--k-ink);
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  transition: box-shadow 160ms var(--ease-out);
+  &::placeholder { color: var(--k-ink-3); }
+  &:focus-visible { outline: 2px solid var(--k-focus); outline-offset: 2px; }
+  &:disabled { color: var(--k-ink-off); background: transparent; box-shadow: inset 0 0 0 1px var(--k-seam); cursor: not-allowed; }
+  &[aria-invalid="true"] { box-shadow: var(--k-recessed), inset 0 0 0 2px var(--k-danger); }
+  &[aria-invalid="true"]:focus-visible { outline-offset: 3px; }
+}
+
+@utility field-area { height: auto; min-height: 108px; padding: 11px 14px; resize: vertical; line-height: 1.5; }
+
+@utility field-select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: var(--k-chevron);
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+@utility label { display: block; font-size: 13px; font-weight: 700; color: var(--k-ink); margin-bottom: 7px; }
+@utility hint { display: block; font-size: 13px; color: var(--k-ink-2); margin-top: 7px; }
+@utility hint-error { display: block; font-size: 13px; font-weight: 600; color: var(--k-danger); margin-top: 7px; }
+
+/* ---------------------------------------------------------------- selection */
+
+@utility check {
+  appearance: none; flex: none; margin: 0;
+  width: 20px; height: 20px; border-radius: 6px;
+  display: inline-grid; place-items: center;
+  cursor: pointer;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  &::after {
+    content: ""; width: 12px; height: 12px; scale: 0.5; opacity: 0;
+    background: var(--k-go);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    transition: scale 160ms var(--ease-out), opacity 120ms var(--ease-out);
+  }
+  &:checked::after { scale: 1; opacity: 1; }
+  &:indeterminate::after { scale: 1; opacity: 1; clip-path: inset(40% 10% 40% 10% round 2px); }
+  &:disabled { cursor: not-allowed; opacity: 0.5; }
+}
+
+@utility radio {
+  appearance: none; flex: none; margin: 0;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: inline-grid; place-items: center;
+  cursor: pointer;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  &::after {
+    content: ""; width: 10px; height: 10px; border-radius: 50%; scale: 0.5; opacity: 0;
+    background: var(--k-ink);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 1px 2px rgb(0 0 0 / 0.25);
+    transition: scale 160ms var(--ease-out), opacity 120ms var(--ease-out);
+  }
+  &:checked::after { scale: 1; opacity: 1; }
+  &:disabled { cursor: not-allowed; opacity: 0.5; }
+}
+
+/* Choice card: a large radio/checkbox target. Flush until chosen, then pressed in. */
+@utility choice-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px; border-radius: 16px;
+  cursor: pointer;
+  border: 1px solid var(--k-seam);
+  box-shadow: var(--k-seam-line);
+  transition: box-shadow var(--dur-toggle) var(--ease-out), background-color var(--dur-toggle) var(--ease-out);
+  @media (hover: hover) and (pointer: fine) { &:hover:not(:has(:checked)) { background: var(--k-housing-up); } }
+  &:has(:checked) { background: var(--k-housing-down); box-shadow: var(--k-recessed); }
+  &:has(:focus-visible) { outline: 2px solid var(--k-focus); outline-offset: 2px; }
+  & :focus-visible { outline: none; }
+}
+
+/* Slide switch: input[type=checkbox][role=switch]. Recessed slot, raised slider. */
+@utility switch {
+  appearance: none; flex: none; position: relative; margin: 0;
+  width: 46px; height: 26px; border-radius: 999px;
+  cursor: pointer;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  transition: background-color var(--dur-toggle) var(--ease-out);
+  &::before {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--k-cast);
+    box-shadow: inset 0 1px 0 rgb(var(--k-hl) / calc(0.9 * var(--k-hl-a))), 0 1px 1px rgb(var(--k-sh) / calc(0.2 * var(--k-sh-a))), 0 2px 5px rgb(var(--k-sh) / calc(0.18 * var(--k-sh-a)));
+    transition: translate var(--dur-toggle) var(--ease-out);
+  }
+  &:checked { background: color-mix(in oklab, var(--k-go) 70%, var(--k-housing-down)); }
+  &:checked::before { translate: 20px 0; }
+  &:disabled { cursor: not-allowed; opacity: 0.5; }
+}
+
+/* Segmented selector / tabs: a recessed channel; the chosen segment is the one
+   raised part. Selection latches without travel, like interlocking hi-fi buttons. */
+@utility seg {
+  display: inline-flex; gap: 2px; padding: 3px;
+  border-radius: 999px;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  & > button, & > a {
+    flex: none;
+    border: 0; background: transparent; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 34px; padding: 0 14px; border-radius: 999px;
+    font: inherit; font-size: 13px; font-weight: 700; color: var(--k-ink-2);
+    transition: color 120ms ease, background-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  }
+  & > :focus-visible { outline-offset: -2px; }
+  @media (hover: hover) and (pointer: fine) { & > :hover { color: var(--k-ink); } }
+  & > [aria-pressed="true"], & > [aria-selected="true"], & > [aria-current="page"] {
+    color: var(--k-ink);
+    background: var(--k-cast);
+    box-shadow:
+      inset 0 1px 0 rgb(var(--k-hl) / calc(0.85 * var(--k-hl-a))),
+      0 1px 1px rgb(var(--k-sh) / calc(0.14 * var(--k-sh-a))),
+      0 2px 5px -1px rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a)));
+  }
+}
+
+/* Range: recessed slot, signal fill, raised thumb. Set --fill to the value %. */
+@utility range {
+  appearance: none; width: 100%; height: 10px; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(to right, var(--k-signal) 0 var(--fill, 50%), transparent var(--fill, 50%)) var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  &::-webkit-slider-thumb {
+    appearance: none; width: 24px; height: 24px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, var(--k-housing-up), var(--k-housing-down));
+    box-shadow: inset 0 1px 0 rgb(var(--k-hl) / calc(0.9 * var(--k-hl-a))), 0 1px 1px rgb(var(--k-sh) / calc(0.22 * var(--k-sh-a))), 0 3px 8px -1px rgb(var(--k-sh) / calc(0.24 * var(--k-sh-a)));
+  }
+  &::-moz-range-thumb {
+    width: 24px; height: 24px; border: 0; border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, var(--k-housing-up), var(--k-housing-down));
+    box-shadow: inset 0 1px 0 rgb(var(--k-hl) / calc(0.9 * var(--k-hl-a))), 0 1px 1px rgb(var(--k-sh) / calc(0.22 * var(--k-sh-a))), 0 3px 8px -1px rgb(var(--k-sh) / calc(0.24 * var(--k-sh-a)));
+  }
+}
+
+/* ---------------------------------------------------------------- display */
+
+/* Status: a lit lamp + flat label. */
+@utility badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 700; color: var(--k-ink);
+  &::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--lamp, var(--k-ink-3));
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.35), 0 0 0 1.5px rgb(var(--k-sh) / calc(0.12 * var(--k-sh-a))), 0 0 6px color-mix(in oklab, var(--lamp, transparent) 55%, transparent);
+  }
+}
+@utility lamp-ok { --lamp: var(--k-ok); }
+@utility lamp-warn { --lamp: var(--k-lamp-warn); }
+@utility lamp-danger { --lamp: var(--k-lamp-danger); }
+@utility lamp-signal { --lamp: var(--k-signal); }
+@utility lamp-off { --lamp: var(--k-ink-3); }
+
+/* Tag: a flush moulded label with a seam. */
+@utility tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 24px; padding: 0 9px; border-radius: 7px;
+  font-size: 12px; font-weight: 700; color: var(--k-ink-2);
+  border: 1px solid var(--k-seam);
+  box-shadow: var(--k-seam-line);
+}
+
+/* Avatar: flat. It holds nothing, so it is not recessed. */
+@utility avatar {
+  display: inline-grid; place-items: center; flex: none;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 13px; font-weight: 800; color: var(--k-ink-2);
+  background: var(--k-housing-down);
+  box-shadow: inset 0 0 0 1px var(--k-seam);
+  overflow: hidden;
+  & img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+/* LCD meter: <div class="meter"><span style="--v:62%"></span></div> */
+@utility meter {
+  height: 12px; padding: 3px; border-radius: 5px;
+  background: var(--k-lcd);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14), inset 0 2px 3px rgb(0 0 0 / 0.2), 0 1px 0 rgb(var(--k-hl) / calc(0.8 * var(--k-hl-a)));
+  & > span {
+    display: block; height: 100%; width: var(--v, 50%); border-radius: 2px;
+    background: repeating-linear-gradient(90deg, var(--k-lcd-ink) 0 5px, transparent 5px 7px);
+  }
+}
+
+/* Alert: flush. Children: an icon, .alert-body, optional .alert-actions (wraps under on narrow). */
+@utility alert {
+  display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-start;
+  padding: 14px 16px; border-radius: 14px;
+  background: var(--k-housing);
+  border: 1px solid var(--k-seam);
+  box-shadow: var(--k-seam-line);
+  font-size: 14px; line-height: 1.45; color: var(--k-ink);
+  & > svg { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--lamp, var(--k-ink-2)); }
+  & > .alert-body { flex: 1 1 220px; min-width: 0; }
+  & > .alert-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+}
+
+/* Data table: flat. Rows are divided by seams; a selected row sinks a little. */
+@utility ktable {
+  position: relative; width: 100%; border-collapse: collapse; font-size: 14px;
+  & th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--k-ink-2); border-bottom: 1px solid var(--k-seam); white-space: nowrap; }
+  & td { white-space: nowrap; padding: 13px 16px; border-bottom: 1px solid var(--k-seam); box-shadow: inset 0 -1px 0 rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a))); }
+  & tbody tr:last-child td { border-bottom: 0; box-shadow: none; }
+  & tbody tr { transition: background-color 120ms ease; }
+  @media (hover: hover) and (pointer: fine) { & tbody tr:hover { background: var(--k-housing-up); } }
+  & tbody tr:has(> td > input[type="checkbox"]:checked) { background: var(--k-housing-down); }
+  & .num { text-align: right; font-variant-numeric: tabular-nums; }
+  @media (max-width: 639px) { & th, & td { padding-inline: 8px; } }
+}
+
+/* Wraps a wide table: scrolls sideways, with an edge fade on narrow screens to say so. */
+@utility table-scroll {
+  overflow-x: auto;
+  @media (max-width: 767px) {
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+}
+
+/* Sidebar / menu item. The current page is pressed home into the plane. */
+@utility nav-item {
+  display: flex; align-items: center; gap: 11px;
+  height: 40px; padding: 0 12px; border-radius: 11px;
+  font-size: 14px; font-weight: 600; text-decoration: none; color: var(--k-ink-2);
+  transition: color 120ms ease, background-color 120ms ease, box-shadow 160ms var(--ease-out);
+  & svg { width: 17px; height: 17px; flex: none; }
+  @media (hover: hover) and (pointer: fine) { &:hover { color: var(--k-ink); } }
+  &[aria-current="page"] { color: var(--k-ink); background: var(--k-housing-down); box-shadow: var(--k-recessed); }
+}
+
+/* ---------------------------------------------------------------- overlays (float) */
+
+/* Menu: on a [popover] element opened by a popovertarget button. Anchor it with
+   style="position-anchor:--x" and give the trigger style="anchor-name:--x". */
+@utility menu {
+  min-width: 200px; padding: 6px; border-radius: 14px; border: 0;
+  color: var(--k-ink);
+  background: var(--k-housing-up);
+  box-shadow: var(--k-float);
+  &[popover] {
+    position: fixed; inset: auto; margin: 6px 0;
+    position-area: bottom span-left;
+    position-try-fallbacks: flip-block;
+    transform-origin: top right;
+    opacity: 1; scale: 1;
+    transition-property: opacity, scale, display, overlay;
+    transition-duration: var(--dur-overlay-out);
+    transition-timing-function: var(--ease-out);
+    transition-behavior: allow-discrete;
+  }
+  &[popover]:not(:popover-open) { opacity: 0; scale: 0.96; }
+  &[popover]:popover-open { transition-duration: var(--dur-overlay-in); }
+  & > a, & > button {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    height: 36px; padding: 0 10px; border: 0; border-radius: 9px;
+    background: transparent; text-align: left; text-decoration: none; cursor: pointer;
+    font: inherit; font-size: 14px; color: var(--k-ink);
+  }
+  & > a svg, & > button svg { width: 16px; height: 16px; color: var(--k-ink-2); flex: none; }
+  @media (hover: hover) and (pointer: fine) { & > a:hover, & > button:hover { background: var(--k-housing); } }
+  & > :focus-visible { background: var(--k-housing); outline: 2px solid var(--k-focus); outline-offset: -2px; }
+  & > hr { border: 0; height: 1px; background: var(--k-seam); margin: 6px 4px; }
+}
+@starting-style { .menu[popover]:popover-open { opacity: 0; scale: 0.96; } }
+
+/* Dialog: on a native <dialog>, opened with showModal(). Centered, so it scales from the middle. */
+@utility dialog {
+  width: min(440px, calc(100vw - 32px));
+  margin: auto; padding: 24px; border: 0; border-radius: 22px;
+  color: var(--k-ink);
+  background: var(--k-housing-up);
+  box-shadow: var(--k-float);
+  opacity: 1; scale: 1;
+  transition-property: opacity, scale, display, overlay;
+  transition-duration: var(--dur-dialog-out);
+  transition-timing-function: var(--ease-out);
+  transition-behavior: allow-discrete;
+  &:not([open]) { opacity: 0; scale: 0.96; }
+  &[open] { transition-duration: var(--dur-dialog-in); }
+  &::backdrop {
+    background: var(--k-scrim);
+    opacity: 0;
+    transition-property: opacity, display, overlay;
+    transition-duration: var(--dur-dialog-out);
+    transition-timing-function: var(--ease-out);
+    transition-behavior: allow-discrete;
+  }
+  &[open]::backdrop { opacity: 1; transition-duration: var(--dur-dialog-in); }
+}
+@starting-style {
+  .dialog[open] { opacity: 0; scale: 0.96; }
+  .dialog[open]::backdrop { opacity: 0; }
+}
+
+/* Sheet: a <dialog> that slides in from the left edge (mobile navigation). */
+@utility sheet {
+  position: fixed; inset: 0 auto 0 0; height: 100dvh; max-height: none;
+  width: min(300px, 86vw); margin: 0; padding: 20px 16px; border: 0; border-radius: 0 22px 22px 0;
+  color: var(--k-ink); background: var(--k-housing);
+  box-shadow: var(--k-float);
+  translate: 0 0;
+  transition-property: translate, display, overlay;
+  transition-duration: var(--dur-sheet-out);
+  transition-timing-function: var(--ease-drawer);
+  transition-behavior: allow-discrete;
+  &:not([open]) { translate: -100% 0; }
+  &[open] { transition-duration: var(--dur-sheet-in); }
+  &::backdrop { background: var(--k-scrim); opacity: 0; transition: opacity var(--dur-sheet-out) var(--ease-out), display var(--dur-sheet-out) allow-discrete, overlay var(--dur-sheet-out) allow-discrete; }
+  &[open]::backdrop { opacity: 1; }
+}
+@starting-style {
+  .sheet[open] { translate: -100% 0; }
+  .sheet[open]::backdrop { opacity: 0; }
+}
+
+/* Toast: an LCD readout that rises from the bottom. On a [popover="manual"]. */
+@utility toast {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 8px 10px 16px; border-radius: 14px; border: 0;
+  background: var(--k-lcd); color: var(--k-lcd-ink);
+  font: 600 13px/1.3 var(--font-mono);
+  box-shadow: var(--k-float);
+  &[popover] {
+    position: fixed; inset: auto 16px 16px 16px; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px);
+    @media (min-width: 768px) { inset: auto 24px 24px auto; margin: 0; }
+    opacity: 1; translate: 0 0;
+    transition-property: opacity, translate, display, overlay;
+    transition-duration: var(--dur-toast-out);
+    transition-timing-function: ease;
+    transition-behavior: allow-discrete;
+  }
+  &[popover]:not(:popover-open) { opacity: 0; translate: 0 100%; }
+  &[popover]:popover-open { transition-duration: var(--dur-toast-in); }
+  & svg { width: 16px; height: 16px; flex: none; }
+}
+@starting-style { .toast[popover]:popover-open { opacity: 0; translate: 0 100%; } }
+
+/* Action printed on an LCD (toast Undo): a flat label, not a plastic button. */
+@utility lcd-action {
+  border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-weight: 700; color: inherit;
+  padding: 6px 8px; border-radius: 6px;
+  text-decoration: underline; text-underline-offset: 3px;
+  @media (hover: hover) and (pointer: fine) { &:hover { background: rgb(0 0 0 / 0.08); } }
+}
+
+/* Tooltip: an LCD label on hover (after a short delay) or keyboard focus.
+   <span class="tooltip" data-tip="…"><button …></button></span> */
+@utility tooltip {
+  position: relative; display: inline-flex;
+  &::after {
+    content: attr(data-tip);
+    position: absolute; left: 50%; bottom: calc(100% + 8px);
+    translate: -50% 4px; opacity: 0; scale: 0.97;
+    padding: 6px 9px; border-radius: 8px; white-space: nowrap;
+    font: 600 12px/1.2 var(--font-mono);
+    color: var(--k-lcd-ink); background: var(--k-lcd);
+    box-shadow: var(--k-float);
+    pointer-events: none;
+    transition: opacity 125ms var(--ease-out), translate 125ms var(--ease-out), scale 125ms var(--ease-out);
+  }
+  &:hover::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 400ms; }
+  &:has(:focus-visible)::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 0ms; }
+  &[data-tip-off]::after { opacity: 0 !important; transition-delay: 0ms !important; }
+}
+
+@utility kbd {
+  display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px;
+  border-radius: 6px; font: 700 11px/1 var(--font-mono); color: var(--k-ink-2);
+  background: var(--k-cast);
+  box-shadow: inset 0 1px 0 rgb(var(--k-hl) / calc(0.85 * var(--k-hl-a))), 0 1px 1px rgb(var(--k-sh) / calc(0.18 * var(--k-sh-a))), 0 1px 0 1px rgb(var(--k-sh) / calc(0.05 * var(--k-sh-a)));
+}
+
+@keyframes plastc-spin { to { rotate: 360deg; } }
+
+/* ---------------------------------------------------------------- reduced motion */
+/* Fewer, gentler: keep fades and colour, drop movement. Busy stays visible, slower. */
+@media (prefers-reduced-motion: reduce) {
+  .btn, .key, .pressable { translate: none !important; scale: none !important; }
+  .menu[popover], .dialog, .toast[popover], .tooltip::after { scale: 1 !important; translate: none !important; }
+  .tooltip::after { translate: -50% 0 !important; }
+  .switch::before { transition-duration: 0ms; }
+  .sheet { transition-property: opacity, display, overlay; }
+  .sheet:not([open]) { translate: 0 0; opacity: 0; }
+  .sheet[open] { opacity: 1; }
+  .btn[aria-busy="true"]::before { animation-duration: 1.6s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @starting-style { .sheet[open] { translate: 0 0; opacity: 0; } }
+}
+
+/* ---------------------------------------------------------------- forced colours */
+/* Windows High Contrast drops every shadow, so parts get real edges. */
+@media (forced-colors: active) {
+  .btn, .key, .seg, .field, .check, .radio, .switch, .range, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
+  .btn-signal, .btn-go { border: 2px solid ButtonText; }
+  .seg > [aria-pressed="true"], .seg > [aria-selected="true"], .seg > [aria-current="page"], .nav-item[aria-current="page"], .key[aria-pressed="true"], .choice-card:has(:checked) { outline: 2px solid Highlight; }
+  .check:checked, .radio:checked, .switch:checked { background: Highlight; }
+  .switch::before { border: 1px solid CanvasText; }
+  .badge::before { forced-color-adjust: none; }
+}
+
+/* Keyboard-opened overlays appear instantly: shortcuts are used too often to animate. */
+.no-motion, .no-motion::backdrop { transition-duration: 0ms !important; }

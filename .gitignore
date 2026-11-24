@@ -1,0 +1,9 @@
+.*/
+!.github/
+!.well-known/
+.DS_Store
+node_modules/
+site/dist.css
+site/index.html
+site/screens/
+direction-contract.md
