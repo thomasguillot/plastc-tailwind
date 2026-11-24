@@ -924,7 +924,7 @@
   & strong { font-weight: 700; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
   & input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   &:has(input:focus-visible) { outline: 2px solid var(--k-focus); outline-offset: 2px; }
-  &:has(input[aria-invalid="true"]), &[aria-invalid="true"] { box-shadow: var(--k-recessed), inset 0 0 0 2px var(--k-danger); }
+  &:where(:has(input[aria-invalid="true"]), [aria-invalid="true"]) { box-shadow: var(--k-recessed), inset 0 0 0 2px var(--k-danger); }
   &[data-dragover] { color: var(--k-ink); box-shadow: var(--k-recessed), inset 0 0 0 2px var(--k-ink-2); }
   &:has(input:disabled), &[aria-disabled="true"] {
     --k-ink: var(--k-ink-off); --k-ink-2: var(--k-ink-off);
