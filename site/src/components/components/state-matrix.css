@@ -9,7 +9,7 @@
     calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.6 * var(--k-hl-a)));
 }
 [data-force="hover"] .btn-quiet:not(:disabled, [aria-disabled="true"], [aria-pressed="true"]) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
-[data-force="hover"] .key:not([aria-pressed="true"]) { box-shadow: var(--k-raised-hover); }
+[data-force="hover"] .key:not([aria-pressed="true"], :disabled, [aria-disabled="true"]) { box-shadow: var(--k-raised-hover); }
 [data-force="hover"] .choice-card:not(:has(:checked)) { background: var(--k-housing-up); }
 [data-force="hover"] .seg > *, [data-force="hover"] .tabs > *, [data-force="hover"] .nav-item { color: var(--k-ink); }
 [data-force="hover"] .breadcrumbs a { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }

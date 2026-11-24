@@ -549,21 +549,21 @@
   transition-property: box-shadow, translate, scale, background-color;
   transition-duration: var(--dur-press-up);
   transition-timing-function: var(--ease-out);
-  @media (hover: hover) and (pointer: fine) { &:hover:not(:active, [aria-pressed="true"], :disabled) { box-shadow: var(--k-raised-hover); } }
-  &:active:not(:disabled), &[aria-pressed="true"] { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
+  @media (hover: hover) and (pointer: fine) { &:hover:not(:active, [aria-pressed="true"], :disabled, [aria-disabled="true"]) { box-shadow: var(--k-raised-hover); } }
+  &:active:not(:disabled, [aria-disabled="true"]), &[aria-pressed="true"] { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
   &[aria-pressed="true"]::after {
     content: ""; position: absolute; top: 5px; left: calc(50% - 3px);
     width: 6px; height: 6px; border-radius: 50%;
     background: var(--lamp, var(--k-ok));
     box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.35), 0 0 6px color-mix(in oklab, var(--lamp, var(--k-ok)) 55%, transparent);
   }
-  &:disabled {
+  &:is(:disabled, [aria-disabled="true"]) {
     cursor: not-allowed; color: var(--k-ink-off);
     background: transparent; box-shadow: none;
     border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
     translate: none; scale: none;
   }
-  &:disabled::after { background: var(--k-ink-off); box-shadow: none; }
+  &:is(:disabled, [aria-disabled="true"])::after { background: var(--k-ink-off); box-shadow: none; }
 }
 
 /* ---------------------------------------------------------------- fields */
