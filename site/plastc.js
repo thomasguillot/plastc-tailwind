@@ -578,6 +578,16 @@
     }));
   }
 
+  /* ---------- announcement banner */
+  $$('[data-banner]').forEach(b => {
+    try { if (localStorage.getItem('plastc-banner') === 'dismissed') b.hidden = true; } catch (e) {}
+  });
+  document.addEventListener('click', e => {
+    const x = e.target.closest('[data-banner-dismiss]'); if (!x) return;
+    const b = x.closest('[data-banner]'); if (b) b.hidden = true;
+    save('plastc-banner', 'dismissed');
+  });
+
   /* ---------- screen previews scale to their frame */
   if ('ResizeObserver' in window) {
     const ro = new ResizeObserver(es => es.forEach(en => { const f = en.target.querySelector('iframe'); if (f) f.style.setProperty('--s', en.contentRect.width / 1440); }));

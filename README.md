@@ -57,6 +57,7 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 
 - `src/plastc.css`: the library.
 - `site/build.py`: generates the showcase (`site/index.html`) and the reference screens (`site/screens/`).
+- `site/marketing/`: one Python file per marketing page (landing, and the pages that join it), run by the build.
 - `site/plastc.js`: demo behavior for the showcase and screens. Not part of the library.
 - `site/plastc.css`: a copy of `src/plastc.css` that the build writes for the website's download link. Not committed.
 - `site/mark-light.svg`, `site/mark-dark.svg`, `site/favicon.svg`: the keycap mark.
