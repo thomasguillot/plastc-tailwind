@@ -25,7 +25,11 @@
   function setDepth(d) {
     quietRetheme();
     root.style.setProperty('--k-depth', d);
-    $$('[data-set-depth]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setDepth === String(d))));
+    $$('[data-set-depth]').forEach(b => {
+      const on = b.dataset.setDepth === String(d);
+      if (b.getAttribute('role') === 'radio') { b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; }
+      else b.setAttribute('aria-pressed', String(on));
+    });
     $$('[data-depth-readout]').forEach(el => el.textContent = (+d).toFixed(1));
   }
   setTheme(root.dataset.theme || 'light');
@@ -584,7 +588,7 @@
     else input.removeAttribute('aria-activedescendant');
   }
   function filterList(input, showAll) {
-    const lb = listboxFor(input), q = showAll ? '' : input.value.trim().toLowerCase();
+    const lb = listboxFor(input), q = showAll ? '' : input.value.trim().toLowerCase().replace(/^\.+/, '');
     $$('[role=option]', lb).forEach(o => { o.hidden = !!q && !(o.textContent + ' ' + (o.dataset.keywords || '')).toLowerCase().includes(q); });
     $$('[role=group]', lb).forEach(g => { g.hidden = !$$('[role=option]', g).some(o => !o.hidden); });
     const vis = visibleOptions(lb), empty = $('.listbox-empty', lb);
