@@ -68,6 +68,33 @@ def line_chart(values, labels, w=720, h=240, highlight=9, fs=13):
   <circle cx="{hx:.1f}" cy="{hy:.1f}" r="5" class="fill-ink" stroke="var(--k-housing)" stroke-width="2.5"/>
 </svg>'''
 
+def bar_chart(values, labels, label, current=-1, w=360, h=190):
+    top, bottom, n = 24, 26, len(values)
+    slot = (w - 8) / n; bw = slot * 0.56; hi = max(values) * 1.08
+    y = lambda v: top + (1 - v / hi) * (h - top - bottom)
+    bars = ""
+    for k, v in enumerate(values):
+        x = 4 + k * slot + (slot - bw) / 2; cur = ' data-current=""' if k == (current % n) else ""
+        bars += f'<rect class="chart-bar"{cur} x="{x:.1f}" y="{y(v):.1f}" width="{bw:.1f}" height="{h - bottom - y(v):.1f}" rx="5"/>'
+        bars += f'<text x="{x + bw / 2:.1f}" y="{h - 8}" text-anchor="middle">{labels[k]}</text>'
+        if k == (current % n): bars += f'<text class="chart-value" x="{x + bw / 2:.1f}" y="{y(v) - 8:.1f}" text-anchor="middle">{v}</text>'
+    return f'<svg class="chart" viewBox="0 0 {w} {h}" role="img" aria-label="{label}"><line class="chart-grid" x1="0" x2="{w}" y1="{h - bottom}" y2="{h - bottom}"/>{bars}</svg>'
+
+def donut(segments, total, caption, label, r=54, sw=14):
+    import math
+    c = 2 * math.pi * r; s = sum(v for _, v, _ in segments); gap = 3; off = 0; arcs = ""
+    for name, v, lamp in segments:
+        ln = c * v / s
+        arcs += f'<circle class="chart-seg {lamp}" cx="70" cy="70" r="{r}" stroke-width="{sw}" stroke-dasharray="{max(ln - gap, 0.1):.2f} {c:.2f}" stroke-dashoffset="{-off:.2f}" transform="rotate(-90 70 70)"/>'
+        off += ln
+    return (f'<svg class="chart" viewBox="0 0 140 140" role="img" aria-label="{label}"><circle class="chart-track" cx="70" cy="70" r="{r}" stroke-width="{sw}"/>{arcs}'
+            f'<text class="chart-total" x="70" y="70" text-anchor="middle" font-size="19">{total}</text><text x="70" y="88" text-anchor="middle" font-size="11">{caption}</text></svg>')
+
+def sparkline(values, w=120, h=32):
+    lo, hi = min(values), max(values)
+    pts = " ".join(f"{k * w / (len(values) - 1):.1f},{h - 3 - (v - lo) / (hi - lo) * (h - 6):.1f}" for k, v in enumerate(values))
+    return f'<svg class="sparkline" viewBox="0 0 {w} {h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="{pts}"/></svg>'
+
 MONTHS = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
 REV = [21400, 23800, 22100, 27300, 26100, 31800, 30200, 36900, 34100, 48210, 41800, 44900]
 
@@ -605,6 +632,40 @@ showcase = f'''<body>
       <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="#components">{i("home")}Dashboard</a></li><li><a href="#components">Invoices</a></li><li><a href="#components">Halden Studio</a></li><li><span aria-current="page">INV-0193</span></li></ol></nav>
       <p class="text-sm text-ink-2 mt-6 max-w-[52ch]" data-demo-note>The command menu is a <code class="font-mono">.dialog</code> holding a search field and a <code class="font-mono">.listbox</code>. Open it from anywhere on this page, type to filter, and move with the arrow keys.</p>
       <button type="button" class="btn mt-4" data-open-command>{i("search")}Search or jump to<span class="kbd ml-1" data-kbd-mod>Ctrl K</span></button>""")}
+    {group("Accordion &amp; description list", ".accordion  .desc-list", f"""
+      <div class="accordion">
+        <details open><summary>When do reminders go out?</summary><p>The morning after a due date passes, then every seven days until the invoice is paid. You can change the schedule, or turn reminders off for one customer.</p></details>
+        <details><summary>Can customers pay by card?</summary><p>Yes. Every invoice has a pay link that takes card and bank transfer. Paid invoices update on their own.</p></details>
+        <details><summary>What happens when I void an invoice?</summary><p>The customer can no longer pay it and it leaves your outstanding total. The record stays in your history, marked void.</p></details>
+      </div>
+      <dl class="desc-list mt-6">
+        <div><dt>Invoice</dt><dd class="font-mono">INV-0193</dd></div>
+        <div><dt>Customer</dt><dd>Halden Studio</dd></div>
+        <div><dt>Issued</dt><dd>Oct 1, 2026</dd></div>
+        <div><dt>Amount</dt><dd class="tabular-nums">$4,820.00</dd></div>
+        <div><dt>Status</dt><dd><span class="badge lamp-ok">Paid</span></dd></div>
+      </dl>""")}
+    {group("Avatar group &amp; timeline", ".avatar-group  .timeline", f"""
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="avatar-group"><span class="avatar">MO</span><span class="avatar">DS</span><span class="avatar">LW</span><button type="button" class="avatar" popovertarget="team-more" style="anchor-name:--team-more" aria-label="3 more people">+3</button></div>
+        <p class="text-sm text-ink-2">6 people can send invoices</p>
+        <div class="popover" popover id="team-more" style="position-anchor:--team-more"><p class="engraved mb-3">Also on the team</p><ul class="grid gap-3">{"".join(f'<li class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{a}</span><span><span class="block text-sm font-semibold">{n}</span><span class="block text-[13px] text-ink-2">{r}</span></span></li>' for a, n, r in (("AB", "Ade Bello", "Member"), ("SM", "Sofia Marin", "Member"), ("KI", "Kenji Ito", "Viewer")))}</ul></div>
+      </div>
+      <ol class="timeline mt-7">
+        <li class="lamp-ok"><b>Paid in full</b> by card<time datetime="2026-10-28T09:14">Oct 28 · 9:14 AM</time></li>
+        <li class="lamp-warn"><b>Reminder sent</b> to billing@halden.studio<time datetime="2026-10-24T08:00">Oct 24 · 8:00 AM</time></li>
+        <li><b>Viewed</b> by Halden Studio<time datetime="2026-10-03T14:31">Oct 3 · 2:31 PM</time></li>
+        <li><b>Sent</b> by Mira Okafor<time datetime="2026-10-01T10:02">Oct 1 · 10:02 AM</time></li>
+      </ol>""")}
+    {group("Charts", ".chart  .sparkline", f"""
+      <div class="grid gap-x-10 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr] items-start">
+        <figure><figcaption><span class="block font-bold">Invoices sent</span><span class="block text-sm text-ink-2">Last six months</span></figcaption><div class="mt-4">{bar_chart([18, 22, 19, 27, 24, 31], ["May", "Jun", "Jul", "Aug", "Sep", "Oct"], "Invoices sent per month, May to October 2026. October: 31, the most in six months.")}</div></figure>
+        <figure><figcaption><span class="block font-bold">Where it stands</span><span class="block text-sm text-ink-2">By status, this quarter</span></figcaption>
+          <div class="mt-4 flex items-center gap-5"><div class="w-[132px] shrink-0">{donut([("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")], "$63.8k", "invoiced", "Invoiced this quarter: $63,800. Paid 62%, open 21%, overdue 9%, draft 8%.")}</div>
+          <ul class="grid gap-2 text-sm">{"".join(f'<li class="flex items-center justify-between gap-4"><span class="badge {l}">{n}</span><span class="tabular-nums text-ink-2">{p}%</span></li>' for n, p, l in (("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")))}</ul></div></figure>
+        <figure><figcaption><span class="block font-bold">In a readout</span><span class="block text-sm text-ink-2">A sparkline on LCD glass</span></figcaption>
+          <div class="lcd mt-4 px-5 py-4"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Revenue · 12 mo</p><p class="text-2xl font-semibold mt-1">$44,900</p><div class="mt-3">{sparkline(REV)}</div></div></figure>
+      </div>""", wide=True)}
     {group("Navigation &amp; data", ".nav-item  .seg  .ktable  .kbd  .lcd", f"""
       <div class="grid sm:grid-cols-[180px_1fr] gap-6 items-start">
         <nav class="flex flex-col gap-1" aria-label="Example"><a class="nav-item" href="#components" aria-current="page">{i("home")}Dashboard</a><a class="nav-item" href="#components">{i("file")}Invoices</a><a class="nav-item" href="#components">{i("users")}Customers</a></nav>

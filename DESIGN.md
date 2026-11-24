@@ -6,7 +6,7 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 
 | Level | Means | Used by | Recipe |
 |---|---|---|---|
-| Plane | The housing and every layout container | `.panel`, `.seam`, `.tabs`, `.empty`, tables, charts, sidebars, page sections | Flush. Moulded seam: 1px parting line + highlight lip. No drop shadow. |
+| Plane | The housing and every layout container | `.panel`, `.seam`, `.tabs`, `.empty`, `.accordion`, `.desc-list`, `.timeline`, `.chart`, tables, charts, sidebars, page sections | Flush. Moulded seam: 1px parting line + highlight lip. No drop shadow. |
 | Raised | A part you press | `.btn*`, `.key`, switch/range thumbs, selected `.seg` item, `.kbd` | `--k-raised`: specular top edge, lower lip, contact shadow, mid shadow, ambient falloff, faint top-left light bounce. Pressing swaps to `--k-pressed` and moves 1px. |
 | Recessed | A part that holds input or output | `.field`, `.input-group`, `.check`, `.radio`, `.switch` slot, `.seg` channel, `.range` track, `.lcd`, a checked `.choice-card`, the selected `.calendar` day, `.progress`, `.dropzone`, `.meter`, the current `.nav-item` | `--k-recessed`: inner contact at top, soft inner fill, highlight lip on the lower outside edge. |
 | Float | An overlay | `.menu`, `.popover`, an open `.combobox` list, `.dialog`, `.sheet`, `.toast`, `.tooltip` | `--k-float`: hairline, short + long ambient shadows. The only level with a long shadow. |
@@ -85,6 +85,11 @@ Command menu `.dialog.command`: a search `.input-group`, a `.listbox` of `role="
 Progress `.progress` is a recessed channel with an ink fill (`role="progressbar"`, `aria-valuenow`, the fill's `--v`). Without `aria-valuenow` it runs indeterminate. It is for a task in progress; `.meter` stays the LCD readout of a level.
 Spinner `.spinner` (`.spinner-lg`, or set `--spinner-size`) for a wait with no measurable progress; pair it with `role="status"` and hidden text. Skeleton `.skeleton` blocks stand in for content while it loads; size them with utilities and label the region (`role="status"`, `aria-label`).
 File upload: `.dropzone` is a recessed `<label>` around a file input, with `data-dragover` while a file is held over it. Each file is a `.file-item` row: `.file-icon`, `.file-name` and `.file-meta` (`.file-error` for a problem), an action button, and an optional `.progress` under the name.
+Accordion `.accordion` holds native `<details>`/`<summary>` rows divided by seams. Browsers with `::details-content` open it smoothly; others open at once.
+Description list `.desc-list` on a `<dl>` of `<div><dt><dd></div>` rows; it stacks below 640px.
+Avatar group `.avatar-group`: overlapping `.avatar`s with a ring the colour of the surface (`--ring`, the housing by default). A `button.avatar` at the end can open a `.popover` with the rest.
+Timeline `.timeline` on an `<ol>`: each `<li>` gets a lamp dot (`lamp-ok`, `lamp-warn`, …) and a `<time>` underneath.
+Charts: put `.chart` on an SVG and use `.chart-grid`, `.chart-bar` (`data-current` turns one bar ink), `.chart-value`, `.chart-track` and `.chart-seg` with a `lamp-*` class for donut segments, and `.chart-total`. Bars are plane, like all data. `.sparkline` is a stroke-only SVG that takes the colour of its parent, so it reads in LCD ink inside a `.lcd`. Give every chart `role="img"` and an `aria-label` that states the numbers.
 Empty states `.empty` centre an LCD `.lcd.readout` (`.readout-value`, `.readout-unit`), a heading, a short reason and `.empty-actions`. Say why it is empty and what to do next; the copy depends on the cause (no data yet, a filter, a search).
 Selection `.check`, `.radio`, `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`).
 Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`; add `.dialog-full` for a 90vw × 90vh dialog that holds a full view, nearly edge to edge on phones), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
@@ -107,6 +112,7 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Keyboard shortcuts | none | Overlays opened by a shortcut get `.no-motion`. |
 | Popover, combobox list | 180ms in; the popover leaves in 120ms, the list closes at once | Opacity + scale 0.96–0.97 from the anchored edge. |
 | Progress, spinner, skeleton | 300ms fill, 700ms spin, 1.5–1.6s loops | Reduced motion: the indeterminate bar and skeletons breathe in place instead of sweeping; the spinner slows. |
+| Accordion | 240ms open, 200ms chevron | Height animates with `interpolate-size` where supported. Reduced motion opens at once. |
 | Tabs | 120ms colour, 160ms indicator | The indicator appears under the new tab; it never slides across. |
 | Tooltip | 125ms, 400ms hover delay | Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
 
