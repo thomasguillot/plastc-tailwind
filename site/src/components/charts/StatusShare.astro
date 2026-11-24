@@ -22,6 +22,7 @@ const { class: cls = '' } = Astro.props;
     let hover: string | undefined;
     let focus: string | undefined;
     let pin: string | undefined;
+    const stop = (n: number) => btns.forEach((x, j) => (x.tabIndex = j === n ? 0 : -1));
     const paint = () => {
       const k = hover ?? focus ?? pin;
       items.forEach((li) => li.toggleAttribute('data-dim', k !== undefined && li.dataset.k !== k));
@@ -33,16 +34,14 @@ const { class: cls = '' } = Astro.props;
       const b = btns[i];
       li.addEventListener('pointerenter', () => { hover = k; paint(); });
       li.addEventListener('pointerleave', () => { hover = undefined; paint(); });
-      b.addEventListener('focus', () => { focus = k; paint(); });
+      b.addEventListener('focus', () => { focus = k; stop(i); paint(); });
       b.addEventListener('blur', () => { focus = undefined; paint(); });
-      b.addEventListener('click', () => { pin = pin === k ? undefined : k; paint(); });
+      b.addEventListener('click', () => { pin = pin === k ? undefined : k; stop(i); paint(); });
       b.addEventListener('keydown', (e) => {
         const d = ({ ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 } as Record<string, number>)[e.key];
         if (!d) return;
         e.preventDefault();
-        const n = (i + d + btns.length) % btns.length;
-        btns.forEach((x, j) => (x.tabIndex = j === n ? 0 : -1));
-        btns[n].focus();
+        btns[(i + d + btns.length) % btns.length].focus();
       });
     });
   });
