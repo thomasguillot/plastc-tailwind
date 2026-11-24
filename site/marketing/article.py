@@ -126,6 +126,10 @@ BLOG_POSTS = [
          date="Sep 16, 2026", iso="2026-09-16", mins=2, author="hana", visual="shortcuts"),
 ]
 
+for _p, _slug in zip(BLOG_POSTS, ("reminders-pause-on-reply", "payment-terms", "marlow-print-co", "bank-transfer-matching", "overdue-follow-up", "studio-varga", "keyboard-shortcuts")):
+    _p["slug"] = _slug
+    _p["href"] = "article.html" if _p is BLOG_POSTS[0] else f"post-{_slug}.html"
+
 def blog_cat_label(key):
     return dict(BLOG_CATEGORIES)[key]
 
@@ -137,12 +141,12 @@ def blog_byline(key, extra=""):
     name, ini, role = BLOG_AUTHORS[key]
     return f'<div class="byline"><span class="avatar !w-8 !h-8 !text-[11px]">{ini}</span><div><strong>{name}</strong>{extra or role}</div></div>'
 
-def blog_post_card(p, href="article.html", tag="h3"):
+def blog_post_card(p, tag="h3"):
     visual = blog_reply_fragment(compact=True) if p["visual"] == "reply" else BLOG_VISUALS[p["visual"]]
     return f'''<article class="post-card" data-category="{p["cat"]}">
   {blog_visual_well(visual)}
   {blog_post_meta(p)}
-  <{tag}><a href="{href}">{p["title"]}</a></{tag}>
+  <{tag}><a href="{p["href"]}">{p["title"]}</a></{tag}>
   <p class="text-[15px] leading-normal text-ink-2 -mt-1">{p["summary"]}</p>
   {blog_byline(p["author"])}
 </article>'''
@@ -160,20 +164,21 @@ def blog_subscribe(id_):
 </section>'''
 
 
-_post = BLOG_POSTS[0]
-_name, _ini, _role = BLOG_AUTHORS[_post["author"]]
-_blog_article = f'''<article>
+def blog_article_page(post, body, related, lede_extra=""):
+    name, ini, role = BLOG_AUTHORS[post["author"]]
+    cat = post["cat"]
+    html = f'''<article>
   <header class="max-w-[1200px] mx-auto px-4 md:px-8 pt-10 md:pt-16">
     <div class="max-w-[648px] mx-auto">
-      <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="blog.html">Blog</a></li><li><a href="blog.html?category=product">Product updates</a></li><li><span aria-current="page">{_post["title"]}</span></li></ol></nav>
-      <h1 class="display text-[38px] sm:text-[48px] md:text-[56px] mt-6 text-balance">{_post["title"]}</h1>
-      <p class="text-lg md:text-xl text-ink-2 mt-5 leading-relaxed text-pretty">{_post["summary"]} You do not need to change anything to get it.</p>
-      <div class="byline mt-8 pb-8 border-b border-[color:var(--k-seam)]"><span class="avatar">{_ini}</span><div><strong>{_name}</strong><p class="post-meta"><span>{_role}</span><time datetime="{_post["iso"]}">{_post["date"]}</time><span>{_post["mins"]} min read</span></p></div></div>
+      <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="blog.html">Blog</a></li><li><a href="blog.html?category={cat}">{blog_cat_label(cat)}</a></li><li><span aria-current="page">{post["title"]}</span></li></ol></nav>
+      <h1 class="display text-[38px] sm:text-[48px] md:text-[56px] mt-6 text-balance">{post["title"]}</h1>
+      <p class="text-lg md:text-xl text-ink-2 mt-5 leading-relaxed text-pretty">{post["summary"]}{lede_extra}</p>
+      <div class="byline mt-8 pb-8 border-b border-[color:var(--k-seam)]"><span class="avatar">{ini}</span><div><strong>{name}</strong><p class="post-meta"><span>{role}</span><time datetime="{post["iso"]}">{post["date"]}</time><span>{post["mins"]} min read</span></p></div></div>
     </div>
   </header>
   <div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-10 md:pt-12 pb-6">
     <div class="prose mx-auto">
-{BLOG_ARTICLE_BODY}
+{body}
     </div>
   </div>
 </article>
@@ -183,9 +188,12 @@ _blog_article = f'''<article>
     <h2 id="more-h" class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em]">More from the blog</h2>
     <a class="btn btn-sm" href="blog.html">All posts{i("right", "w-4 h-4")}</a>
   </div>
-  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">{"".join(blog_post_card(p, href="blog.html") for p in (BLOG_POSTS[3], BLOG_POSTS[4], BLOG_POSTS[1]))}</div>
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">{"".join(blog_post_card(p) for p in related)}</div>
 </section>
 
 {blog_subscribe("article-sub")}
 '''
-mkt_page("screens/article.html", f'{_post["title"]} · Plastc', _blog_article, active="blog")
+    mkt_page("screens/" + post["href"], f'{post["title"]} · Plastc', html, active="blog")
+
+
+blog_article_page(BLOG_POSTS[0], BLOG_ARTICLE_BODY, (BLOG_POSTS[3], BLOG_POSTS[4], BLOG_POSTS[1]), " You do not need to change anything to get it.")

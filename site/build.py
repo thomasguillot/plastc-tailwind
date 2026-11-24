@@ -636,7 +636,7 @@ PLANS = [
     ("Practice", "29", "290", "For firms with many clients.", ["Unlimited people", "Unlimited invoices", "Your own domain for pay links", "Priority support"], False, "Start with Practice"),
 ]
 plan_cards = "".join(f'''<article class="plan"{' data-featured' if feat else ''}>
-  <div><div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold">{name}</h3>{'<span class="badge lamp-signal">Recommended</span>' if feat else ''}</div><p class="text-sm text-ink-2 mt-1">{blurb}</p></div>
+  <div><div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold">{name}</h3>{'<span class="badge lamp-ok">Recommended</span>' if feat else ''}</div><p class="text-sm text-ink-2 mt-1">{blurb}</p></div>
   <p class="plan-price"><span data-price data-monthly="${mo}" data-yearly="${yr}">${mo}</span><small data-price-unit>/ month</small></p>
   <ul class="check-list">{"".join(f"<li>{x}</li>" for x in feats)}</ul>
   <a class="btn {'btn-signal' if feat else ''} w-full" href="sign-in.html">{cta}</a>
