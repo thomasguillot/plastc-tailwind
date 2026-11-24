@@ -4,8 +4,21 @@ interface Props {
   labels: string[];
   highlight?: number;
   class?: string;
+  label?: string;
+  ticks?: number[];
+  format?: (v: number) => string;
+  id?: string;
 }
-const { values, labels, highlight = 9, class: cls = 'h-[220px] sm:h-[260px]' } = Astro.props;
+const {
+  values,
+  labels,
+  highlight = 9,
+  class: cls = 'h-[220px] sm:h-[260px]',
+  label = 'Revenue by month, November 2025 to October 2026. October $44,900; peak $48,210 in August.',
+  ticks: tickValues = [10000, 20000, 30000, 40000, 50000],
+  format = (v: number) => `$${Math.floor(v / 1000)}k`,
+  id = 'fillg',
+} = Astro.props;
 const hi = Math.max(...values) * 1.15;
 const n = values.length;
 const X = (k: number) => (k * 100) / (n - 1);
@@ -23,18 +36,18 @@ for (let k = 0; k < n - 1; k++) {
   d += ` C${f(c1[0])},${f(c1[1])} ${f(c2[0])},${f(c2[1])} ${f(p2[0])},${f(p2[1])}`;
 }
 const area = `${d} L${f(pts[n - 1][0])},100 L${f(pts[0][0])},100 Z`;
-const ticks = [10000, 20000, 30000, 40000, 50000].filter((v) => v < hi);
+const ticks = tickValues.filter((v) => v < hi);
 const [hx, hy] = pts[highlight];
 ---
-<div class={`relative ml-10 mt-3 mb-8 ${cls}`} role="img" aria-label="Revenue by month, November 2025 to October 2026. October $44,900; peak $48,210 in August.">
+<div class={`relative ml-10 mt-3 mb-8 ${cls}`} role="img" aria-label={label}>
   <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
-    <defs><linearGradient id="fillg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".10"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+    <defs><linearGradient id={id} x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".10"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
     <g fill="none">{ticks.map((v) => <line x1="0" x2="100" y1={f(Y(v))} y2={f(Y(v))} vector-effect="non-scaling-stroke" class="stroke-[color:var(--k-seam)]"/>)}</g>
-    <path d={area} fill="url(#fillg)" class="text-ink"/>
+    <path d={area} fill={`url(#${id})`} class="text-ink"/>
     <path d={d} fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" class="text-ink" stroke-linejoin="round" stroke-linecap="round"/>
     <line x1={f(hx)} x2={f(hx)} y1={f(hy)} y2="100" stroke="currentColor" vector-effect="non-scaling-stroke" class="text-ink" stroke-dasharray="2 3"/>
   </svg>
   <span class="absolute size-3.5 -translate-1/2 rounded-full bg-ink border-[2.5px] border-[color:var(--k-housing)]" style={`left:${f(hx)}%;top:${f(hy)}%`} aria-hidden="true"></span>
-  <div aria-hidden="true">{ticks.map((v) => <span class="absolute right-full pr-2 -translate-y-1/2 text-xs text-ink-2 tabular-nums" style={`top:${f(Y(v))}%`}>${Math.floor(v / 1000)}k</span>)}</div>
+  <div aria-hidden="true">{ticks.map((v) => <span class="absolute right-full pr-2 -translate-y-1/2 text-xs text-ink-2 tabular-nums" style={`top:${f(Y(v))}%`}>{format(v)}</span>)}</div>
   <div class="absolute inset-x-0 top-full pt-2" aria-hidden="true">{labels.map((l, k) => <span class={`absolute -translate-x-1/2 text-xs text-ink-2${k % 3 === 2 ? '' : ' max-sm:hidden'}`} style={`left:${f(X(k))}%`}>{l}</span>)}</div>
 </div>
