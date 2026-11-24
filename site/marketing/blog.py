@@ -21,7 +21,7 @@ _blog = f'''{page_header("Blog", "Product updates, guides to getting paid on tim
       {blog_post_meta(_featured)}
       <div class="byline mt-2"><span class="avatar">{_fini}</span><div><strong>{_fname}</strong>{_frole}</div></div>
     </div>
-    <div class="rounded-[16px] seam p-5 sm:p-6 max-md:mt-2" aria-hidden="true">{blog_reply_fragment(compact=True)}</div>
+    <div class="max-md:mt-2" aria-hidden="true">{blog_reply_fragment(compact=True)}</div>
   </article>
 
   <section class="mt-14 md:mt-16" aria-labelledby="latest-h" data-post-group>

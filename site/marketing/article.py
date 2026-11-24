@@ -39,7 +39,7 @@ BLOG_VISUALS = {
 }
 
 def blog_visual_well(html, cls="h-[168px]"):
-    return f'<div class="rounded-[14px] seam {cls} grid items-center p-4 overflow-hidden" aria-hidden="true"><div class="min-w-0 w-full grid justify-items-center"><div class="w-full max-w-[300px]">{html}</div></div></div>'
+    return f'<div class="{cls} grid items-center overflow-hidden" aria-hidden="true"><div class="min-w-0 w-full grid justify-items-center"><div class="w-full max-w-[300px]">{html}</div></div></div>'
 
 
 def _blog_article_body():
