@@ -8,18 +8,42 @@ interface Props {
 const { class: cls = '' } = Astro.props;
 ---
 <div class={`share flex flex-wrap items-center gap-6 ${cls}`} data-share>
-  <div class="w-[140px] shrink-0 [[data-hl='0']_&_.chart-seg:not([data-k='0'])]:opacity-35 [[data-hl='1']_&_.chart-seg:not([data-k='1'])]:opacity-35 [[data-hl='2']_&_.chart-seg:not([data-k='2'])]:opacity-35 [[data-hl='3']_&_.chart-seg:not([data-k='3'])]:opacity-35"><Donut segments={STATUS_SHARE} total="$63.8k" caption="invoiced" label={STATUS_SHARE_LABEL} /></div>
-  <ul class="grid gap-2 text-sm min-w-[150px] flex-1" aria-label="Share by status">{STATUS_SHARE.map(({ name, value, lamp }, k) => <li data-k={k} tabindex="0" class="flex items-center justify-between gap-4 rounded-md outline-offset-4 [[data-hl='0']_&:not([data-k='0'])]:opacity-35 [[data-hl='1']_&:not([data-k='1'])]:opacity-35 [[data-hl='2']_&:not([data-k='2'])]:opacity-35 [[data-hl='3']_&:not([data-k='3'])]:opacity-35"><span class={`badge ${lamp}`}>{name}</span><span class="tabular-nums text-ink-2">{value}%</span></li>)}</ul>
+  <div class="w-[140px] shrink-0"><Donut segments={STATUS_SHARE} total="$63.8k" caption="invoiced" label={STATUS_SHARE_LABEL} /></div>
+  <ul class="grid gap-2 text-sm min-w-[150px] flex-1" aria-label="Share by status">{STATUS_SHARE.map(({ name, value, lamp }, k) => <li data-k={k}><button type="button" tabindex={k === 0 ? 0 : -1} aria-pressed="false" class="flex w-full items-center justify-between gap-4 rounded-md text-left outline-offset-4 cursor-pointer"><span class={`badge ${lamp}`}>{name}</span><span class="tabular-nums text-ink-2">{value}%</span></button></li>)}</ul>
 </div>
+<style is:global>
+  .share [data-dim]{opacity:.35}
+</style>
 <script>
   document.querySelectorAll<HTMLElement>('[data-share]').forEach((root) => {
-    const set = (k?: string) => (k === undefined ? root.removeAttribute('data-hl') : root.setAttribute('data-hl', k));
-    root.querySelectorAll<HTMLElement>('li[data-k]').forEach((li) => {
+    const items = [...root.querySelectorAll<HTMLElement>('li[data-k]')];
+    const segs = [...root.querySelectorAll<SVGElement>('.chart-seg')];
+    const btns = items.map((li) => li.querySelector('button')!);
+    let hover: string | undefined;
+    let focus: string | undefined;
+    let pin: string | undefined;
+    const paint = () => {
+      const k = hover ?? focus ?? pin;
+      items.forEach((li) => li.toggleAttribute('data-dim', k !== undefined && li.dataset.k !== k));
+      segs.forEach((s) => s.toggleAttribute('data-dim', k !== undefined && s.dataset.k !== k));
+      btns.forEach((b, i) => b.setAttribute('aria-pressed', String(items[i].dataset.k === pin)));
+    };
+    items.forEach((li, i) => {
       const k = li.dataset.k;
-      li.addEventListener('pointerenter', () => set(k));
-      li.addEventListener('pointerleave', () => set());
-      li.addEventListener('focus', () => set(k));
-      li.addEventListener('blur', () => set());
+      const b = btns[i];
+      li.addEventListener('pointerenter', () => { hover = k; paint(); });
+      li.addEventListener('pointerleave', () => { hover = undefined; paint(); });
+      b.addEventListener('focus', () => { focus = k; paint(); });
+      b.addEventListener('blur', () => { focus = undefined; paint(); });
+      b.addEventListener('click', () => { pin = pin === k ? undefined : k; paint(); });
+      b.addEventListener('keydown', (e) => {
+        const d = ({ ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 } as Record<string, number>)[e.key];
+        if (!d) return;
+        e.preventDefault();
+        const n = (i + d + btns.length) % btns.length;
+        btns.forEach((x, j) => (x.tabIndex = j === n ? 0 : -1));
+        btns[n].focus();
+      });
     });
   });
 </script>
