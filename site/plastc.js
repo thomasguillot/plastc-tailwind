@@ -405,6 +405,26 @@
     li.remove(); live(`${name} removed`);
   });
 
+  $$('form[data-newsletter]').forEach(f => {
+    const input = $('input[type=email]', f), err = $('[data-newsletter-error]', f), btn = $('[type=submit]', f);
+    const done = document.getElementById(f.dataset.newsletter);
+    const problem = () => { const v = input.value.trim(); return !v ? 'Enter your email address.' : /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? '' : 'Enter a full email address, like you@studio.com.'; };
+    const showError = msg => { input.setAttribute('aria-invalid', String(!!msg)); err.textContent = msg; err.hidden = !msg; };
+    input.addEventListener('input', () => { if (input.getAttribute('aria-invalid') === 'true' && !problem()) showError(''); });
+    f.addEventListener('submit', e => {
+      e.preventDefault();
+      const msg = problem(); showError(msg);
+      if (msg) { input.focus(); return; }
+      btn.setAttribute('aria-busy', 'true'); btn.disabled = true;
+      setTimeout(() => {
+        btn.removeAttribute('aria-busy'); btn.disabled = false;
+        if (done) { $('[data-newsletter-email]', done).textContent = input.value.trim(); f.hidden = true; done.hidden = false; done.focus(); }
+        else toast('Subscribed');
+      }, 700);
+    });
+    if (done) $$('[data-newsletter-reset]', done).forEach(b => b.addEventListener('click', () => { input.value = ''; done.hidden = true; f.hidden = false; input.focus(); }));
+  });
+
   /* ---------- pricing: monthly or yearly */
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-billing]'); if (!b) return;
