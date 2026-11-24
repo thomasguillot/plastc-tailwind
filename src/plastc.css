@@ -1238,8 +1238,7 @@
   .check:checked, .radio:checked, .switch:checked { background: Highlight; }
   .switch::before { border: 1px solid CanvasText; }
   .badge::before { forced-color-adjust: none; }
-  .ktable tbody tr:has(input[type="checkbox"]:checked) > td { border-block-color: Highlight; }
-  .ktable tbody tr:has(input[type="checkbox"]:checked) > td:first-child { border-inline-start: 4px solid Highlight; }
+  .ktable tbody tr:has(input[type="checkbox"]:checked) { outline: 2px solid Highlight; outline-offset: -2px; }
 }
 
 /* Keyboard-opened overlays appear instantly: shortcuts are used too often to animate. */
