@@ -1,5 +1,5 @@
 // Plastc demo behaviour. The library itself is CSS; this file only wires the
-// reference pages: housing, depth, tabs, dialogs, toasts, selection, copy.
+// reference pages: theme, depth, tabs, dialogs, toasts, selection, copy.
 (function () {
   const root = document.documentElement;
   const $ = (s, el = document) => el.querySelector(s);
@@ -7,19 +7,20 @@
   const live = msg => { const l = $('#live'); if (l) { l.textContent = ''; setTimeout(() => l.textContent = msg, 30); } };
   const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 
-  /* ---------- housing + depth */
-  function setHousing(h) {
-    root.dataset.housing = h; save('plastc-housing', h);
-    $$('[data-set-housing]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setHousing === h)));
-    $$('[data-housing-readout]').forEach(el => el.textContent = h === 'dark' ? 'Dark' : 'Light');
-    $$('[data-housing-next]').forEach(el => el.textContent = h === 'dark' ? 'Switch to light' : 'Switch to dark');
+  /* ---------- theme + depth */
+  function setTheme(h) {
+    root.dataset.theme = h; save('plastc-theme', h);
+    $$('[data-set-theme]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setTheme === h)));
+    $$('[data-theme-readout]').forEach(el => el.textContent = h === 'dark' ? 'Dark' : 'Light');
+    $$('[data-theme-next]').forEach(el => el.textContent = h === 'dark' ? 'Switch to light' : 'Switch to dark');
   }
   function setDepth(d) {
     root.style.setProperty('--k-depth', d);
     $$('[data-set-depth]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setDepth === String(d))));
     $$('[data-depth-readout]').forEach(el => el.textContent = (+d).toFixed(1));
   }
-  setHousing(root.dataset.housing || 'light');
+  setTheme(root.dataset.theme || 'light');
+  addEventListener('storage', e => { if (e.key === 'plastc-theme' && (e.newValue === 'light' || e.newValue === 'dark')) setTheme(e.newValue); });
 
   /* ---------- toast */
   const toastEl = $('#toast');
@@ -81,7 +82,7 @@
     });
     const sel = $('[data-screen-select]', viewer); if (sel) sel.addEventListener('change', () => showScreen(sel.value));
     viewer.addEventListener('close', () => {
-      try { const h = localStorage.getItem('plastc-housing'); if (h === 'light' || h === 'dark') setHousing(h); } catch (e) {}
+      try { const h = localStorage.getItem('plastc-theme'); if (h === 'light' || h === 'dark') setTheme(h); } catch (e) {}
     });
   }
 
@@ -121,15 +122,15 @@
   document.addEventListener('click', e => {
     const t = e.target;
     const co = t.closest('#command [role=option]'); if (co) co.closest('dialog').close();
-    if (t.closest('[data-command="housing"]')) return setHousing(root.dataset.housing === 'dark' ? 'light' : 'dark');
+    if (t.closest('[data-command="theme"]')) return setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
     if (t.closest('[data-open-command]')) return openCommand(false);
     const ct = t.closest('[data-combobox-toggle]');
     if (ct) { const inp = $('input[role=combobox]', ct.closest('.combobox')); if (listboxFor(inp).hidden) { openList(inp); filterList(inp, true); } else closeList(inp); inp.focus(); return; }
     const opt = t.closest('.combobox [role=option]');
     if (opt) { choose($('input[role=combobox]', opt.closest('.combobox')), opt); return; }
-    const h = t.closest('[data-set-housing]'); if (h) return setHousing(h.dataset.setHousing);
+    const h = t.closest('[data-set-theme]'); if (h) return setTheme(h.dataset.setTheme);
     const d = t.closest('[data-set-depth]'); if (d) return setDepth(d.dataset.setDepth);
-    if (t.closest('[data-reset]')) { setDepth('1'); setHousing('light'); return; }
+    if (t.closest('[data-reset]')) { setDepth('1'); setTheme('light'); return; }
 
     const od = t.closest('[data-open-dialog]'); if (od) { e.preventDefault(); closePopovers(); return openDialog(od.dataset.openDialog); }
     const cd = t.closest('[data-close-dialog]'); if (cd) return cd.closest('dialog').close();

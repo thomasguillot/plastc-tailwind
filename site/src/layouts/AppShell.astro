@@ -7,7 +7,7 @@ import NavBlock from '../components/app/NavBlock.astro';
 import InvoiceDialogs from '../components/app/InvoiceDialogs.astro';
 import CommandMenu, { type CommandGroup } from '../components/CommandMenu.astro';
 import { NAV } from '../data/app';
-import { HOUSING_COMMAND } from '../data/commands';
+import { THEME_COMMAND } from '../data/commands';
 
 interface Props {
   title: string;
@@ -22,7 +22,7 @@ const commands: CommandGroup[] = [
     label: 'Actions',
     items: [
       { icon: 'plus', text: 'New invoice', attrs: { 'data-open-dialog': 'new-invoice' }, kbd: 'N' },
-      HOUSING_COMMAND,
+      THEME_COMMAND,
       { icon: 'logout', text: 'Sign out', attrs: { href: 'sign-in.html' } },
       { icon: 'left', text: 'Back to Plastc', attrs: { href: '../index.html', target: '_top' } },
     ],

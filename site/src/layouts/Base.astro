@@ -24,7 +24,7 @@ const css = root + cssHref.replace(/^\//, '');
 <link rel="icon" href={`${root}favicon.ico`} sizes="32x32">
 <link rel="icon" href={`${root}favicon.svg`} type="image/svg+xml">
 <link rel="apple-touch-icon" href={`${root}apple-touch-icon.png`}>
-<script is:inline>(function(){var r=document.documentElement,h=null;try{h=localStorage.getItem('plastc-housing')}catch(e){}if(h!=='light'&&h!=='dark'){var t=r.getAttribute('data-theme');h=(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light'}r.dataset.housing=h})();</script>
+<script is:inline>(function(){var r=document.documentElement,h=null;try{h=localStorage.getItem('plastc-theme')}catch(e){}if(h!=='light'&&h!=='dark'){var t=r.getAttribute('data-theme');h=(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light'}r.dataset.theme=h})();</script>
 </head>
 <body class={bodyClass}>
 <slot />

@@ -18,10 +18,10 @@
  *
  * Shadows are built from physical light, top-left: a tight contact shadow,
  * a soft ambient falloff, a specular top edge and a lower lip. All alpha, so
- * they sit correctly on either housing.
+ * they sit correctly in either theme.
  *
- * Housings: light by default. data-housing="dark" on any ancestor for dark,
- * data-housing="light" to switch back inside a dark region. .depth-soft / .depth-deep scale every shadow in a region.
+ * Themes: light by default. data-theme="dark" on any ancestor for dark,
+ * data-theme="light" to switch back inside a dark region. .depth-soft / .depth-deep scale every shadow in a region.
  *
  * Motion: presses go down fast and return slower; overlays enter with
  * @starting-style and leave faster than they arrive; nothing animates on
@@ -31,7 +31,7 @@
 /* ---------------------------------------------------------------- tokens */
 
 :root,
-[data-housing="light"] {
+[data-theme="light"] {
   --k-housing: #dcd8cf;
   --k-housing-up: #e7e4dc;
   --k-housing-down: #d1ccc2;
@@ -66,7 +66,7 @@
   color-scheme: light;
 }
 
-[data-housing="dark"] {
+[data-theme="dark"] {
   --k-housing: #2b2a27;
   --k-housing-up: #343330;
   --k-housing-down: #21201c;
@@ -190,9 +190,9 @@
   --dur-toast-out: 240ms;
 }
 
-/* Shadow recipes, re-declared wherever housing or depth can change so they
+/* Shadow recipes, re-declared wherever the theme or depth can change so they
    resolve against the local values. */
-:root, [data-housing], .depth-soft, .depth-deep {
+:root, [data-theme], .depth-soft, .depth-deep {
   --d: var(--k-depth, 1);
   --k-raised:
     inset 0 1px 0 rgb(var(--k-hl) / calc(0.85 * var(--k-hl-a))),

@@ -19,19 +19,19 @@ One sanctioned exception: the showcase hero unit is a raised housing because it 
 
 LCD rule: the LCD is a material. As a readout set into the housing (KPI band, meter, empty-state counter) it is recessed. Toasts and tooltips are LCD labels cut as separate floating parts, so they take `--k-float`; nothing raised ever sits on LCD glass (use `.lcd-action`).
 
-Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined. A latched `.key[aria-pressed=true]` sits in that darker well in both housings.
+Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined. A latched `.key[aria-pressed=true]` sits in that darker well in both themes.
 
-Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per housing, so one recipe works on both housings. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-housing]`, `.depth-soft` and `.depth-deep` so they resolve locally.
+Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per theme, so one recipe works in both themes. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-theme]`, `.depth-soft` and `.depth-deep` so they resolve locally.
 
-## Housings
+## Themes
 
-- **Light** (default, or `data-housing="light"`): `#dcd8cf` warm grey ABS, umber shadows, warm-white highlights.
-- **Dark**: `data-housing="dark"` on any ancestor. `#2b2a27` smoked plastic; shadows strengthen (×2.6), highlights drop to 16%.
+- **Light** (default, or `data-theme="light"`): `#dcd8cf` warm grey ABS, umber shadows, warm-white highlights.
+- **Dark**: `data-theme="dark"` on any ancestor. `#2b2a27` smoked plastic; shadows strengthen (×2.6), highlights drop to 16%.
 
 ## Colour
 
-- Semantic (housing-aware): `housing(-up/-down)`, `ink`, `ink-2` (secondary, ≥6:1), `ink-3` (placeholder, ≥4.5:1), `lcd`, `lcd-ink`, `lcd-dim`, `signal`, `signal-text` (orange for text on housing), `go`, `danger`, `warn`, `ok`.
-- Scales: `gray-25…950` (warm, tuned to the light housing), `brand-25…950` (signal orange), `success`, `warning`, `error`.
+- Semantic (theme-aware): `housing(-up/-down)`, `ink`, `ink-2` (secondary, ≥6:1), `ink-3` (placeholder, ≥4.5:1), `lcd`, `lcd-ink`, `lcd-dim`, `signal`, `signal-text` (orange for text on housing), `go`, `danger`, `warn`, `ok`.
+- Scales: `gray-25…950` (warm, tuned to the light theme), `brand-25…950` (signal orange), `success`, `warning`, `error`.
 - Signal orange marks the one primary action per view. Green (`btn-go`) is for confirm/positive actions. Status uses lamps (`.badge.lamp-*`), not filled pills.
 - The sage LCD is a readout material: key figures, toasts, tooltips, code lines. Text inside is Geist Mono.
 
@@ -46,7 +46,7 @@ Classes are unprefixed (`btn`, `field`, `panel`), the same convention as other T
 
 ## Accessibility
 
-Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 0.0.98G). Targets: body text Lc 75+, labels and short bold text Lc 60+, placeholders and large text Lc 45+. WCAG 2 alone overrates light-on-dark, so dark-housing tokens are tuned to APCA.
+Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 0.0.98G). Targets: body text Lc 75+, labels and short bold text Lc 60+, placeholders and large text Lc 45+. WCAG 2 alone overrates light-on-dark, so dark-theme tokens are tuned to APCA.
 
 | Pair | Light WCAG | Light Lc | Dark WCAG | Dark Lc |
 |---|---|---|---|---|
@@ -54,7 +54,7 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | Secondary ink-2 | 8.8:1 | 76 | 10.0:1 | 79 |
 | Placeholder ink-3 | 4.9:1 | 58 | 6.2:1 | 50 |
 | Input affix (ink-2 in a recessed well) | 7.9:1 | 69 | 11.4:1 | 80 |
-| Orange button label (white on `#c4470e`→`#b23c0a`, both housings) | 4.9–5.9:1 | 79–84 | same | same |
+| Orange button label (white on `#c4470e`→`#b23c0a`, both themes) | 4.9–5.9:1 | 79–84 | same | same |
 | Green button label | 4.7:1 | 78 | 4.7:1 | 78 |
 | Orange text (`signal-text`, reserved; links now use ink + underline) | 6.3:1 | 67 | 7.6:1 | 63 |
 | Error text / overdue counts | 6.2:1 | 66 | 8.8:1 | 71 (69 on menus) |
@@ -66,7 +66,7 @@ Disabled text (`--k-ink-off`) is deliberately below these (about 3:1); WCAG exem
 
 Orange is only the primary action (plus the range fill). Overdue counts use `danger` (matching the red lamps); links are ink and underlined; the chart highlight is ink; text selection is an ink tint.
 
-Focus is its own token: a 2px ink ring (light ink in dark) with an offset, never orange, so it can't be confused with the primary action or an error. Orange means "the primary action" (plus the range fill); radio dots are ink. Field edges carry a 30% umber ring; a `forced-colors` block gives every part a real border in Windows High Contrast. The housings are called light and dark everywhere: labels, docs and the `data-housing` values.
+Focus is its own token: a 2px ink ring (light ink in dark) with an offset, never orange, so it can't be confused with the primary action or an error. Orange means "the primary action" (plus the range fill); radio dots are ink. Field edges carry a 30% umber ring; a `forced-colors` block gives every part a real border in Windows High Contrast. The themes are called light and dark everywhere: labels, docs and the `data-theme` values.
 
 Pressing a coloured button keeps its colour: variants set `--btn-pressed-bg` / `--btn-pressed-shadow`, which `.btn:active` reads.
 

@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import SkipLink from '../components/SkipLink.astro';
 import Icon from '../components/Icon.astro';
 import Wordmark from '../components/Wordmark.astro';
-import HousingSeg from '../components/HousingSeg.astro';
+import ThemeSeg from '../components/ThemeSeg.astro';
 import CommandMenu, { type CommandGroup } from '../components/CommandMenu.astro';
 import ShowcaseGroup from '../components/showcase/ShowcaseGroup.astro';
 import Spec from '../components/showcase/Spec.astro';
@@ -26,7 +26,7 @@ import AvatarTimeline from '../components/showcase/examples/AvatarTimeline.astro
 import Charts from '../components/showcase/examples/Charts.astro';
 import NavigationData from '../components/showcase/examples/NavigationData.astro';
 import { GITHUB_SVG } from '../lib/icons';
-import { HOUSING_COMMAND } from '../data/commands';
+import { THEME_COMMAND } from '../data/commands';
 import { CSS_KB, CSS_ON_GITHUB, DESCRIPTION, HOME_TITLE, IMPORT_LINE, REPO, SITE, VERSION } from '../data/site';
 import { DEPTH_TOKENS, GROUPS, MARKETING_SCREENS, SCALE, SCREENS } from '../data/showcase';
 
@@ -66,7 +66,7 @@ const commands: CommandGroup[] = [
   {
     label: 'Actions',
     items: [
-      HOUSING_COMMAND,
+      THEME_COMMAND,
       { icon: 'down', text: 'Download plastc.css', attrs: { href: 'plastc.css', download: true } },
       { icon: 'copy', text: 'Copy the import line', attrs: { 'data-copy': IMPORT_LINE } },
       { icon: 'external', text: 'Source on GitHub', attrs: { href: REPO } },
@@ -90,7 +90,7 @@ const colors = ['success', 'warning', 'error'].flatMap((c) => [50, 300, 600].map
   <Wordmark href="#top" root="" />
   <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Sections"><a class="btn btn-quiet btn-sm" href="#depth">Depth</a><a class="btn btn-quiet btn-sm" href="#components">Components</a><a class="btn btn-quiet btn-sm" href="#screens">Screens</a><a class="btn btn-quiet btn-sm" href="#install">Install</a></nav>
   <a class="btn btn-quiet btn-sm ml-auto" href={REPO}><Fragment set:html={GITHUB_SVG} /><span class="sr-only sm:not-sr-only">GitHub</span></a>
-  <HousingSeg />
+  <ThemeSeg />
 </header>
 
 <main id="main">
@@ -106,7 +106,7 @@ const colors = ['success', 'warning', 'error'].flatMap((c) => [50, 300, 600].map
     <div class="rounded-[34px] p-6 sm:p-7 bg-[image:var(--k-cast)] shadow-[var(--k-raised)]">
       <div class="lcd px-5 py-4 flex items-end justify-between">
         <div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Depth</p><p class="text-[40px] font-semibold leading-none mt-1" data-depth-readout>1.0</p></div>
-        <div class="text-right"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Housing</p><p class="text-lg font-semibold mt-1 uppercase" data-housing-readout>Light</p></div>
+        <div class="text-right"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Theme</p><p class="text-lg font-semibold mt-1 uppercase" data-theme-readout>Light</p></div>
       </div>
       <p class="engraved mt-7 mb-3" id="dk">Depth</p>
       <div class="grid grid-cols-3 gap-4" role="group" aria-labelledby="dk">
@@ -114,10 +114,10 @@ const colors = ['success', 'warning', 'error'].flatMap((c) => [50, 300, 600].map
         <button class="key text-sm" data-set-depth="1" aria-pressed="true">Normal</button>
         <button class="key text-sm" data-set-depth="1.7" aria-pressed="false">Deep</button>
       </div>
-      <p class="engraved mt-6 mb-3" id="hk">Housing</p>
+      <p class="engraved mt-6 mb-3" id="hk">Theme</p>
       <div class="grid grid-cols-3 gap-4" role="group" aria-labelledby="hk">
-        <button class="key text-[13px]" data-set-housing="light" aria-pressed="true">Light</button>
-        <button class="key text-[13px]" data-set-housing="dark" aria-pressed="false">Dark</button>
+        <button class="key text-[13px]" data-set-theme="light" aria-pressed="true">Light</button>
+        <button class="key text-[13px]" data-set-theme="dark" aria-pressed="false">Dark</button>
         <button class="key text-[13px]" data-reset>Reset</button>
       </div>
     </div>
@@ -182,7 +182,7 @@ const colors = ['success', 'warning', 'error'].flatMap((c) => [50, 300, 600].map
   </div>
   <div class="grid gap-10 lg:grid-cols-2 mt-10">
     <div>
-      <h3 class="engraved mb-4">Gray · warm, tuned to the light housing</h3>
+      <h3 class="engraved mb-4">Gray · warm, tuned to the light theme</h3>
       <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{SCALE.map((n) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-gray-${n}`} title={`gray-${n}`}></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>)}</div>
       <h3 class="engraved mt-7 mb-4">Brand · signal orange</h3>
       <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{SCALE.map((n) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-brand-${n}`} title={`brand-${n}`}></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>)}</div>
@@ -215,7 +215,7 @@ const colors = ['success', 'warning', 'error'].flatMap((c) => [50, 300, 600].map
         <pre class="code min-w-0">{IMPORT_LINE}</pre></li>
       <li><p class="font-bold mb-2">Load Geist</p>
         <div class="flex items-start gap-3"><pre class="code flex-1 min-w-0">{fontLink}</pre><button class="btn btn-sm shrink-0 mt-1.5" data-copy={fontLink}><Icon name="copy" />Copy</button></div></li>
-      <li><p class="font-bold mb-2">Pick a housing</p><p class="text-sm text-ink-2">Light is the default. Add <code class="font-mono">data-housing="dark"</code> to <code class="font-mono">&lt;html&gt;</code> (or any section) for dark.</p></li>
+      <li><p class="font-bold mb-2">Pick a theme</p><p class="text-sm text-ink-2">Light is the default. Add <code class="font-mono">data-theme="dark"</code> to <code class="font-mono">&lt;html&gt;</code> (or any section) for dark.</p></li>
     </ol>
   </div>
 </section>

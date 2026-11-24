@@ -17,10 +17,10 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 ### What it does
 
 - **One depth grammar.** Four levels, each with one job: plane for layout, raised for parts you press, recessed for parts that hold input or output, float for overlays. Data is never extruded.
-- **Light and dark housings.** Warm pebble-gray plastic and smoked dark plastic, switched with one attribute on any element. Every shadow is alpha over the housing, so one recipe works on both.
+- **Light and dark themes.** Warm pebble-gray plastic and smoked dark plastic, switched with one attribute on any element. Every shadow is alpha over the housing, so one recipe works in both.
 - **Components.** Buttons, fields, input groups, comboboxes, a date picker, checkboxes, radios, switches, segmented controls, ranges, choice cards, file upload, tabs, breadcrumbs, pagination, a command menu, badges with status lamps, tags, meters, progress bars, spinners, skeletons, alerts, LCD readouts, empty states, accordions, description lists, avatar groups, timelines, tables, charts, pricing cards, menus, popovers, dialogs, sheets, toasts and tooltips.
 - **Reference screens.** A dashboard, invoices, customers, reports, products, tabbed settings, sign-in and a marketing landing page, all built only with the library's classes.
-- **Readable first.** Every text color is checked against WCAG 2 and APCA in both housings. Focus is a 2px ink ring on every control, and Windows High Contrast gets real borders.
+- **Readable first.** Every text color is checked against WCAG 2 and APCA in both themes. Focus is a 2px ink ring on every control, and Windows High Contrast gets real borders.
 - **Motion with a reason.** Presses go down in 80ms and come back in 160ms. Overlays arrive and leave on one curve, nothing moves on scroll, and reduced motion keeps the fades.
 - **CSS only.** Every class is a Tailwind `@utility`, unprefixed (`btn`, `field`, `tabs`), so variants work: `md:btn-lg`.
 
@@ -40,7 +40,7 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
    ```
 
-4. Light is the default. Add `data-housing="dark"` to `<html>`, or to any section, for dark.
+4. Light is the default. Add `data-theme="dark"` to `<html>`, or to any section, for dark.
 
 [DESIGN.md](DESIGN.md) documents the depth grammar, tokens, motion, the contrast table and every class.
 

@@ -3,7 +3,7 @@ import Base from './Base.astro';
 import SkipLink from '../components/SkipLink.astro';
 import Icon from '../components/Icon.astro';
 import Wordmark from '../components/Wordmark.astro';
-import HousingSeg from '../components/HousingSeg.astro';
+import ThemeSeg from '../components/ThemeSeg.astro';
 import { FOOTER_NAV, MKT_NAV } from '../data/marketing';
 
 interface Props {
@@ -37,7 +37,7 @@ const { title, active = '', banner = true } = Astro.props;
   </div>
   <div class="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t border-[color:var(--k-seam)] text-sm text-ink-2">
     <p>Sample page built with Plastc. The product, prices and copy are made up.</p>
-    <HousingSeg />
+    <ThemeSeg />
   </div>
  </div>
 </footer>
