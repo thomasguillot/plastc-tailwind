@@ -26,7 +26,7 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 
 ### Install
 
-1. Copy `src/plastc.css` into your project.
+1. Download `plastc.css` from the [website](https://plastc.space.fast/), or copy [`src/plastc.css`](src/plastc.css) from this repository, into your project.
 2. Import it after Tailwind in your entry stylesheet:
 
    ```css
@@ -58,6 +58,7 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 - `src/plastc.css`: the library.
 - `site/build.py`: generates the showcase (`site/index.html`) and the reference screens (`site/screens/`).
 - `site/plastc.js`: demo behavior for the showcase and screens. Not part of the library.
+- `site/plastc.css`: a copy of `src/plastc.css` that the build writes for the website's download link. Not committed.
 - `site/mark-light.svg`, `site/mark-dark.svg`, `site/favicon.svg`: the keycap mark.
 - `DESIGN.md` and `PRODUCT.md`: the design system and the product brief.
 
@@ -65,11 +66,11 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 
 ```sh
 npm install
-npm run build   # writes site/index.html, site/screens/ and site/dist.css
+npm run build   # writes site/index.html, site/screens/, site/plastc.css and site/dist.css
 npm run serve   # http://localhost:8765
 ```
 
-The generated pages and `dist.css` are not committed.
+The generated pages, `dist.css` and the `plastc.css` copy are not committed. Each component group's View HTML and Copy HTML markup is generated from its demo at build time, with the demo-only hooks removed.
 
 ## License
 

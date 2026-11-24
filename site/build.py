@@ -1,7 +1,14 @@
 """Generates the Plastc showcase and reference screens. Run: python3 build.py"""
-import pathlib, math
+import pathlib, math, json, re, shutil, datetime
+from html.parser import HTMLParser
 
 HERE = pathlib.Path(__file__).parent
+CSS_SRC = HERE.parent / "src" / "plastc.css"
+shutil.copyfile(CSS_SRC, HERE / "plastc.css")
+VERSION = json.loads((HERE.parent / "package.json").read_text())["version"]
+CSS_KB = round(CSS_SRC.stat().st_size / 1024)
+REPO = "https://github.com/thomasguillot/plastc-tailwind"
+CSS_ON_GITHUB = f"{REPO}/blob/main/src/plastc.css"
 
 def ico(d, cls="", sw="1.8"):
     c = f' class="{cls}"' if cls else ''
@@ -39,7 +46,9 @@ I = {
     "chevron": '<path d="m6 9 6 6 6-6"/>',
     "hash": '<path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/>',
     "external": '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    "code": '<path d="m8 7-5 5 5 5M16 7l5 5-5 5"/>',
 }
+GITHUB = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.01 8.01 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82a7.6 7.6 0 0 0-4 0C4.49 1.11 3.82 1.32 3.82 1.32c-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A8 8 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>'
 def i(name, cls="", sw="1.8"):
     return ico(I[name], cls, sw)
 def line_chart(values, labels, w=720, h=240, highlight=9, fs=13):
@@ -724,15 +733,140 @@ def spec(name, cls, rule, specimen):
   <div><p class="font-bold">{name} <code class="font-mono text-xs text-ink-2 ml-1">{cls}</code></p><p class="text-sm text-ink-2 mt-1 max-w-[36ch]">{rule}</p></div>
 </div>'''
 
-GN = [0]
-def group(title, classes, body, wide=False):
-    GN[0] += 1
-    gid = f"g{GN[0]}"
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+SVG_CASE = {"viewbox": "viewBox", "preserveaspectratio": "preserveAspectRatio", "lineargradient": "linearGradient"}
+LIBRARY_DATA = set(re.findall(r"data-[a-z-]+", CSS_SRC.read_text()))
+
+class Node:
+    def __init__(self, tag, attrs, selfclose=False):
+        self.tag, self.attrs, self.selfclose, self.children = tag, attrs, selfclose, []
+
+class Tree(HTMLParser):
+    def __init__(self, markup):
+        super().__init__(convert_charrefs=True)
+        self.root = Node(None, [])
+        self.stack = [self.root]
+        self.feed(markup); self.close()
+    def handle_starttag(self, tag, attrs):
+        n = Node(tag, attrs); self.stack[-1].children.append(n)
+        if tag not in VOID: self.stack.append(n)
+    def handle_startendtag(self, tag, attrs):
+        self.stack[-1].children.append(Node(tag, attrs, True))
+    def handle_endtag(self, tag):
+        for k in range(len(self.stack) - 1, 0, -1):
+            if self.stack[k].tag == tag:
+                del self.stack[k:]; return
+    def handle_data(self, data):
+        self.stack[-1].children.append(data)
+
+def static_calendar(value):
+    sel = datetime.date.fromisoformat(value)
+    first = sel.replace(day=1)
+    start = first - datetime.timedelta(days=(first.weekday() + 1) % 7)
+    today = datetime.date.today()
+    rows = ""
+    for w in range(6):
+        cells = ""
+        for d in range(7):
+            day = start + datetime.timedelta(days=w * 7 + d)
+            extra = (" data-outside" if day.month != sel.month else "") + (' aria-current="date"' if day == today else "")
+            cells += (f'<td><button type="button" tabindex="{0 if day == sel else -1}" aria-label="{day:%A, %B} {day.day}, {day.year}"'
+                      f'{extra} aria-pressed="{"true" if day == sel else "false"}">{day.day}</button></td>')
+        rows += f"<tr>{cells}</tr>"
+    title = f"{first:%B %Y}"
+    heads = "".join(f'<th scope="col"><abbr title="{n}">{n[:2]}</abbr></th>' for n in ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+    step = lambda label, d: f'<button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="{label}">{ico('<path d="' + d + '"/>')}</button>'
+    return (f'<div class="calendar-head">{step("Previous month", "m15 6-6 6 6 6")}<p class="calendar-title" aria-live="polite">{title}</p>{step("Next month", "m9 6 6 6-6 6")}</div>'
+            f'<table role="grid" aria-label="{title}"><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table>')
+
+def strip_demo(node, dialog=None):
+    kept = []
+    for c in node.children:
+        if isinstance(c, str):
+            kept.append(c); continue
+        names = {k for k, _ in c.attrs}
+        if "data-demo-note" in names: continue
+        if "data-calendar" in names and not any(isinstance(x, Node) for x in c.children):
+            c.children = Tree(static_calendar(dict(c.attrs).get("data-value") or datetime.date.today().isoformat())).root.children
+        attrs = []
+        for k, v in c.attrs:
+            if k == "data-open-dialog": attrs += [("commandfor", v), ("command", "show-modal")]
+            elif k == "data-open-command": attrs += [("commandfor", "command"), ("command", "show-modal")]
+            elif k == "data-close-dialog" and dialog: attrs += [("commandfor", dialog), ("command", "close")]
+            elif k.startswith("data-") and k not in LIBRARY_DATA: continue
+            else: attrs.append((k, v))
+        c.attrs = attrs
+        strip_demo(c, dict(attrs).get("id") if c.tag == "dialog" else dialog)
+        kept.append(c)
+    node.children = kept
+
+def esc_text(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+def open_tag(n):
+    attrs = "".join(f" {SVG_CASE.get(k, k)}" if v is None else f' {SVG_CASE.get(k, k)}="{v.replace("&", "&amp;").replace(chr(34), "&quot;")}"' for k, v in n.attrs)
+    tag = SVG_CASE.get(n.tag, n.tag)
+    return f"<{tag}{attrs}{'/' if n.selfclose else ''}>"
+
+def inline(n):
+    if isinstance(n, str): return esc_text(re.sub(r"\s+", " ", n))
+    if n.selfclose or n.tag in VOID: return open_tag(n)
+    return open_tag(n) + "".join(inline(c) for c in n.children) + f"</{SVG_CASE.get(n.tag, n.tag)}>"
+
+def breaks(n):
+    if isinstance(n, str) or n.tag in ("pre", "textarea"): return False
+    if n.tag == "svg" and "chart" not in dict(n.attrs).get("class", ""): return False
+    if any(isinstance(c, str) and c.strip() for c in n.children): return False
+    kids = [c for c in n.children if isinstance(c, Node)]
+    return len(kids) > 1 or (len(kids) == 1 and breaks(kids[0]))
+
+def pretty(n, depth=0):
+    pad = "  " * depth
+    if not breaks(n): return pad + inline(n)
+    kids = "\n".join(pretty(c, depth + 1) for c in n.children if isinstance(c, Node))
+    return f"{pad}{open_tag(n)}\n{kids}\n{pad}</{SVG_CASE.get(n.tag, n.tag)}>"
+
+def clean_html(markup):
+    tree = Tree(markup).root
+    strip_demo(tree)
+    return "\n".join(pretty(c) for c in tree.children if isinstance(c, Node))
+
+def script_note(body, extra):
+    needs = [label for hit, label in (
+        ('role="combobox"' in body, "combobox filtering and keys"),
+        ("data-calendar" in body, "the calendar’s month grid"),
+        ("data-page-step" in body, "moving the page numbers"),
+        ("data-file-input" in body, "listing files and their upload progress"),
+        ('class="toast"' in extra, "showing toasts and hiding them on a timer"),
+        ("data-open-command" in body, "the Cmd+K shortcut, filtering and arrow keys"),
+    ) if hit]
+    if not needs: return ""
+    last = ", and " if any(" and " in n for n in needs) else " and "
+    said = needs[0] if len(needs) == 1 else ", ".join(needs[:-1]) + last + needs[-1]
+    return f'<p class="text-[13px] text-ink-2">Your own script handles {said}. <a class="text-ink underline" href="{REPO}/blob/main/site/plastc.js">plastc.js</a> shows one way.</p>'
+
+def slug(title):
+    return re.sub(r"[^a-z0-9]+", "-", title.replace("&amp;", " ").lower()).strip("-")
+
+GROUPS = []
+def group(title, classes, body, wide=False, extra=""):
+    gid = slug(title)
+    assert gid not in {g[0] for g in GROUPS}, gid
+    GROUPS.append((gid, title, classes))
     span = " lg:col-span-2" if wide else ""
-    return f'''<section class="py-7{span} border-t border-[color:var(--k-seam)] shadow-[inset_0_1px_0_rgb(var(--k-hl)/calc(.55*var(--k-hl-a)))] min-w-0">
-  <div class="flex flex-wrap items-center justify-between gap-2 mb-5"><h3 class="engraved">{title}</h3><div class="flex items-center gap-3 min-w-0"><code class="font-mono text-[11px] text-ink-2 break-words min-w-0 hidden sm:block">{classes}</code><button class="btn btn-quiet btn-sm" data-copy-from="{gid}">{i("copy")}Copy HTML</button></div></div>
-  <div id="{gid}">{body}</div>
+    markup = clean_html(body + extra)
+    return f'''<section id="{gid}" class="py-7{span} border-t border-[color:var(--k-seam)] shadow-[inset_0_1px_0_rgb(var(--k-hl)/calc(.55*var(--k-hl-a)))] min-w-0 scroll-mt-4">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-5"><h3 class="engraved">{title}</h3><code class="order-last basis-full sm:order-none sm:basis-0 sm:flex-1 sm:text-right font-mono text-[11px] text-ink-2 break-words min-w-0">{classes}</code><button type="button" class="btn btn-quiet btn-sm ml-auto sm:ml-0 -mr-3.5" data-copy-from="{gid}-html">{i("copy")}Copy HTML</button></div>
+  <div>{body}</div>
+  <details class="group/code mt-5">
+    <summary class="btn btn-quiet btn-sm -ml-3.5 [&::-webkit-details-marker]:hidden">{i("code")}View HTML{i("chevron", "transition-transform duration-200 ease-out motion-reduce:transition-none group-open/code:rotate-180")}</summary>
+    <div class="grid gap-3 mt-3">{script_note(body, extra)}<pre class="code min-w-0 max-h-[28rem] overflow-y-auto" id="{gid}-html" tabindex="0" aria-label="HTML for {title}">{esc_text(markup)}</pre></div>
+  </details>
 </section>'''
+
+def jump_list():
+    links = "".join(f'<li><a class="btn btn-quiet btn-sm" href="#{gid}">{title}</a></li>' for gid, title, _ in GROUPS)
+    return f'<nav aria-label="Component groups" class="mb-8"><ul class="flex flex-wrap gap-1 -ml-3.5">{links}</ul></nav>'
 
 CB_SEEN = {}
 for row_ in CUSTOMERS: CB_SEEN.setdefault(row_[1], row_[2])
@@ -754,6 +888,11 @@ previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underlin
 </a>''' for k, t in screens)
 
 IMPORT = '@import "tailwindcss";\n@import "./plastc.css";'
+TOAST_EXAMPLE = '<div class="toast" popover="manual" role="status" id="toast"><span>Invoice INV-0193 sent</span><button type="button" class="lcd-action">Undo</button></div>'
+COMMAND_EXAMPLE = command_dialog([
+    ("Go to", [("home", "Dashboard", 'href="dashboard.html"', ""), ("file", "Invoices", 'href="invoices.html"', "")]),
+    ("Actions", [("plus", "New invoice", 'data-command="new-invoice"', "N")]),
+])
 SHOWNAV = '<a class="btn btn-quiet btn-sm" href="#depth">Depth</a><a class="btn btn-quiet btn-sm" href="#components">Components</a><a class="btn btn-quiet btn-sm" href="#screens">Screens</a><a class="btn btn-quiet btn-sm" href="#install">Install</a>'
 
 showcase = f'''<body>
@@ -761,7 +900,8 @@ showcase = f'''<body>
 <header class="max-w-[1240px] mx-auto px-4 md:px-8 pt-6 pb-2 md:pb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
   {wordmark("#top", "")}
   <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Sections">{SHOWNAV}</nav>
-  {housing_seg(extra="ml-auto")}
+  <a class="btn btn-quiet btn-sm ml-auto" href="{REPO}">{GITHUB}<span class="sr-only sm:not-sr-only">GitHub</span></a>
+  {housing_seg()}
 </header>
 
 <main id="main">
@@ -769,7 +909,8 @@ showcase = f'''<body>
   <div>
     <h1 class="display text-[52px] sm:text-[76px] lg:text-[96px]">Every button a real button.</h1>
     <p class="text-lg text-ink-2 max-w-[46ch] mt-7 leading-relaxed">Plastc is a neumorphic UI library for Tailwind v4, with components, app screens and tokens. Depth goes only where your hand expects it. Parts you press stand up, parts that hold input sit in, and everything else stays flush and quiet.</p>
-    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="#install">Get the CSS</a><a class="btn btn-xl" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
+    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="plastc.css" download>{i("down")}Get the CSS</a><a class="btn btn-xl" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
+    <p class="text-sm text-ink-2 mt-4 tabular-nums">plastc.css · v{VERSION} · {CSS_KB} KB · MIT license</p>
   </div>
 
   <div class="relative mx-auto w-full max-w-[400px]">
@@ -808,8 +949,9 @@ showcase = f'''<body>
 <section id="components" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <div class="flex flex-wrap items-end justify-between gap-6 mb-10">
     <h2 class="display text-[40px] md:text-[56px]">Components</h2>
-    <p class="text-ink-2 max-w-[44ch]">Every part below is live HTML using the classes beside it. Press, type, toggle, then copy the markup.</p>
+    <p class="text-ink-2 max-w-[44ch]">Every part below is live HTML using the classes beside it. Press, type and toggle, then view or copy the markup.</p>
   </div>
+  <!--jump-->
   <div class="grid lg:grid-cols-2 gap-x-14 [&>*]:min-w-0">
     {group("Buttons", ".btn  .btn-signal  .btn-go  .btn-quiet  .btn-sm…2xl", f"""
       <div class="flex flex-wrap items-center gap-3"><button class="btn btn-signal">{i("plus","", "2.2")}New invoice</button><button class="btn">Secondary</button><button class="btn btn-go">{i("check","", "2.2")}Approve</button><button class="btn btn-quiet">Tertiary</button></div>
@@ -870,7 +1012,7 @@ showcase = f'''<body>
         <button class="btn" data-open-dialog="demo-dialog">Open dialog</button>
         <button class="btn" data-toast="Invoice INV-0193 sent">Show toast</button>
       </div>
-      <dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete">{i("trash")}Delete</button></div></form></dialog>""")}
+      <dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete">{i("trash")}Delete</button></div></form></dialog>""", extra=TOAST_EXAMPLE)}
     {group("Progress &amp; loading", ".progress  .spinner  .skeleton", f"""
       <div class="grid gap-6">
         <div><div class="flex justify-between text-[13px] mb-2"><span class="font-semibold" id="pg1-l">Exporting invoices</span><span class="text-ink-2 tabular-nums">64%</span></div><div class="progress" role="progressbar" aria-labelledby="pg1-l" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"><span style="--v:64%"></span></div></div>
@@ -897,7 +1039,7 @@ showcase = f'''<body>
     {group("Breadcrumbs &amp; command menu", ".breadcrumbs  .command", f"""
       <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="#components">{i("home")}Dashboard</a></li><li><a href="#components">Invoices</a></li><li><a href="#components">Halden Studio</a></li><li><span aria-current="page">INV-0193</span></li></ol></nav>
       <p class="text-sm text-ink-2 mt-6 max-w-[52ch]" data-demo-note>The command menu is a <code class="font-mono">.dialog</code> holding a search field and a <code class="font-mono">.listbox</code>. Open it from anywhere on this page, type to filter, and move with the arrow keys.</p>
-      <button type="button" class="btn mt-4" data-open-command>{i("search")}Search or jump to<span class="kbd ml-1" data-kbd-mod>Ctrl K</span></button>""")}
+      <button type="button" class="btn mt-4" data-open-command>{i("search")}Search or jump to<span class="kbd ml-1" data-kbd-mod>Ctrl K</span></button>""", extra=COMMAND_EXAMPLE)}
     {group("Accordion &amp; description list", ".accordion  .desc-list", f"""
       <div class="accordion">
         <details open><summary>When do reminders go out?</summary><p>The morning after a due date passes, then every seven days until the invoice is paid. You can change the schedule, or turn reminders off for one customer.</p></details>
@@ -987,12 +1129,13 @@ showcase = f'''<body>
     <div>
       <h2 class="display text-[40px] md:text-[56px]">Install</h2>
       <p class="text-ink-2 text-lg max-w-[44ch] mt-5">Plastc isn’t on npm yet. It’s one CSS file you add next to your Tailwind v4 entry stylesheet.</p>
-      <div class="flex flex-wrap gap-3 mt-8"><button class="btn btn-signal btn-lg" data-copy='{IMPORT}'>{i("copy")}Copy the import</button><a class="btn btn-lg" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
+      <div class="flex flex-wrap gap-3 mt-8"><a class="btn btn-signal btn-lg" href="plastc.css" download>{i("down")}Download plastc.css</a><button type="button" class="btn btn-lg" data-copy='{IMPORT}'>{i("copy")}Copy the import</button></div>
+      <p class="text-sm text-ink-2 mt-4 tabular-nums">v{VERSION} · {CSS_KB} KB · MIT license</p>
     </div>
     <ol class="grid grid-cols-1 gap-6 list-none p-0 m-0">
-      <li><p class="font-bold mb-2">Copy <code class="font-mono text-[14px]">plastc.css</code> into your project</p><p class="text-sm text-ink-2">From <code class="font-mono">src/plastc.css</code>. It holds the tokens, depth recipes and every component class.</p></li>
+      <li><p class="font-bold mb-2">Add <code class="font-mono text-[14px]">plastc.css</code> to your project</p><p class="text-sm text-ink-2"><a class="text-ink underline" href="plastc.css" download>Download it</a>, or copy <a class="text-ink underline" href="{CSS_ON_GITHUB}"><code class="font-mono">src/plastc.css</code> on GitHub</a>. It holds the tokens, depth recipes and every component class.</p></li>
       <li><p class="font-bold mb-2">Import it after Tailwind</p>
-        <div class="flex items-start gap-3"><pre class="code flex-1 min-w-0">{IMPORT}</pre><button class="btn btn-sm shrink-0 mt-1.5" data-copy='{IMPORT}'>{i("copy")}Copy</button></div></li>
+        <pre class="code min-w-0">{IMPORT}</pre></li>
       <li><p class="font-bold mb-2">Load Geist</p>
         <div class="flex items-start gap-3"><pre class="code flex-1 min-w-0">&lt;link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap" rel="stylesheet"&gt;</pre><button class="btn btn-sm shrink-0 mt-1.5" data-copy='<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap" rel="stylesheet">'>{i("copy")}Copy</button></div></li>
       <li><p class="font-bold mb-2">Pick a housing</p><p class="text-sm text-ink-2">Light is the default. Add <code class="font-mono">data-housing="dark"</code> to <code class="font-mono">&lt;html&gt;</code> (or any section) for dark.</p></li>
@@ -1004,13 +1147,15 @@ showcase = f'''<body>
 {command_dialog([
     ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("chart", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', "")]),
     ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("marketing", "Marketing sections"), ("tokens", "Tokens"), ("install", "Install"))]),
-    ("Actions", [HOUSING_CMD, ("copy", "Copy the import line", f"data-copy='{IMPORT}'", "")]),
+    ("Actions", [HOUSING_CMD, ("down", "Download plastc.css", 'href="plastc.css" download', ""), ("copy", "Copy the import line", f"data-copy='{IMPORT}'", ""), ("external", "Source on GitHub", f'href="{REPO}"', "")]),
+    ("Components", [("grid", title, f'href="#{gid}" data-keywords="{" ".join(re.findall(r"[.]([a-z][a-z0-9-]*)", classes))}"', "") for gid, title, classes in GROUPS]),
 ])}
 
 <footer class="max-w-[1240px] mx-auto px-4 md:px-8 py-10 border-t border-[color:var(--k-seam)] flex flex-wrap gap-4 justify-between items-center text-sm text-ink-2">
-  <span>Plastc, a neumorphic UI library for Tailwind CSS v4.</span><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
+  <p>Plastc, a neumorphic UI library for Tailwind CSS v4. <a class="text-ink underline" href="{REPO}">Source on GitHub</a>, MIT license.</p><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
 </footer>
 '''
+showcase = showcase.replace("<!--jump-->", jump_list())
 HOME_TITLE = "Neumorphic UI library for Tailwind CSS v4 · Plastc"
 page("index.html", HOME_TITLE, showcase, description=DESCRIPTION, extra=f"""<link rel="canonical" href="{SITE}/">
 <meta property="og:type" content="website">
