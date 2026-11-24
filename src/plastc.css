@@ -841,6 +841,12 @@
   .dialog[open]::backdrop { opacity: 0; }
 }
 
+@utility dialog-full {
+  &.dialog { width: 90vw; height: 90vh; max-width: none; max-height: none; padding: 0; overflow: hidden; }
+  &.dialog[open] { display: flex; flex-direction: column; }
+  @media (width < 40rem) { &.dialog { width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 18px; } }
+}
+
 /* Sheet: a <dialog> that slides in from the left edge (mobile navigation). */
 @utility sheet {
   position: fixed; inset: 0 auto 0 0; height: 100dvh; max-height: none;

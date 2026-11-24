@@ -60,6 +60,28 @@
     });
   });
 
+  /* ---------- screen viewer (showcase) */
+  const viewer = document.getElementById('screen-viewer');
+  const frame = viewer && $('[data-screen-frame]', viewer);
+  function syncViewer(k) {
+    $$('[data-screen]', viewer).forEach(b => b.dataset.screen === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+    const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html`;
+    const b = $(`[data-screen="${k}"]`, viewer); if (b) frame.title = b.textContent;
+  }
+  function showScreen(k) {
+    const url = `screens/${k}.html`;
+    if (frame.getAttribute('src') !== url) frame.src = url;
+    syncViewer(k);
+  }
+  if (viewer) {
+    frame.addEventListener('load', () => {
+      try { const m = frame.contentWindow.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1]); } catch (e) {}
+    });
+    viewer.addEventListener('close', () => {
+      try { const h = localStorage.getItem('plastc-housing'); if (h === 'light' || h === 'dark') setHousing(h); } catch (e) {}
+    });
+  }
+
   /* ---------- void with undo (invoices) */
   let voidRow = null;
   const voidDialog = $('#void-invoice');
@@ -89,6 +111,12 @@
 
     const vd = t.closest('[data-void]');
     if (vd) { closePopovers(); voidRow = vd.closest('tr'); $('[data-void-label]', voidDialog).textContent = vd.dataset.void; return openDialog('void-invoice'); }
+
+    const os = t.closest('[data-open-screen]');
+    if (os && viewer && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+      e.preventDefault(); showScreen(os.dataset.openScreen); viewer.showModal(); return;
+    }
+    const sc = t.closest('[data-screen]'); if (sc) return showScreen(sc.dataset.screen);
 
     const ts = t.closest('[data-toast]'); if (ts) { closePopovers(); return toast(ts.dataset.toast); }
     if (t.closest('[data-toast-undo]')) return runUndo();

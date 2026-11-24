@@ -79,7 +79,7 @@ Tabs `.tabs` switch the panels of one page (`role="tablist"` with `aria-selected
 Pagination `.pager` lays out Previous, a middle slot, and Next. The middle slot holds `.seg.pager-pages` (page buttons with `aria-current="page"`, `<span>` for a gap) and/or `.pager-status`. Below 640px the page numbers hide and the status shows; with no page numbers, the status always shows.
 Empty states `.empty` centre an LCD `.lcd.readout` (`.readout-value`, `.readout-unit`), a heading, a short reason and `.empty-actions`. Say why it is empty and what to do next; the copy depends on the cause (no data yet, a filter, a search).
 Selection `.check`, `.radio`, `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`).
-Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
+Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`; add `.dialog-full` for a 90vw × 90vh dialog that holds a full view, nearly edge to edge on phones), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
 Selection also `.choice-card`. Code `.code`. Tables `.table-scroll` (edge fade on narrow screens).
 Display `.panel`, `.raised`, `.recessed`, `.seam`, `.float`, `.lcd`, `.meter`, `.badge` + `.lamp-ok|warn|danger|signal|off`, `.tag`, `.avatar`, `.alert`, `.ktable` (`.num` cells), `.nav-item`, `.menu`, `.dialog`, `.toast`, `.kbd`, `.key`.
 

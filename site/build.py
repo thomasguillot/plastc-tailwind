@@ -36,6 +36,7 @@ I = {
     "key": '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l2 2M14.5 8.5l2 2"/>',
     "grid": '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
     "x": '<path d="M6 6l12 12M18 6 6 18"/>',
+    "external": '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
 }
 def i(name, cls="", sw="1.8"):
     return ico(I[name], cls, sw)
@@ -198,7 +199,7 @@ def nav_block(active):
     return f'''<nav class="flex flex-col gap-1" aria-label="Main">{items}</nav>
     <div class="mt-auto flex flex-col gap-1 pt-6">
       <a class="nav-item" href="settings.html"{CUR if active == "settings" else ""}>{i("cog")}Settings</a>
-      <a class="nav-item" href="../index.html#install">{i("help")}Docs</a>
+      <a class="nav-item" href="../index.html#install" target="_top">{i("help")}Docs</a>
       <div class="flex items-center justify-between gap-3 px-3 py-3 mt-2"><span class="text-sm font-semibold text-ink-2">Appearance</span>{housing_seg()}</div>
       <div class="flex items-center gap-3 px-2 pt-4 border-t border-[color:var(--k-seam)]">
         <span class="avatar">MO</span>
@@ -417,7 +418,17 @@ def group(title, classes, body, wide=False):
 </section>'''
 
 screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("settings", "Settings"), ("sign-in", "Sign in")]
-previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink">
+viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in screens)
+VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference screens">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2.5 px-3 sm:px-4 py-2.5 border-b border-[color:var(--k-seam)]">
+    <p class="sm:hidden text-sm font-bold">Reference screens</p>
+    <div class="seg order-last sm:order-none" role="group" aria-label="Screens">{viewer_tabs}</div>
+    <a class="btn btn-quiet btn-sm ml-auto" href="screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab>{i("external")}<span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
+    <button type="button" class="btn btn-sm btn-icon" data-close-dialog aria-label="Close">{i("x")}</button>
+  </div>
+  <iframe class="flex-1 min-h-0 w-full border-0 bg-housing" title="Dashboard" data-screen-frame></iframe>
+</dialog>'''
+previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink" data-open-screen="{k}">
   <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
   <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
 </a>''' for k, t in screens)
@@ -438,7 +449,7 @@ showcase = f'''<body>
   <div>
     <h1 class="display text-[52px] sm:text-[76px] lg:text-[96px]">Every button a real button.</h1>
     <p class="text-lg text-ink-2 max-w-[46ch] mt-7 leading-relaxed">Plastc is a neumorphic UI library for Tailwind v4, with components, app screens and tokens. Depth goes only where your hand expects it. Parts you press stand up, parts that hold input sit in, and everything else stays flush and quiet.</p>
-    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="#install">Get the CSS</a><a class="btn btn-xl" href="screens/dashboard.html">Open the dashboard</a></div>
+    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="#install">Get the CSS</a><a class="btn btn-xl" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
   </div>
 
   <div class="relative mx-auto w-full max-w-[400px]">
@@ -585,7 +596,7 @@ showcase = f'''<body>
     <div>
       <h2 class="display text-[40px] md:text-[56px]">Install</h2>
       <p class="text-ink-2 text-lg max-w-[44ch] mt-5">Plastc isn’t on npm yet. It’s one CSS file you add next to your Tailwind v4 entry stylesheet.</p>
-      <div class="flex flex-wrap gap-3 mt-8"><button class="btn btn-signal btn-lg" data-copy='{IMPORT}'>{i("copy")}Copy the import</button><a class="btn btn-lg" href="screens/dashboard.html">Open the dashboard</a></div>
+      <div class="flex flex-wrap gap-3 mt-8"><button class="btn btn-signal btn-lg" data-copy='{IMPORT}'>{i("copy")}Copy the import</button><a class="btn btn-lg" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
     </div>
     <ol class="grid grid-cols-1 gap-6 list-none p-0 m-0">
       <li><p class="font-bold mb-2">Copy <code class="font-mono text-[14px]">plastc.css</code> into your project</p><p class="text-sm text-ink-2">From <code class="font-mono">src/plastc.css</code>. It holds the tokens, depth recipes and every component class.</p></li>
@@ -598,6 +609,7 @@ showcase = f'''<body>
   </div>
 </section>
 </main>
+{VIEWER}
 
 <footer class="max-w-[1240px] mx-auto px-4 md:px-8 py-10 border-t border-[color:var(--k-seam)] flex flex-wrap gap-4 justify-between items-center text-sm text-ink-2">
   <span>Plastc, a neumorphic UI library for Tailwind CSS v4.</span><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
