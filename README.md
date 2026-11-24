@@ -1,4 +1,4 @@
-<img src="site/mark-light.svg" alt="" width="96" height="96">
+<img src="site/public/mark-light.svg" alt="" width="96" height="96">
 
 # Plastc
 
@@ -50,28 +50,31 @@ A neumorphic UI library for Tailwind CSS v4, cast as molded appliance plastic. P
 
 ### Requirements
 
-- Node 22+ (for the Tailwind CLI)
-- Python 3 (for the page generator)
+- Node 22.23.4 or later
 
 ### Layout
 
 - `src/plastc.css`: the library.
-- `site/build.py`: generates the showcase (`site/index.html`) and the reference screens (`site/screens/`).
-- `site/marketing/`: one Python file per marketing page (landing, and the pages that join it), run by the build.
-- `site/plastc.js`: demo behavior for the showcase and screens. Not part of the library.
-- `site/plastc.css`: a copy of `src/plastc.css` that the build writes for the website's download link. Not committed.
-- `site/mark-light.svg`, `site/mark-dark.svg`, `site/favicon.svg`: the keycap mark.
+- `site/`: the showcase and reference screens, an [Astro](https://astro.build) static site.
+  - `site/src/pages/`: `index.astro` (the showcase) and `screens/` (app screens and marketing pages).
+  - `site/src/layouts/`, `site/src/components/`: the page frames and the parts they share.
+  - `site/src/data/`: sample data and page content as TypeScript modules.
+  - `site/src/content/posts/`: the sample blog posts, a Markdown content collection.
+  - `site/src/app.css`: the Tailwind entry; it imports `src/plastc.css` from the repository root.
+  - `site/public/plastc.js`: demo behavior for the showcase and screens. Not part of the library.
+  - `site/public/mark-light.svg`, `site/public/mark-dark.svg`, `site/public/favicon.svg`: the keycap mark.
 - `DESIGN.md` and `PRODUCT.md`: the design system and the product brief.
 
 ### Build and preview
 
 ```sh
 npm install
-npm run build   # writes site/index.html, site/screens/, site/plastc.css and site/dist.css
-npm run serve   # http://localhost:8765
+npm run dev       # local dev server with reload
+npm run build     # writes the static site to site/dist/
+npm run preview   # serves site/dist/
 ```
 
-The generated pages, `dist.css` and the `plastc.css` copy are not committed. Each component group's View HTML and Copy HTML markup is generated from its demo at build time, with the demo-only hooks removed.
+The build writes `index.html`, `screens/*.html`, `dist.css` (Tailwind with the library) and `plastc.css` (an exact copy of `src/plastc.css`, for the download link) to `site/dist/`, which is not committed. Each component group's View HTML and Copy HTML markup is generated at build time from the same rendered markup as its live demo, with the demo-only hooks removed.
 
 ## License
 

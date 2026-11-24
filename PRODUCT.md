@@ -6,7 +6,7 @@ web
 
 ## Stack
 
-Tailwind CSS v4 (CSS-first `@theme` tokens + `@utility` neumorphic primitives + component classes), distributed as importable CSS, plus static HTML reference screens and a showcase site built with it. No JS framework. Deploy target: none yet; preview locally with `npm run build` and `npm run serve`.
+Tailwind CSS v4 (CSS-first `@theme` tokens + `@utility` neumorphic primitives + component classes), distributed as importable CSS, plus static HTML reference screens and a showcase site built with it. No JS framework. The site is an Astro static build (`npm run build`, preview with `npm run preview`), published to Spacefast from `main`.
 
 ## Users
 
