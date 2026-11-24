@@ -8,10 +8,10 @@ import { LAYERS, layerNumber } from '../../data/home';
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Pick a layer to see its parts and the classes behind them.</p>
   <div data-track>
     <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10" data-ex>
-      <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
+      <div class="xr @container min-w-0 md:h-full max-md:hidden" data-xr data-active="all"><AnatomyMock /></div>
       <div class="flex flex-col gap-3 min-w-0">
-        <ul class="grid gap-2 sm:grid-cols-2 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
-          <li class="lrow"><button type="button" class="lbtn" data-layer-key={key} aria-pressed="false"><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}</span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></button><a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a></li>
+        <ul class="grid md:gap-3 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
+          <li class="lrow">{[{ Tag: 'button', attrs: { type: 'button', 'data-layer-key': key, 'aria-pressed': 'false' } }, { Tag: 'div', attrs: { 'data-layer-static': '' } }].map(({ Tag, attrs }) => <Tag class="lbtn" {...attrs}><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}</span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></Tag>)}<a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a><div class="lpiece"><AnatomyMock piece={key} /></div></li>
         ))}</ul>
       </div>
     </div>
@@ -44,14 +44,17 @@ import { LAYERS, layerNumber } from '../../data/home';
   .xr[data-active="6"] .mock [data-layer="6"]{transition:opacity 180ms var(--ease-out),scale 180ms var(--ease-out),translate 180ms var(--ease-out),visibility 0s}
   @media (prefers-reduced-motion:no-preference){.xr:not([data-active="6"]) .mock .menu[data-layer="6"]{scale:.96}.xr:not([data-active="6"]) .mock .toast[data-layer="6"]{translate:0 8px}}
   @container (max-width:599px){.xr .d-cust{display:none}.xr .mock dl.lcd{grid-template-columns:repeat(2,minmax(0,1fr))}.xr .d-search{flex-basis:100%}.xr .d-side{width:auto;padding:12px 8px}.xr .d-side>p{display:none}.xr .d-side .nav-item{width:40px;padding:0;gap:0;justify-content:center}.xr .d-side .d-nl{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
-  .lrow{display:flex;align-items:stretch;border-radius:16px;border:1px solid var(--k-seam);box-shadow:var(--k-seam-line);transition:background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
-  .lrow[data-current]{background:var(--k-housing-down);box-shadow:var(--k-recessed)}
-  @media (hover:hover) and (pointer:fine){.lrow:not([data-current]):hover{background:var(--k-housing-up)}}
+  .lrow{display:flex;align-items:stretch;border-bottom:1px solid var(--k-seam)}
+  .lrow:last-child{border-bottom:0}
+  @media (min-width:768px){.lrow{border:1px solid transparent;border-radius:16px;background:transparent;transition:background-color 180ms var(--ease-out),border-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out),translate 180ms var(--ease-out)}.lrow:last-child{border-bottom:1px solid transparent}}
+  @media (min-width:768px){.lrow[data-current]{translate:0 1px;background:var(--k-well);box-shadow:var(--k-latched);border-color:transparent}}
+  @media (hover:hover) and (pointer:fine) and (min-width:768px){.lrow:not([data-current]):hover{background:var(--k-housing-up);border-color:var(--k-seam);box-shadow:var(--k-seam-line)}}
   .lbtn{flex:1;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px 8px 12px 14px;background:none;border:0;border-radius:16px;font:inherit;color:inherit;cursor:pointer}
   .lbtn .num{flex:none}
   .lbtn:focus-visible{outline:none}
   .lrow:has(.lbtn:focus-visible){outline:2px solid var(--k-focus);outline-offset:2px}
-  @media (min-width:768px){.lbtn{align-items:center}}
+  @media (min-width:768px){.lbtn{align-items:center}.lbtn[data-layer-static],.lpiece{display:none}}
+  @media (max-width:767.98px){.lrow{flex-wrap:wrap}button.lbtn{display:none}.lbtn[data-layer-static]{cursor:default}.lpiece{flex:1 0 100%;min-width:0;padding:0 14px 14px}}
   .llink{flex:none;align-self:center;display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 6px;font-size:13px;font-weight:600;color:var(--k-ink);text-decoration:underline;text-underline-offset:3px;border-radius:12px}
   .llink:focus-visible{outline:2px solid var(--k-focus);outline-offset:-2px}
 </style>
@@ -62,7 +65,7 @@ import { LAYERS, layerNumber } from '../../data/home';
   const legend = document.querySelector<HTMLElement>('[data-legend]');
 
   if (xr && legend) {
-    const keys = $$<HTMLButtonElement>('.lbtn', legend);
+    const keys = $$<HTMLButtonElement>('button.lbtn', legend);
     let chosen: string | null = null;
 
     const paint = () => {
