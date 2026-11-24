@@ -545,8 +545,14 @@
   transition-property: box-shadow, translate, scale, background-color;
   transition-duration: var(--dur-press-up);
   transition-timing-function: var(--ease-out);
-  @media (hover: hover) and (pointer: fine) { &:hover:not([aria-pressed="true"]) { box-shadow: var(--k-raised-hover); } }
-  &:active, &[aria-pressed="true"] { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
+  @media (hover: hover) and (pointer: fine) { &:hover:not([aria-pressed="true"]):not(:disabled) { box-shadow: var(--k-raised-hover); } }
+  &:active:not(:disabled), &[aria-pressed="true"] { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
+  &:disabled {
+    cursor: not-allowed; color: var(--k-ink-off);
+    background: transparent; box-shadow: none;
+    border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
+    translate: none; scale: none;
+  }
 }
 
 /* ---------------------------------------------------------------- fields */

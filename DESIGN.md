@@ -72,7 +72,7 @@ Pressing a coloured button keeps its colour: variants set `--btn-pressed-bg` / `
 
 ## Components
 
-Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`.
+Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`. A `.key` takes `:disabled` the same way as a button: no body, a dashed outline, faded ink, and it no longer presses or lifts on hover.
 Fields `.field`, `.field-select`, `.field-area`, `.label`, `.hint`, `.hint-error`, invalid via `aria-invalid="true"`.
 Input groups `.input-group` is one recessed well around a bare `<input>`: a leading or trailing icon, `.input-affix` text (a seam divides it from the value), a `.kbd` hint, or a `.btn` set into the well like the raised item in a `.seg` channel, with concentric corners (the well's radius minus the 4px inset) rather than a pill. Focus, invalid and disabled are read from the input. Wrap it in a `<label>` when it holds no button; with a button, use a `<div>` and a separate `<label for>`.
 Tabs `.tabs` switch the panels of one page (`role="tablist"` with `aria-selected`) or the sections of a page (links with `aria-current="page"`): plane, on a seam, with an ink indicator under the current tab. Filters and view modes inside a panel stay `.seg`.
