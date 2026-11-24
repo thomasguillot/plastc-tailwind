@@ -11,7 +11,7 @@ import { LAYERS, layerNumber } from '../../data/home';
       <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
       <div class="flex flex-col gap-3 min-w-0">
         <ul class="grid gap-2 sm:grid-cols-2 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
-          <li class="lrow"><button type="button" class="lbtn" data-layer-key={key} aria-pressed="false"><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}<span class="lpin tag" aria-hidden="true">Pinned</span></span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></button><a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a></li>
+          <li class="lrow"><div class="lbtn" data-layer-key={key}><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}</span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></div><a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a></li>
         ))}</ul>
       </div>
     </div>
@@ -47,12 +47,8 @@ import { LAYERS, layerNumber } from '../../data/home';
   @container (max-width:599px){.xr .d-cust{display:none}.xr .mock dl.lcd{grid-template-columns:repeat(2,minmax(0,1fr))}.xr .d-search{flex-basis:100%}.xr .d-side{width:auto;padding:12px 8px}.xr .d-side>p{display:none}.xr .d-side .nav-item{width:40px;padding:0;gap:0;justify-content:center}.xr .d-side .d-nl{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
   .lrow{display:flex;align-items:stretch;border-radius:16px;border:1px solid var(--k-seam);box-shadow:var(--k-seam-line);transition:background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
   .lrow[data-current]{background:var(--k-housing-down);box-shadow:var(--k-recessed)}
-  .lrow:has(.lbtn:focus-visible){outline:2px solid var(--k-focus);outline-offset:2px}
   @media (hover:hover) and (pointer:fine){.lrow:not([data-current]):hover{background:var(--k-housing-up)}}
-  .lpin{display:none}
-  .lrow:has(.lbtn[aria-pressed=true]) .lpin{display:inline-flex}
-  .lbtn{flex:1;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px 8px 12px 14px;background:none;border:0;border-radius:16px;font:inherit;color:inherit;cursor:pointer}
-  .lbtn:focus-visible{outline:none}
+  .lbtn{flex:1;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px 8px 12px 14px;background:none;border:0;border-radius:16px;font:inherit;color:inherit}
   .lbtn .num{flex:none}
   @media (min-width:768px){.lbtn{align-items:center}}
   .llink{flex:none;align-self:center;display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 6px;font-size:13px;font-weight:600;color:var(--k-ink);text-decoration:underline;text-underline-offset:3px;border-radius:12px}
@@ -67,23 +63,20 @@ import { LAYERS, layerNumber } from '../../data/home';
   const grid = track?.querySelector<HTMLElement>('[data-ex]');
 
   if (xr && legend && track && grid) {
-    const keys = $$<HTMLButtonElement>('.lbtn', legend);
+    const keys = $$<HTMLElement>('.lbtn', legend);
     const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
     const wide = matchMedia('(min-width:1024px)');
-    let pin: string | null = null;
     let hover: string | null = null;
-    let focus: string | null = null;
     let auto: string | null = null;
     let busy = false;
     let jumping = false;
     let gridH = grid.offsetHeight;
 
     const paint = () => {
-      const shown = hover || focus || pin || auto || 'all';
+      const shown = hover || auto || 'all';
       xr.dataset.active = shown;
       keys.forEach((b) => {
         const k = b.dataset.layerKey;
-        b.setAttribute('aria-pressed', String(k === pin));
         b.parentElement!.toggleAttribute('data-current', k === shown);
       });
     };
@@ -99,25 +92,30 @@ import { LAYERS, layerNumber } from '../../data/home';
       }
       if (k !== auto) { auto = k; paint(); }
     };
-    const setPin = (k: string | null) => { pin = k; paint(); if (!pin) step(); };
-
-    keys.forEach((b, i) => {
+    keys.forEach((b) => {
       const k = b.dataset.layerKey!;
       const row = b.parentElement!;
-      b.addEventListener('click', () => setPin(pin === k ? null : k));
       if (fine) {
         row.addEventListener('pointermove', () => { if (hover !== k) { hover = k; paint(); } });
         row.addEventListener('mouseleave', () => { if (hover) { hover = null; paint(); } });
       }
-      b.addEventListener('focus', () => { if (b.matches(':focus-visible')) { focus = k; paint(); } });
-      b.addEventListener('blur', () => { if (focus === k) { focus = null; paint(); } });
-      b.addEventListener('keydown', (e) => {
-        const d = ({ ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 } as Record<string, number>)[e.key];
-        if (!d) return;
-        e.preventDefault();
-        keys[(i + d + keys.length) % keys.length].focus();
-      });
     });
+    if (fine) {
+      const parts = $$('[data-layer]', xr);
+      const partAt = (x: number, y: number) => {
+        let best: HTMLElement | null = null;
+        let area = Infinity;
+        for (const el of parts) {
+          const r = el.getBoundingClientRect();
+          if (!r.width || x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
+          if (getComputedStyle(el).visibility === 'hidden') continue;
+          if (r.width * r.height < area) { area = r.width * r.height; best = el; }
+        }
+        return best?.dataset.layer ?? null;
+      };
+      xr.addEventListener('pointermove', (e) => { const k = partAt(e.clientX, e.clientY); if (k !== hover) { hover = k; paint(); } });
+      xr.addEventListener('mouseleave', () => { if (hover) { hover = null; paint(); } });
+    }
     new ResizeObserver(() => { gridH = grid.offsetHeight; track.style.setProperty('--xh', `${gridH}px`); }).observe(grid);
     const onStep = () => { if (!busy) { busy = true; requestAnimationFrame(step); } };
     new IntersectionObserver((en) => {
@@ -126,7 +124,6 @@ import { LAYERS, layerNumber } from '../../data/home';
         step();
       } else {
         removeEventListener('scroll', onStep);
-        if (wide.matches) pin = null;
         auto = null;
         hover = null;
         paint();
