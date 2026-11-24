@@ -76,20 +76,6 @@ import { LAYERS, layerNumber } from '../../data/home';
         row.addEventListener('pointermove', () => set(b.dataset.layerKey!));
         row.addEventListener('mouseleave', () => set(null));
       });
-      const parts = $$('[data-layer]', xr);
-      const partAt = (x: number, y: number) => {
-        let best: HTMLElement | null = null;
-        let area = Infinity;
-        for (const el of parts) {
-          const r = el.getBoundingClientRect();
-          if (!r.width || x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
-          if (getComputedStyle(el).visibility === 'hidden') continue;
-          if (r.width * r.height < area) { area = r.width * r.height; best = el; }
-        }
-        return best?.dataset.layer ?? null;
-      };
-      xr.addEventListener('pointermove', (e) => set(partAt(e.clientX, e.clientY)));
-      xr.addEventListener('mouseleave', () => set(null));
     }
   }
 </script>
