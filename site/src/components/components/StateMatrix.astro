@@ -1,6 +1,5 @@
 ---
 import './state-matrix.css';
-import Icon from '../Icon.astro';
 import { NA_REASON, STATE_LABEL, type Matrix, type State } from './matrices';
 
 interface Props {
@@ -16,7 +15,6 @@ const heldText = held.length > 1 ? `${held.slice(0, -1).join(', ')} and ${held.a
 const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${held.length > 1 ? 'are' : 'is'} held on here so you can compare without a pointer. ` : '';
 ---
 <div class="mx" data-matrix>
-  <p class="mx-hint" data-matrix-hint hidden><Icon name="right" />Scroll sideways for more states.</p>
   <div class="mx-frame" data-matrix-frame>
     <div class="mx-scroll" role="region" aria-labelledby={labelledby} tabindex="0" data-matrix-scroll>
       <table class="mx-table" role="table">
@@ -47,12 +45,10 @@ const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${
 <script>
   const sync = (scroll: HTMLElement) => {
     const frame = scroll.parentElement!;
-    const hint = frame.parentElement!.querySelector<HTMLElement>('[data-matrix-hint]')!;
     const max = scroll.scrollWidth - scroll.clientWidth;
     const over = max > 1;
     frame.toggleAttribute('data-more-start', over && scroll.scrollLeft > 1);
     frame.toggleAttribute('data-more-end', over && scroll.scrollLeft < max - 1);
-    hint.hidden = max <= 24;
     if (over) scroll.tabIndex = 0;
     else scroll.removeAttribute('tabindex');
   };
@@ -65,9 +61,6 @@ const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${
 
 <style>
   .mx { container-type: inline-size; }
-  .mx-hint { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--k-ink-2); }
-  .mx-hint[hidden] { display: none; }
-  .mx-hint :global(svg) { width: 14px; height: 14px; }
   .mx-frame { position: relative; }
   .mx-frame::after {
     content: ""; position: absolute; inset: 0 0 0 auto; width: 56px; pointer-events: none;
