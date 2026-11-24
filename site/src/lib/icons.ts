@@ -17,6 +17,7 @@ export const ICONS = {
   cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   left: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
   right: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  'up-right': '<path d="M7 17 17 7M8 7h9v9"/>',
   copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
   send: '<path d="m21 3-9.5 9.5M21 3l-6.5 18-3-8.5L3 9.5z"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/>',
