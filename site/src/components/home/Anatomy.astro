@@ -7,7 +7,7 @@ import { LAYERS, layerNumber } from '../../data/home';
   <h2 id="anat-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">What one screen is made of</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Pick a layer to see its parts and the classes behind them.</p>
   <div data-track>
-    <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10 lg:sticky lg:top-[max(24px,calc(50vh_-_var(--xh,700px)/2))]" data-ex>
+    <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10" data-ex>
       <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
       <div class="flex flex-col gap-3 min-w-0">
         <ul class="grid gap-2 sm:grid-cols-2 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
@@ -15,7 +15,6 @@ import { LAYERS, layerNumber } from '../../data/home';
         ))}</ul>
       </div>
     </div>
-    <div class="hidden lg:block lg:h-[240vh]" aria-hidden="true"></div>
   </div>
   <div class="mt-10"><a class="btn btn-lg" href="/components/">Browse all components<Icon name="right" class="w-4 h-4" /></a></div>
 </section>
@@ -59,48 +58,24 @@ import { LAYERS, layerNumber } from '../../data/home';
   const $$ = <T extends Element = HTMLElement>(s: string, el: ParentNode = document) => [...el.querySelectorAll<T>(s)];
   const xr = document.querySelector<HTMLElement>('[data-xr]');
   const legend = document.querySelector<HTMLElement>('[data-legend]');
-  const track = document.querySelector<HTMLElement>('[data-track]');
-  const grid = track?.querySelector<HTMLElement>('[data-ex]');
 
-  if (xr && legend && track && grid) {
+  if (xr && legend) {
     const keys = $$<HTMLElement>('.lbtn', legend);
     const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
-    const wide = matchMedia('(min-width:1024px)');
     let hover: string | null = null;
-    let auto: string | null = null;
-    let busy = false;
-    let jumping = false;
-    let gridH = grid.offsetHeight;
 
     const paint = () => {
-      const shown = hover || auto || 'all';
+      const shown = hover || 'all';
       xr.dataset.active = shown;
-      keys.forEach((b) => {
-        const k = b.dataset.layerKey;
-        b.parentElement!.toggleAttribute('data-current', k === shown);
-      });
+      keys.forEach((b) => b.parentElement!.toggleAttribute('data-current', b.dataset.layerKey === shown));
     };
-    const step = () => {
-      busy = false;
-      if (jumping) return;
-      let k: string | null = null;
-      if (wide.matches) {
-        const r = track.getBoundingClientRect();
-        const top = Math.max(24, innerHeight / 2 - gridH / 2);
-        const p = (top - r.top) / (r.height - gridH);
-        if (p >= 0 && p <= 1) k = String(Math.min(6, Math.floor(p * 6) + 1));
-      }
-      if (k !== auto) { auto = k; paint(); }
-    };
-    keys.forEach((b) => {
-      const k = b.dataset.layerKey!;
-      const row = b.parentElement!;
-      if (fine) {
-        row.addEventListener('pointermove', () => { if (hover !== k) { hover = k; paint(); } });
-        row.addEventListener('mouseleave', () => { if (hover) { hover = null; paint(); } });
-      }
-    });
     if (fine) {
+      const set = (k: string | null) => { if (k !== hover) { hover = k; paint(); } };
+      keys.forEach((b) => {
+        const row = b.parentElement!;
+        row.addEventListener('pointermove', () => set(b.dataset.layerKey!));
+        row.addEventListener('mouseleave', () => set(null));
+      });
       const parts = $$('[data-layer]', xr);
       const partAt = (x: number, y: number) => {
         let best: HTMLElement | null = null;
@@ -113,45 +88,8 @@ import { LAYERS, layerNumber } from '../../data/home';
         }
         return best?.dataset.layer ?? null;
       };
-      xr.addEventListener('pointermove', (e) => { const k = partAt(e.clientX, e.clientY); if (k !== hover) { hover = k; paint(); } });
-      xr.addEventListener('mouseleave', () => { if (hover) { hover = null; paint(); } });
+      xr.addEventListener('pointermove', (e) => set(partAt(e.clientX, e.clientY)));
+      xr.addEventListener('mouseleave', () => set(null));
     }
-    new ResizeObserver(() => { gridH = grid.offsetHeight; track.style.setProperty('--xh', `${gridH}px`); }).observe(grid);
-    const onStep = () => { if (!busy) { busy = true; requestAnimationFrame(step); } };
-    new IntersectionObserver((en) => {
-      if (en[en.length - 1].isIntersecting) {
-        addEventListener('scroll', onStep, { passive: true });
-        step();
-      } else {
-        removeEventListener('scroll', onStep);
-        auto = null;
-        hover = null;
-        paint();
-      }
-    }).observe(track);
-    addEventListener('resize', onStep);
-
-    const hasScrollEnd = 'onscrollend' in window;
-    let jumpTimer = 0;
-    let jumpY = 0;
-    const jumpDone = () => {
-      clearTimeout(jumpTimer);
-      removeEventListener('scrollend', jumpDone);
-      if (!jumping) return;
-      jumping = false;
-      step();
-    };
-    document.addEventListener('click', (e) => {
-      if (!(e.target as Element).closest('a[href^="#"]')) return;
-      clearTimeout(jumpTimer);
-      removeEventListener('scrollend', jumpDone);
-      jumping = true;
-      jumpY = scrollY;
-      // A jump to where the page already is never scrolls, so scrollend would never come.
-      if (hasScrollEnd) {
-        addEventListener('scrollend', jumpDone);
-        jumpTimer = window.setTimeout(() => { if (scrollY === jumpY) jumpDone(); }, 150);
-      } else jumpTimer = window.setTimeout(jumpDone, 2000);
-    });
   }
 </script>
