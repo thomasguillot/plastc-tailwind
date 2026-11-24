@@ -11,7 +11,7 @@ const description = `Plastc components for Tailwind CSS v4, in ${PAGES.length} g
   <ul class="grid gap-4 sm:grid-cols-2 mt-10 list-none p-0">
     {PAGES.map((p) => (
       <li>
-        <a class="flex flex-col gap-3 h-full p-5 rounded-2xl border border-transparent text-ink no-underline transition-[background-color,border-color,box-shadow] duration-[180ms] hover:bg-[var(--k-housing-up)] hover:border-[color:var(--k-seam)] hover:shadow-[var(--k-seam-line)] focus-visible:outline-2 focus-visible:outline-[var(--k-focus)] focus-visible:outline-offset-2" href={`/components/${p.slug}/`}>
+        <a class="flex flex-col gap-3 h-full p-5 rounded-2xl text-ink no-underline bg-[var(--k-housing)] shadow-[var(--k-raised)] transition-[box-shadow,translate] duration-[180ms] hover:shadow-[var(--k-raised-hover)] active:translate-y-px active:shadow-[var(--k-pressed)] focus-visible:outline-2 focus-visible:outline-[var(--k-focus)] focus-visible:outline-offset-2" href={`/components/${p.slug}/`}>
           <h2 class="text-[19px] font-bold">{p.title}</h2>
           <p class="text-sm text-ink-2">{p.summary}</p>
           <code class="font-mono text-[11px] text-ink-2 break-words mt-auto">{p.classes}</code>
