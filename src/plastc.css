@@ -531,7 +531,10 @@
 @utility btn-lg { --btn-h: 46px; font-size: 15px; }
 @utility btn-xl { --btn-h: 50px; font-size: 16px; }
 @utility btn-2xl { --btn-h: 58px; font-size: 18px; }
-@utility btn-icon { padding: 0; width: var(--btn-h); }
+@utility btn-icon {
+  padding: 0; width: var(--btn-h);
+  &[aria-busy="true"] > svg { display: none; }
+}
 
 /* Round calculator key: for hardware-like controls only. aria-pressed latches it down. */
 @utility key {
