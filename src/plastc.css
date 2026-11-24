@@ -586,6 +586,12 @@
     background: radial-gradient(circle at 40% 35%, var(--k-lamp-core) 0 22%, var(--lamp, var(--k-lamp-lit)) 62%);
     box-shadow: 0 0 0 1px var(--k-lamp-rim), 0 0 7px 1px color-mix(in oklab, var(--lamp, var(--k-lamp-lit)) 70%, transparent);
   }
+  &[aria-checked="true"]:not(:active, :disabled, [aria-disabled="true"]) { background: radial-gradient(circle at 50% 30%, var(--k-chosen-top), var(--k-chosen) 70%); }
+  &[aria-checked="true"]::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 15%;
+    width: min(16px, 34%); height: 3px; margin-inline: auto; border-radius: 3px;
+    background: var(--k-ink);
+  }
   &:is(:disabled, [aria-disabled="true"]) {
     cursor: not-allowed; color: var(--k-ink-off);
     background: transparent; box-shadow: none;
