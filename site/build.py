@@ -293,7 +293,7 @@ def shell(active, title, sub, actions, content):
     {search()}
     {nav_block(active)}
   </aside>
-  <main id="main" class="flex-1 min-w-0 px-4 py-6 sm:px-6 md:px-10 md:py-9">
+  <main id="main" class="flex-1 min-w-0 px-4 pt-6 pb-24 sm:px-6 md:px-10 md:pt-9 md:pb-28">
     <header class="flex flex-wrap items-end gap-4 justify-between pb-7">
       <div><h1 class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em] leading-tight">{title}</h1><p class="text-ink-2 mt-1">{sub}</p></div>
       <div class="flex flex-wrap gap-3">{actions}</div>
@@ -361,14 +361,14 @@ inv = shell("invoices", "Invoices", "Create, send and track every invoice in one
     f'<button class="btn" data-toast="Import is not part of this demo">{i("down")}Import</button>{NEW_BTN}',
     f'''
 <div class="flex flex-wrap items-center gap-3 justify-between mb-5">
-  <div class="seg" role="tablist" aria-label="Filter by status" data-filter-tabs>
-    <button role="tab" aria-selected="true" data-filter="all">All <span class="text-ink-2 font-semibold" data-count="all">{len(CUSTOMERS)}</span></button>
-    <button role="tab" aria-selected="false" data-filter="paid">Paid</button><button role="tab" aria-selected="false" data-filter="open">Open</button>
-    <button role="tab" aria-selected="false" data-filter="overdue">Overdue <span class="text-danger" data-count="overdue">2</span></button><button role="tab" aria-selected="false" data-filter="draft">Draft</button>
+  <div class="seg max-sm:w-full" role="tablist" aria-label="Filter by status" data-filter-tabs>
+    <button role="tab" class="max-sm:!flex-1 max-sm:!px-2" aria-selected="true" data-filter="all">All <span class="text-ink-2 font-semibold" data-count="all">{len(CUSTOMERS)}</span></button>
+    <button role="tab" class="max-sm:!flex-1 max-sm:!px-2" aria-selected="false" data-filter="paid">Paid</button><button role="tab" class="max-sm:!flex-1 max-sm:!px-2" aria-selected="false" data-filter="open">Open</button>
+    <button role="tab" class="max-sm:!flex-1 max-sm:!px-2" aria-selected="false" data-filter="overdue">Overdue <span class="text-danger" data-count="overdue">2</span></button><button role="tab" class="max-sm:!flex-1 max-sm:!px-2" aria-selected="false" data-filter="draft">Draft</button>
   </div>
   <div class="flex gap-3 flex-1 sm:flex-none min-w-0">
-    <label class="input-group flex-1 sm:w-72 min-w-0">{i("search")}<span class="sr-only">Search invoices</span><input placeholder="Search by customer or number" data-search data-table-search></label>
-    <button class="btn btn-icon sm:!w-auto sm:!px-4" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Sep 1 to Oct 31" data-range-btn>{i("cal")}<span class="hidden sm:inline" data-range-label>Sep 1 – Oct 31</span></button>
+    <label class="input-group flex-1 sm:w-72 min-w-0">{i("search")}<span class="sr-only">Search invoices</span><input placeholder="Customer or number" data-search data-table-search></label>
+    <button class="btn shrink-0" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Sep 1 to Oct 31" data-range-btn>{i("cal")}<span data-range-label>Sep 1 – Oct 31</span></button>
     <div class="menu" popover id="range-menu" style="position-anchor:--range-menu" aria-label="Date range"><button type="button" data-range="Last 30 days">Last 30 days</button><button type="button" data-range="Sep 1 – Oct 31">Sep 1 – Oct 31</button><button type="button" data-range="This quarter">This quarter</button><button type="button" data-range="This year">This year</button></div>
   </div>
 </div>

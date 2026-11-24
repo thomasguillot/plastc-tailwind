@@ -212,7 +212,6 @@
   let filter = 'all';
   function filterRows(f) {
     const scope = wrap || document;
-    if (f && f !== filter) $$('[data-row-select]').forEach(c => c.checked = false);
     if (f) filter = f;
     const q = ($('[data-table-search]') || {}).value?.trim() || '';
     const ql = q.toLowerCase();
@@ -224,6 +223,7 @@
     $$('[data-nav-count]').forEach(el => { const k = el.dataset.navCount; el.textContent = kept.filter(r => r.dataset.status === k).length; });
     if (!wrap) { updateBulk(); return; }
     let shown = 0;
+    const wasChecked = $$('[data-row-select]:checked').length;
     $$('tbody tr', wrap).forEach(r => {
       const ok = (filter === 'all' || r.dataset.status === filter) && matches(r);
       r.style.display = ok ? '' : 'none'; if (ok && !r.hidden) shown++;
@@ -250,6 +250,9 @@
         $('[data-empty-new]', empty).hidden = !!q || filter !== 'draft';
       }
     }
+    $$('[data-row-select]:checked').forEach(c => { const r = c.closest('tr'); if (r.hidden || r.style.display === 'none') c.checked = false; });
+    const dropped = wasChecked - $$('[data-row-select]:checked').length;
+    if (dropped) live(`${dropped} hidden invoice${dropped === 1 ? '' : 's'} deselected`);
     const pager = $('[data-pager]'); if (pager) pager.hidden = !shown;
     const showing = $('[data-showing]'); if (showing) showing.textContent = shown === kept.length ? `Showing all ${shown} invoices` : `Showing ${shown} of ${kept.length} invoices`;
     updateBulk();
