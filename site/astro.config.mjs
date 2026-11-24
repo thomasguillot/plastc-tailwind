@@ -2,13 +2,34 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import { Features } from 'lightningcss';
+import { copyFile, mkdir, readdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const folderIndexes = {
+  name: 'folder-indexes',
+  hooks: {
+    'astro:build:done': async ({ dir }) => {
+      const out = fileURLToPath(dir);
+      const section = join(out, 'components');
+      const put = async (from, to) => {
+        await mkdir(dirname(to), { recursive: true });
+        await copyFile(from, to);
+      };
+      await put(`${section}.html`, join(section, 'index.html'));
+      for (const file of await readdir(section)) {
+        if (file.endsWith('.html') && file !== 'index.html') await put(join(section, file), join(section, file.slice(0, -5), 'index.html'));
+      }
+    },
+  },
+};
 
 export default defineConfig({
   site: 'https://plastc.space.fast',
   compressHTML: false,
   build: { format: 'file' },
   markdown: { syntaxHighlight: false },
-  integrations: [mdx()],
+  integrations: [mdx(), folderIndexes],
   vite: {
     plugins: [tailwindcss()],
     css: {
