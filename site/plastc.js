@@ -67,7 +67,7 @@
   function syncViewer(k) {
     $$('[data-screen]', viewer).forEach(b => b.dataset.screen === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
     const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html`;
-    const b = $(`[data-screen="${k}"]`, viewer); if (b) frame.title = b.textContent;
+    const b = $(`[data-screen="${k}"]`, viewer); frame.title = b ? b.textContent : 'Landing page';
   }
   function showScreen(k) {
     const url = `screens/${k}.html`;
@@ -402,6 +402,14 @@
     const rm = e.target.closest('[data-file-remove]'); if (!rm) return;
     const li = rm.closest('.file-item'), name = $('.file-name', li).textContent;
     li.remove(); live(`${name} removed`);
+  });
+
+  /* ---------- pricing: monthly or yearly */
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-billing]'); if (!b) return;
+    const yearly = b.dataset.billing === 'yearly';
+    $$('[data-price]').forEach(p => { p.textContent = yearly ? p.dataset.yearly : p.dataset.monthly; });
+    $$('[data-price-unit]').forEach(u => { u.textContent = yearly ? '/ year' : '/ month'; });
   });
 
   /* ---------- listbox: combobox and command menu share one controller */

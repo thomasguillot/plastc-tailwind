@@ -451,6 +451,111 @@ signin = f'''<body class="min-h-screen grid place-items-center px-4 py-12">
 '''
 page("screens/sign-in.html", "Sign in · Plastc", signin, "../")
 
+
+# ------------------------------------------------------------------ landing page (marketing sections)
+LNAV = [("features", "Features"), ("pricing", "Pricing"), ("faq", "FAQ")]
+PLANS = [
+    ("Solo", "0", "0", "For your first few clients.", ["5 invoices a month", "Card and bank payments", "Automatic reminders"], False, "Start free"),
+    ("Studio", "12", "120", "For a small team that bills every week.", ["Up to 3 people", "200 invoices a month", "Reminders and late fees", "CSV export"], True, "Start with Studio"),
+    ("Practice", "29", "290", "For firms with many clients.", ["Unlimited people", "Unlimited invoices", "Your own domain for pay links", "Priority support"], False, "Start with Practice"),
+]
+plan_cards = "".join(f'''<article class="plan"{' data-featured' if feat else ''}>
+  <div><div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold">{name}</h3>{'<span class="badge lamp-signal">Recommended</span>' if feat else ''}</div><p class="text-sm text-ink-2 mt-1">{blurb}</p></div>
+  <p class="plan-price"><span data-price data-monthly="${mo}" data-yearly="${yr}">${mo}</span><small data-price-unit>/ month</small></p>
+  <ul class="check-list">{"".join(f"<li>{x}</li>" for x in feats)}</ul>
+  <a class="btn {'btn-signal' if feat else ''} w-full" href="sign-in.html">{cta}</a>
+</article>''' for name, mo, yr, blurb, feats, feat, cta in PLANS)
+
+FAQS = [
+    ("Do my customers need an account?", "No. They get an email with a link to the invoice, and they can pay from there by card or bank transfer."),
+    ("Can I bring invoices from another tool?", "Yes. Import a CSV export and your customers, invoices and their statuses come across together."),
+    ("What happens when I void an invoice?", "The customer can no longer pay it and it leaves your outstanding total. It stays in your history, marked void."),
+    ("Can I change plans later?", "Any time. Moving up takes effect at once; moving down takes effect at the end of the billing period."),
+]
+
+def feature(title, body, visual, flip=False):
+    return f'''<div class="grid gap-8 md:gap-14 md:grid-cols-2 items-center py-12 border-t border-[color:var(--k-seam)]">
+  <div class="{'md:order-2' if flip else ''}"><h3 class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em] text-balance">{title}</h3><p class="text-ink-2 text-lg mt-3 max-w-[46ch] text-pretty">{body}</p></div>
+  <div class="rounded-[22px] seam p-6 md:p-8">{visual}</div>
+</div>'''
+
+def footer_nav(cols):
+    out = ""
+    for h, links in cols:
+        items = "".join(f'<li><a class="text-ink-2 hover:text-ink hover:underline underline-offset-3" href="{u}"{t}>{l}</a></li>' for l, u, t in links)
+        out += f'<nav aria-label="{h}"><p class="engraved mb-3">{h}</p><ul class="grid gap-2 text-sm">{items}</ul></nav>'
+    return out
+
+FOOTER_NAV = footer_nav([
+    ("Product", [("Features", "#features", ""), ("Pricing", "#pricing", ""), ("Questions", "#faq", "")]),
+    ("App", [("Dashboard", "dashboard.html", ""), ("Invoices", "invoices.html", ""), ("Settings", "settings.html", "")]),
+    ("Plastc", [("The UI library", "../index.html", ' target="_top"'), ("Source on GitHub", "https://github.com/thomasguillot/plastc-tailwind", ' target="_top"')]),
+])
+
+landing = f'''<body>
+{SKIP}
+<header class="max-w-[1200px] mx-auto px-4 md:px-8 pt-6 pb-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+  {wordmark("#top")}
+  <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Sections">{"".join(f'<a class="btn btn-quiet btn-sm" href="#{k}">{l}</a>' for k, l in LNAV)}</nav>
+  <div class="ml-auto flex items-center gap-2"><a class="btn btn-quiet btn-sm" href="sign-in.html">Sign in</a><a class="btn btn-sm" href="dashboard.html">Open the app</a></div>
+</header>
+
+<main id="main">
+<section id="top" class="max-w-[1200px] mx-auto px-4 md:px-8 pt-14 md:pt-24 pb-20 grid gap-12 lg:grid-cols-[1.05fr_1fr] items-center">
+  <div>
+    <h1 class="display text-[48px] sm:text-[64px] md:text-[80px] text-balance">Invoices that chase themselves.</h1>
+    <p class="text-lg text-ink-2 max-w-[44ch] mt-7 leading-relaxed text-pretty">Send an invoice in a minute. Reminders follow up on their own, and one readout shows what is paid, open and overdue.</p>
+    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="sign-in.html">Start free</a><a class="btn btn-xl" href="dashboard.html">See the dashboard</a></div>
+  </div>
+  <div class="panel !p-4 sm:!p-5 min-w-0">
+    <div class="lcd px-5 py-4 grid grid-cols-3 gap-4">{"".join(f'<div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{k}</p><p class="text-lg sm:text-xl font-semibold mt-1">{v}</p></div>' for k, v in (("Paid", "$48,210"), ("Open", "$15,447"), ("Overdue", "$9,300")))}</div>
+    <div class="table-scroll mt-3">{table(CUSTOMERS[:4], select=False, actions=False, dates=False)}</div>
+  </div>
+</section>
+
+<section id="features" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24">
+  <h2 class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">Built for the part after you hit send</h2>
+  <div class="mt-12">
+  {feature("Reminders that go out on their own", "The morning after a due date passes, then every week until the invoice is paid. Pause them for one customer whenever you need to.", """<ol class="timeline"><li class="lamp-ok"><b>Paid in full</b> by card<time>Oct 28 · 9:14 AM</time></li><li class="lamp-warn"><b>Reminder sent</b> to billing@halden.studio<time>Oct 24 · 8:00 AM</time></li><li><b>Viewed</b> by Halden Studio<time>Oct 3 · 2:31 PM</time></li><li><b>Sent</b> by Mira Okafor<time>Oct 1 · 10:02 AM</time></li></ol>""")}
+  {feature("Paid the way your customers prefer", "Every invoice carries a pay link for card and bank transfer. Payments mark the invoice paid as they land.", """<div class="grid gap-3" role="radiogroup" aria-label="Payment method"><label class="choice-card"><input type="radio" name="lpm" class="radio mt-0.5" checked><span><span class="block text-sm font-bold">Card</span><span class="block text-sm text-ink-2">Visa, Mastercard and Amex. Paid in seconds.</span></span></label><label class="choice-card"><input type="radio" name="lpm" class="radio mt-0.5"><span><span class="block text-sm font-bold">Bank transfer</span><span class="block text-sm text-ink-2">Details on the invoice. Matched when it arrives.</span></span></label></div>""", flip=True)}
+  {feature("Know where you stand", "Paid, open and overdue in one readout, updated as payments arrive. No spreadsheet to keep in step.", f"""<div class="flex flex-wrap items-center gap-6"><div class="w-[140px] shrink-0">{donut([("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")], "$63.8k", "invoiced", "Invoiced this quarter: $63,800. Paid 62%, open 21%, overdue 9%, draft 8%.")}</div><ul class="grid gap-2 text-sm min-w-[150px]">{"".join(f'<li class="flex items-center justify-between gap-4"><span class="badge {l}">{n}</span><span class="tabular-nums text-ink-2">{p}%</span></li>' for n, p, l in (("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")))}</ul></div>""")}
+  </div>
+</section>
+
+<section id="pricing" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24">
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <div><h2 class="display text-[40px] md:text-[56px]">Pricing</h2><p class="text-ink-2 text-lg mt-4 max-w-[44ch]">Start free. Move up when your team or your client list grows.</p></div>
+    <div class="seg" role="group" aria-label="Billing period"><button type="button" aria-pressed="true" data-billing="monthly">Monthly</button><button type="button" aria-pressed="false" data-billing="yearly">Yearly <span class="text-ink-2 font-semibold">2 months free</span></button></div>
+  </div>
+  <div class="grid gap-5 md:grid-cols-3 mt-10 items-stretch">{plan_cards}</div>
+</section>
+
+<section id="faq" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24 grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+  <div><h2 class="display text-[40px] md:text-[56px]">Questions</h2><p class="text-ink-2 text-lg mt-4 max-w-[36ch]">Something else? Write to the team from inside the app.</p></div>
+  <div class="accordion">{"".join(f'<details{" open" if n == 0 else ""}><summary>{q}</summary><p>{a}</p></details>' for n, (q, a) in enumerate(FAQS))}</div>
+</section>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-20">
+  <div class="panel !px-6 !py-10 md:!px-12 md:!py-14 flex flex-wrap items-center justify-between gap-8">
+    <div><h2 class="text-[32px] md:text-[40px] font-bold tracking-[-0.02em] text-balance max-w-[18ch]">Send your next invoice in a minute.</h2><p class="text-ink-2 text-lg mt-3">Free for your first five invoices every month.</p></div>
+    <div class="flex flex-wrap gap-3"><a class="btn btn-signal btn-lg" href="sign-in.html">Start free</a><a class="btn btn-lg" href="#pricing">Compare plans</a></div>
+  </div>
+</section>
+</main>
+
+<footer class="max-w-[1200px] mx-auto px-4 md:px-8 pt-12 pb-10 mt-6 border-t border-[color:var(--k-seam)]">
+  <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <div>{wordmark("#top")}<p class="text-sm text-ink-2 mt-4 max-w-[32ch]">Invoicing for studios and small practices.</p></div>
+    {FOOTER_NAV}
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t border-[color:var(--k-seam)] text-sm text-ink-2">
+    <p>Sample page built with Plastc. The product, prices and copy are made up.</p>
+    {housing_seg()}
+  </div>
+</footer>
+'''
+page("screens/landing.html", "Landing page · Plastc", landing, "../")
+
 # ------------------------------------------------------------------ showcase
 def spec(name, cls, rule, specimen):
     return f'''<div class="flex flex-col gap-4">
@@ -684,6 +789,15 @@ showcase = f'''<body>
   <div class="grid gap-8 sm:grid-cols-2">{previews}</div>
 </section>
 
+<section id="marketing" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
+  <h2 class="display text-[40px] md:text-[56px]">Marketing sections</h2>
+  <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">A landing page for the invoicing app above: hero, features, pricing, questions, a call to action and a footer, built from the same parts.</p>
+  <a href="screens/landing.html" class="group block no-underline text-ink" data-open-screen="landing">
+    <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] md:aspect-[16/8] bg-housing"><iframe src="screens/landing.html" title="Landing page preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[1100px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
+    <p class="flex items-center justify-between font-bold mt-3">Landing page<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
+  </a>
+</section>
+
 <section id="tokens" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <h2 class="display text-[40px] md:text-[56px]">Tokens</h2>
   <div class="grid gap-10 lg:grid-cols-2 mt-10">
@@ -727,8 +841,8 @@ showcase = f'''<body>
 </main>
 {VIEWER}
 {command_dialog([
-    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', "")]),
-    ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("tokens", "Tokens"), ("install", "Install"))]),
+    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("chart", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', "")]),
+    ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("marketing", "Marketing sections"), ("tokens", "Tokens"), ("install", "Install"))]),
     ("Actions", [HOUSING_CMD, ("copy", "Copy the import line", f"data-copy='{IMPORT}'", "")]),
 ])}
 
