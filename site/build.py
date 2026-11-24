@@ -417,16 +417,177 @@ settings = shell("settings", "Settings", "Manage your studio profile, team and b
 ''')
 page("screens/settings.html", "Settings · Plastc", settings, "../")
 
-# ------------------------------------------------------------------ stub screens (honest: not in the reference set)
-for key, label, ic in NAV[2:]:
-    stub = shell(key, label, f"{label} isn’t one of the reference screens yet.", "", f'''
-<section class="panel !p-0"><div class="empty">
-  {lcd_empty("--", label)}
-  <h2>Not built yet</h2>
-  <p>The reference set covers the dashboard, invoices, settings and sign-in. {label} would reuse the same table, filters and empty states.</p>
-  <div class="empty-actions"><a class="btn btn-sm" href="dashboard.html">{i("left")}Back to dashboard</a><a class="btn btn-sm" href="invoices.html">See invoices</a></div>
-</div></section>''')
-    page(f"screens/{key}.html", f"{label} · Plastc", stub, "../")
+# ------------------------------------------------------------------ customers, reports, products
+def money(v):
+    return f"${v:,.2f}" if v % 1 else f"${v:,.0f}"
+
+def row_actions(rid, label, items):
+    body = "".join(items)
+    return (f'<button class="btn btn-quiet btn-sm btn-icon" popovertarget="{rid}" style="anchor-name:--{rid}" aria-label="Actions for {label}">{i("dots")}</button>'
+            f'<div class="menu" popover id="{rid}" style="position-anchor:--{rid}">{body}</div>')
+
+def filter_toolbar(table_id, placeholder, segs):
+    seg = "".join(f'<button type="button" aria-pressed="{"true" if n == 0 else "false"}" data-row-filter="{k}">{l}<span class="hidden sm:inline text-ink-2 font-semibold">{c}</span></button>' for n, (k, l, c) in enumerate(segs))
+    return f'''<div class="flex flex-wrap items-center gap-3 justify-between mb-5">
+  <div class="seg" role="group" aria-label="Filter" data-filter-for="{table_id}">{seg}</div>
+  <label class="input-group flex-1 sm:flex-none sm:w-72 min-w-0">{i("search")}<span class="sr-only">Search</span><input placeholder="{placeholder}" data-filter-for="{table_id}"></label>
+</div>'''
+
+def filter_empty(table_id, unit):
+    return f'''<div class="empty" data-empty-for="{table_id}" hidden>
+    <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit">{unit}</span></div>
+    <h2>Nothing matches</h2>
+    <p>Check the spelling, or try another filter.</p>
+    <button class="btn btn-sm" data-clear-filter="{table_id}">{i("x")}Clear search</button>
+  </div>'''
+
+CLIENTS = [
+    ("Halden Studio", "HS", "billing@halden.studio", 24, 0, 64180, "Oct 28", "paid"),
+    ("Ortiz & Lane", "OL", "accounts@ortizlane.com", 15, 0, 31480.50, "Oct 27", "paid"),
+    ("Northwind Co-op", "NC", "finance@northwind.coop", 19, 9300, 71250, "Oct 12", "owes overdue"),
+    ("Priya Nair", "PN", "priya@nair.design", 10, 612, 14210, "Oct 9", "owes"),
+    ("Brightwater Labs", "BL", "ap@brightwater.io", 18, 0, 52300, "Oct 4", "paid"),
+    ("Fenwick & Daughters", "FD", "office@fenwick.co", 12, 3140, 18900, "Sep 30", "owes overdue"),
+    ("Tamsin Reyes", "TR", "tamsin@reyes.studio", 9, 0, 12600, "Sep 26", "paid"),
+    ("Kettle Hill Bakery", "KH", "orders@kettlehill.co", 11, 415.25, 11449.50, "Sep 21", "owes"),
+    ("Alder Robotics", "AR", "ap@alder-robotics.com", 22, 0, 96400, "Sep 18", "paid"),
+    ("Juno Park", "JP", "juno@junopark.co", 11, 1980, 15840, "Sep 11", "owes"),
+]
+
+def client_row(n, c):
+    name, ini, email, count, owed, billed, last, group = c
+    owed_cell = '<span class="text-ink-2">$0</span>' if not owed else f'<span class="{"text-danger font-bold" if "overdue" in group else "font-semibold"}">{money(owed)}</span>'
+    menu = row_actions(f"cm{n}", name, [
+        f'<button type="button" data-open-dialog="new-invoice">{i("plus")}New invoice</button>',
+        f'<button type="button" data-toast="Statement sent to {email}">{i("send")}Send statement</button>',
+        '<hr>',
+        f'<button type="button" data-toast="{name} archived">{i("box")}Archive</button>',
+    ])
+    return (f'<tr data-group="{group}"><td><div class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{ini}</span>'
+            f'<div class="min-w-0"><p class="font-semibold">{name}</p><p class="text-ink-2 text-[13px]">{email}</p></div></div></td>'
+            f'<td class="hidden md:table-cell num">{count}</td><td class="num">{owed_cell}</td><td class="hidden md:table-cell num">{money(billed)}</td>'
+            f'<td class="hidden md:table-cell text-ink-2 whitespace-nowrap">{last}</td><td class="w-12">{menu}</td></tr>')
+
+ADD_CUSTOMER = f'''<dialog class="dialog" id="add-customer" aria-labelledby="ac-h">
+  <form method="dialog" class="grid gap-5" data-toast-on-submit="Customer added">
+    <div class="flex items-start justify-between gap-4"><div><h2 id="ac-h" class="text-lg font-bold">Add customer</h2><p class="text-sm text-ink-2 mt-1">Invoices and statements go to this address.</p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" data-close-dialog aria-label="Close">{i("x")}</button></div>
+    <div><label class="label" for="ac-n">Name</label><input id="ac-n" class="field" autocomplete="organization" autofocus></div>
+    <div><label class="label" for="ac-e">Billing email</label><input id="ac-e" class="field" type="email" autocomplete="email"></div>
+    <div class="flex justify-end gap-3 pt-1"><button type="button" class="btn" data-close-dialog>Cancel</button><button class="btn btn-signal" value="ok">Add customer</button></div>
+  </form>
+</dialog>'''
+
+owes = sum(1 for c in CLIENTS if "owes" in c[7]); overdue = sum(1 for c in CLIENTS if "overdue" in c[7])
+customers = shell("customers", "Customers", "Everyone you invoice, and what each of them owes.",
+    f'<button class="btn" data-toast="Import is not part of this demo">{i("down")}Import</button><button class="btn btn-signal" data-open-dialog="add-customer">{i("plus","", "2.2")}Add customer</button>',
+    f'''
+{filter_toolbar("cust-table", "Search by name or email", [("all", "All", len(CLIENTS)), ("owes", "Owes money", owes), ("overdue", "Overdue", overdue), ("paid", "Paid up", len(CLIENTS) - owes)])}
+<section class="panel !p-0">
+  <div class="table-scroll px-2 pt-1"><table class="ktable" id="cust-table">
+    <thead><tr><th>Customer</th><th class="hidden md:table-cell num">Invoices</th><th class="num">Owes</th><th class="hidden md:table-cell num">Billed this year</th><th class="hidden md:table-cell">Last invoice</th><th class="w-12"><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>{"".join(client_row(n, c) for n, c in enumerate(CLIENTS))}</tbody>
+  </table></div>
+  {filter_empty("cust-table", "Matches")}
+  <nav class="pager px-5 sm:px-6 py-4 border-t border-[color:var(--k-seam)]" aria-label="Pagination">
+    <button class="btn btn-sm" disabled>{i("left")}Previous</button>
+    <p class="pager-status" data-count-for="cust-table">Showing all {len(CLIENTS)} customers</p>
+    <button class="btn btn-sm" disabled>Next{i("right")}</button>
+  </nav>
+</section>
+{ADD_CUSTOMER}
+''')
+page("screens/customers.html", "Customers · Plastc", customers, "../")
+
+INVOICES_SENT = [9, 10, 9, 12, 11, 13, 12, 14, 13, 16, 14, 18]
+TOP = sorted(CLIENTS, key=lambda c: -c[5])[:5]
+TOTAL = sum(c[5] for c in CLIENTS)
+top_rows = "".join(
+    f'<tr><td><div class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{c[1]}</span><span class="font-semibold">{c[0]}</span></div></td>'
+    f'<td class="hidden md:table-cell num">{c[3]}</td><td class="num">{money(c[5])}</td>'
+    f'<td class="hidden sm:table-cell w-[28%] min-w-[120px]"><div class="flex items-center gap-3"><div class="meter flex-1" role="meter" aria-label="Share of revenue for {c[0]}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{c[5] / TOTAL * 100:.1f}"><span style="--v:{c[5] / TOTAL * 100 * 2.5:.1f}%"></span></div><span class="text-ink-2 tabular-nums text-[13px] w-12 text-right">{c[5] / TOTAL * 100:.1f}%</span></div></td></tr>'
+    for c in TOP)
+
+reports = shell("reports", "Reports", "How invoicing has gone over the last twelve months.",
+    f'''<button class="btn" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Last 12 months" data-range-btn>{i("cal")}<span data-range-label>Last 12 months</span></button>
+    <div class="menu" popover id="range-menu" style="position-anchor:--range-menu" aria-label="Date range"><button type="button" data-range="Last 30 days">Last 30 days</button><button type="button" data-range="This quarter">This quarter</button><button type="button" data-range="Last 12 months">Last 12 months</button><button type="button" data-range="All time">All time</button></div>
+    <button class="btn" data-toast="Export started. We’ll email the CSV.">{i("down")}Export</button>''',
+    f'''
+<section class="lcd px-6 py-5 grid gap-5 grid-cols-2 lg:grid-cols-4" aria-label="Key figures, last twelve months">
+  {"".join(f'<div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{k}</p><p class="text-[28px] font-semibold leading-none mt-2 tracking-[-0.02em]">{v}</p><p class="text-xs mt-2">{d}</p></div>' for k, v, d in (("Revenue", money(TOTAL), "▲ 31% on the year before"), ("Invoices sent", str(sum(INVOICES_SENT)), "18 in October"), ("Avg. days to pay", "18.2", "▼ 2.1 days faster"), ("Paid on time", "86%", "of invoices due")))}
+</section>
+
+<section class="panel !p-5 sm:!p-6 mt-8" aria-labelledby="rr-h">
+  <div class="flex flex-wrap items-center gap-3 justify-between mb-5"><div><h2 id="rr-h" class="font-bold">Revenue</h2><p class="text-sm text-ink-2">Paid invoices by month</p></div><p class="text-sm text-ink-2 tabular-nums">Nov 2025 – Oct 2026</p></div>
+  <div class="hidden sm:block">{line_chart(REV, MONTHS, highlight=11)}</div>
+  <div class="sm:hidden">{line_chart(REV, [m if n % 3 == 2 else "" for n, m in enumerate(MONTHS)], w=360, h=220, highlight=11, fs=12)}</div>
+</section>
+
+<div class="grid gap-6 lg:grid-cols-[1.5fr_1fr] mt-6 [&>*]:min-w-0">
+  <section class="panel !p-5 sm:!p-6" aria-labelledby="rs-h">
+    <h2 id="rs-h" class="font-bold">Invoices sent</h2><p class="text-sm text-ink-2">By month</p>
+    <div class="mt-5 hidden sm:block">{bar_chart(INVOICES_SENT, MONTHS, "Invoices sent per month, November 2025 to October 2026. October: 18, the most in the year.", w=560, h=290)}</div>
+    <div class="mt-5 sm:hidden">{bar_chart(INVOICES_SENT[6:], MONTHS[6:], "Invoices sent per month, May to October 2026. October: 18.")}</div>
+  </section>
+  <section class="panel !p-5 sm:!p-6" aria-labelledby="rd-h">
+    <h2 id="rd-h" class="font-bold">By status</h2><p class="text-sm text-ink-2">Share of invoiced value this quarter</p>
+    <div class="mt-5 flex flex-wrap items-center gap-6"><div class="w-[140px] shrink-0">{donut([("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")], "$63.8k", "invoiced", "Invoiced this quarter: $63,800. Paid 62%, open 21%, overdue 9%, draft 8%.")}</div>
+    <ul class="grid gap-2 text-sm min-w-[150px] flex-1">{"".join(f'<li class="flex items-center justify-between gap-4"><span class="badge {l}">{n}</span><span class="tabular-nums text-ink-2">{p}%</span></li>' for n, p, l in (("Paid", 62, "lamp-ok"), ("Open", 21, "lamp-warn"), ("Overdue", 9, "lamp-danger"), ("Draft", 8, "lamp-off")))}</ul></div>
+  </section>
+</div>
+
+<section class="panel !p-0 mt-6" aria-labelledby="rt-h">
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 pt-5 pb-3"><h2 id="rt-h" class="font-bold">Top customers</h2><a class="btn btn-sm" href="customers.html">All customers{i("right")}</a></div>
+  <div class="table-scroll px-2 pb-2"><table class="ktable"><thead><tr><th>Customer</th><th class="hidden md:table-cell num">Invoices</th><th class="num">Billed</th><th class="hidden sm:table-cell">Share of revenue</th></tr></thead><tbody>{top_rows}</tbody></table></div>
+</section>
+''')
+page("screens/reports.html", "Reports · Plastc", reports, "../")
+
+PRODUCTS = [
+    ("Brand identity", "Project", 6400, 9, "active"),
+    ("Website design", "Project", 8200, 6, "active"),
+    ("Design day", "Day", 950, 31, "active"),
+    ("Consulting", "Hour", 140, 64, "active"),
+    ("Print production", "Item", 380, 12, "active"),
+    ("Monthly retainer", "Month", 1800, 14, "active"),
+    ("Photography, half day", "Half day", 620, 3, "archived"),
+]
+
+def product_row(n, p):
+    name, unit, price, used, group = p
+    menu = row_actions(f"pm{n}", name, [
+        f'<button type="button" data-open-dialog="add-product">{i("file")}Edit</button>',
+        f'<button type="button" data-toast="{name} duplicated">{i("copy")}Duplicate</button>',
+        '<hr>',
+        f'<button type="button" data-toast="{name} {"restored" if group == "archived" else "archived"}">{i("box")}{"Restore" if group == "archived" else "Archive"}</button>',
+    ])
+    return (f'<tr data-group="{group}"{" hidden" if group == "archived" else ""}><td class="font-semibold">{name}</td><td class="hidden sm:table-cell"><span class="tag">{unit}</span></td>'
+            f'<td class="num">{money(price)}</td><td class="hidden md:table-cell num">{used}</td><td class="w-12">{menu}</td></tr>')
+
+ADD_PRODUCT = f'''<dialog class="dialog" id="add-product" aria-labelledby="ap-h">
+  <form method="dialog" class="grid gap-5" data-toast-on-submit="Product saved">
+    <div class="flex items-start justify-between gap-4"><div><h2 id="ap-h" class="text-lg font-bold">Product</h2><p class="text-sm text-ink-2 mt-1">Something you bill for. Add it to any invoice as a line item.</p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" data-close-dialog aria-label="Close">{i("x")}</button></div>
+    <div><label class="label" for="ap-n">Name</label><input id="ap-n" class="field" autofocus placeholder="Design day"></div>
+    <div class="grid grid-cols-2 gap-4"><div><label class="label" for="ap-u">Unit</label><select id="ap-u" class="field field-select"><option>Hour</option><option selected>Day</option><option>Project</option><option>Item</option><option>Month</option></select></div>
+    <div><label class="label" for="ap-p">Price</label><div class="input-group"><span class="input-affix">$</span><input id="ap-p" inputmode="decimal" placeholder="0.00"></div></div></div>
+    <div class="flex justify-end gap-3 pt-1"><button type="button" class="btn" data-close-dialog>Cancel</button><button class="btn btn-signal" value="ok">Save product</button></div>
+  </form>
+</dialog>'''
+
+active = sum(1 for p in PRODUCTS if p[4] == "active")
+products = shell("products", "Products", "What you bill for, ready to drop into an invoice.",
+    f'<button class="btn btn-signal" data-open-dialog="add-product">{i("plus","", "2.2")}Add product</button>',
+    f'''
+{filter_toolbar("prod-table", "Search products", [("active", "Active", active), ("archived", "Archived", len(PRODUCTS) - active)])}
+<section class="panel !p-0">
+  <div class="table-scroll px-2 pt-1"><table class="ktable" id="prod-table">
+    <thead><tr><th>Name</th><th class="hidden sm:table-cell">Unit</th><th class="num">Price</th><th class="hidden md:table-cell num">On invoices</th><th class="w-12"><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>{"".join(product_row(n, p) for n, p in enumerate(PRODUCTS))}</tbody>
+  </table></div>
+  {filter_empty("prod-table", "Matches")}
+</section>
+{ADD_PRODUCT}
+''')
+page("screens/products.html", "Products · Plastc", products, "../")
 
 # ------------------------------------------------------------------ sign in
 signin = f'''<body class="min-h-screen grid place-items-center px-4 py-12">

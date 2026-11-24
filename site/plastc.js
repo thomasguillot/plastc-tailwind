@@ -412,6 +412,29 @@
     $$('[data-price-unit]').forEach(u => { u.textContent = yearly ? '/ year' : '/ month'; });
   });
 
+  /* ---------- generic table filter: a search box and a .seg, both pointing at one table */
+  function applyFilter(id) {
+    const table = document.getElementById(id); if (!table) return;
+    const q = (($(`input[data-filter-for="${id}"]`) || {}).value || '').trim().toLowerCase();
+    const on = $(`.seg[data-filter-for="${id}"] [aria-pressed="true"]`), f = on ? on.dataset.rowFilter : 'all';
+    let shown = 0;
+    $$('tbody tr', table).forEach(r => {
+      const ok = (f === 'all' || (r.dataset.group || '').split(' ').includes(f)) && (!q || r.textContent.toLowerCase().includes(q));
+      r.hidden = !ok; if (ok) shown++;
+    });
+    const empty = $(`[data-empty-for="${id}"]`), wrap = table.closest('.table-scroll');
+    if (empty) { empty.hidden = !!shown; if (wrap) wrap.hidden = !shown; }
+    const count = $(`[data-count-for="${id}"]`), total = $$('tbody tr', table).length;
+    if (count) count.textContent = shown === total ? `Showing all ${total} customers` : `Showing ${shown} of ${total} customers`;
+  }
+  document.addEventListener('input', e => { const s = e.target.closest('input[data-filter-for]'); if (s) applyFilter(s.dataset.filterFor); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.seg[data-filter-for] > button');
+    if (b) { [...b.parentElement.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); return applyFilter(b.parentElement.dataset.filterFor); }
+    const c = e.target.closest('[data-clear-filter]');
+    if (c) { const id = c.dataset.clearFilter, inp = $(`input[data-filter-for="${id}"]`); if (inp) { inp.value = ''; inp.focus(); } applyFilter(id); }
+  });
+
   /* ---------- listbox: combobox and command menu share one controller */
   function listboxFor(input) { return document.getElementById(input.getAttribute('aria-controls')); }
   const visibleOptions = lb => $$('[role=option]', lb).filter(o => !o.hidden && !o.closest('[hidden]'));
