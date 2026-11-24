@@ -6,3 +6,4 @@ node_modules/
 site/dist/
 site/.astro/
 direction-contract.md
+site/public/home-options/
