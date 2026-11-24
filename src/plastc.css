@@ -536,7 +536,7 @@
 @utility btn-quiet {
   background: transparent; box-shadow: none; color: var(--k-ink-2);
   @media (hover: hover) and (pointer: fine) {
-    &:hover:not(:disabled, [aria-disabled="true"], [aria-pressed="true"]) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
+    &:hover:not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]):not(:active) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
   }
   --btn-pressed-bg: var(--k-housing-down);
 }
