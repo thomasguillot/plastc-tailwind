@@ -356,6 +356,47 @@
     r.addEventListener('input', upd); upd();
   });
 
+  function applyPostFilter(id, announce = true) {
+    const scope = document.getElementById(id); if (!scope) return;
+    const q = (($(`input[data-post-filter="${id}"]`) || {}).value || '').trim().toLowerCase();
+    const on = $(`.seg[data-post-filter="${id}"] [aria-pressed="true"]`), f = on ? on.dataset.categoryFilter : 'all';
+    let shown = 0;
+    $$('[data-category]', scope).forEach(p => {
+      const text = $$('h2, h3, p', p).filter(x => !x.closest('[aria-hidden="true"]')).map(x => x.textContent).join(' ').toLowerCase();
+      const ok = (f === 'all' || p.dataset.category === f) && (!q || text.includes(q));
+      p.hidden = !ok; if (ok) shown++;
+    });
+    $$('[data-post-group]', scope).forEach(g => { g.hidden = !$$('[data-category]', g).some(p => !p.hidden); });
+    const empty = $('[data-post-empty]', scope); if (empty) empty.hidden = !!shown;
+    if (announce) live(shown === 1 ? '1 post' : `${shown} posts`);
+  }
+  document.addEventListener('input', e => { const s = e.target.closest('input[data-post-filter]'); if (s) applyPostFilter(s.dataset.postFilter); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.seg[data-post-filter] > button');
+    if (b) { [...b.parentElement.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); return applyPostFilter(b.parentElement.dataset.postFilter); }
+    const c = e.target.closest('[data-post-clear]'); if (!c) return;
+    const id = c.dataset.postClear, inp = $(`input[data-post-filter="${id}"]`);
+    $$(`.seg[data-post-filter="${id}"] > button`).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.categoryFilter === 'all')));
+    if (inp) { inp.value = ''; inp.focus(); }
+    applyPostFilter(id);
+  });
+  $$('.seg[data-post-filter]').forEach(seg => {
+    const want = new URLSearchParams(location.search).get('category');
+    const b = want && $(`[data-category-filter="${CSS.escape(want)}"]`, seg); if (!b) return;
+    [...seg.children].forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    applyPostFilter(seg.dataset.postFilter, false);
+  });
+  document.addEventListener('submit', e => {
+    const f = e.target.closest('form[data-subscribe]'); if (!f) return;
+    e.preventDefault();
+    const inp = $('input[type=email]', f), hint = $('[data-subscribe-hint]', f);
+    const bad = !inp.value.trim() || !inp.checkValidity();
+    inp.setAttribute('aria-invalid', String(bad));
+    if (hint) { hint.dataset.idle ??= hint.textContent; hint.textContent = bad ? 'Enter an email address, like you@studio.com.' : hint.dataset.idle; hint.className = bad ? 'hint-error' : 'hint'; }
+    if (bad) return inp.focus();
+    inp.value = ''; toast('Check your inbox to confirm your subscription');
+  });
+
   /* ---------- file upload (simulated progress) */
   const fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>';
   const xIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
