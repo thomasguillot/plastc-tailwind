@@ -1,0 +1,35 @@
+---
+import './state-matrix.css';
+import { NA_REASON, STATE_LABEL, type Matrix, type State } from './matrices';
+
+interface Props {
+  matrix: Matrix;
+}
+const { matrix } = Astro.props;
+const FORCED = new Set<State>(['hover', 'focus', 'active']);
+const ALL = Object.keys(STATE_LABEL) as State[];
+const left = ALL.filter((s) => s !== 'default' && !matrix.states.includes(s));
+---
+<div class="table-scroll" role="region" aria-label="State matrix" tabindex="0">
+  <table class="sm-table w-full border-collapse text-sm">
+    <thead>
+      <tr>
+        <th scope="col" class="text-left text-[11px] font-bold tracking-[0.09em] uppercase text-ink-2 border-b border-[color:var(--k-seam)]">Part</th>
+        {matrix.states.map((s) => <th scope="col" class="text-left text-[11px] font-bold tracking-[0.09em] uppercase text-ink-2 border-b border-[color:var(--k-seam)]">{STATE_LABEL[s]}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {matrix.rows.map((r) => (
+        <tr class="border-b border-[color:var(--k-seam)]">
+          <th scope="row" class="text-left font-bold align-middle min-w-[132px]"><span class="block">{r.name}</span><code class="block font-mono text-[11px] font-normal text-ink-2 mt-0.5">{r.cls}</code></th>
+          {matrix.states.map((s) => r.cells[s] !== undefined ? (
+            <td data-force={FORCED.has(s) ? s : undefined} data-pad={r.pad ? '' : undefined}><div class={`flex items-center min-h-10 ${matrix.cellClass ?? ''}`} set:html={r.cells[s]} /></td>
+          ) : (
+            <td><span class="sm-na" aria-hidden="true">N/A</span><span class="sr-only">Not applicable. {NA_REASON[s]}</span></td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p class="text-[13px] text-ink-2 mt-4 max-w-[68ch]">{matrix.states.some((s) => FORCED.has(s)) && 'Hover, focus and pressed are held on with a site-only attribute that copies the library rules, so you can compare them without a pointer. '}{matrix.states.includes('on') && 'On covers checked, pressed, selected, open and drag-over. '}N/A means the library gives the part no such style.{left.length > 0 && ` Not shown, because nothing on this page has them: ${left.map((s) => STATE_LABEL[s].toLowerCase()).join(', ')}.`}</p>
