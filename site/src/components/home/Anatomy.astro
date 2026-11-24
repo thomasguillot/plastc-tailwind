@@ -6,12 +6,10 @@ import { LAYERS, layerNumber } from '../../data/home';
 <section id="anatomy" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="anat-h">
   <h2 id="anat-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">What one screen is made of</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Pick a layer to see its parts and the classes behind them.</p>
-  <div class="seg mt-8 lg:hidden" role="group" aria-label="Layer" data-layer-seg><button type="button" aria-pressed="true" data-seg-layer="all">All</button>{LAYERS.map(({ key, name }) => <button type="button" aria-pressed="false" data-seg-layer={key} aria-label={`${layerNumber(key)} ${name}`}>{layerNumber(key)}</button>)}</div>
   <div data-track>
     <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10 lg:sticky lg:top-[max(24px,calc(50vh_-_var(--xh,700px)/2))]" data-ex>
       <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
       <div class="flex flex-col gap-3 min-w-0">
-        <div class="hidden lg:flex items-center gap-3"><button type="button" class="key text-[13px] !aspect-auto h-10 px-5 !rounded-2xl" data-layer-auto aria-pressed="true">Auto</button><p class="text-sm text-ink-2">Steps through the layers as you scroll. Pick a layer to pin it.</p></div>
         <ul class="grid gap-2 sm:grid-cols-2 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
           <li class="lrow"><button type="button" class="lbtn" data-layer-key={key} aria-pressed="false"><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}<span class="lpin tag" aria-hidden="true">Pinned</span></span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></button><a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a></li>
         ))}</ul>
@@ -65,8 +63,6 @@ import { LAYERS, layerNumber } from '../../data/home';
   const $$ = <T extends Element = HTMLElement>(s: string, el: ParentNode = document) => [...el.querySelectorAll<T>(s)];
   const xr = document.querySelector<HTMLElement>('[data-xr]');
   const legend = document.querySelector<HTMLElement>('[data-legend]');
-  const seg = document.querySelector<HTMLElement>('[data-layer-seg]');
-  const autoKey = document.querySelector<HTMLElement>('[data-layer-auto]');
   const track = document.querySelector<HTMLElement>('[data-track]');
   const grid = track?.querySelector<HTMLElement>('[data-ex]');
 
@@ -90,8 +86,6 @@ import { LAYERS, layerNumber } from '../../data/home';
         b.setAttribute('aria-pressed', String(k === pin));
         b.parentElement!.toggleAttribute('data-current', k === shown);
       });
-      if (seg) $$<HTMLButtonElement>('button', seg).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.segLayer === (pin || 'all'))));
-      if (autoKey) autoKey.setAttribute('aria-pressed', String(!pin));
     };
     const step = () => {
       busy = false;
@@ -107,7 +101,6 @@ import { LAYERS, layerNumber } from '../../data/home';
     };
     const setPin = (k: string | null) => { pin = k; paint(); if (!pin) step(); };
 
-    autoKey?.addEventListener('click', () => setPin(null));
     keys.forEach((b, i) => {
       const k = b.dataset.layerKey!;
       const row = b.parentElement!;
@@ -124,10 +117,6 @@ import { LAYERS, layerNumber } from '../../data/home';
         e.preventDefault();
         keys[(i + d + keys.length) % keys.length].focus();
       });
-    });
-    seg?.addEventListener('click', (e) => {
-      const b = (e.target as Element).closest<HTMLElement>('[data-seg-layer]');
-      if (b) setPin(b.dataset.segLayer === 'all' ? null : b.dataset.segLayer!);
     });
     new ResizeObserver(() => { gridH = grid.offsetHeight; track.style.setProperty('--xh', `${gridH}px`); }).observe(grid);
     const onStep = () => { if (!busy) { busy = true; requestAnimationFrame(step); } };
