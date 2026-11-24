@@ -1,3 +1,5 @@
 @import "tailwindcss";
 @import "../src/plastc.css";
 @source "./";
+@source "./index.html";
+@source "./screens/*.html";
