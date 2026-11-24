@@ -8,12 +8,14 @@ def ico(d, cls="", sw="1.8"):
     return f'<svg{c} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{d}</svg>'
 
 I = {
+    "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+    "moon": '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
     "home": '<path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z"/>',
     "file": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
     "users": '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/>',
     "chart": '<path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-6"/>',
     "box": '<path d="m21 8-9-5-9 5v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
-    "cog": '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/>',
+    "cog": '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     "help": '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.9M12 17.2v.1"/>',
     "search": '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     "plus": '<path d="M12 5v14M5 12h14"/>',
@@ -104,10 +106,10 @@ def page(path, title, body, root="", description=SCREEN_DESCRIPTION, extra=""):
     (HERE / path).parent.mkdir(parents=True, exist_ok=True)
     (HERE / path).write_text(HEAD.format(title=title, root=root, description=description, extra=extra) + body + FOOT.format(root=root))
 
-def housing_seg(light="Light", dark="Dark", extra=""):
+def housing_seg(extra=""):
     return f'''<div class="seg {extra}" role="group" aria-label="Appearance">
-  <button type="button" data-set-housing="light" aria-pressed="true">{light}</button>
-  <button type="button" data-set-housing="dark" aria-pressed="false">{dark}</button>
+  <button type="button" class="!px-3" data-set-housing="light" aria-pressed="true" aria-label="Light">{i("sun", "w-4 h-4")}</button>
+  <button type="button" class="!px-3" data-set-housing="dark" aria-pressed="false" aria-label="Dark">{i("moon", "w-4 h-4")}</button>
 </div>'''
 
 def mark(root="", size="w-10 h-10 -m-1.5"):
