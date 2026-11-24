@@ -21,7 +21,9 @@
 [data-force="hover"] .bar-chart > .bar:not([data-current]) { background: color-mix(in oklab, var(--k-ink-2) 34%, transparent); }
 [data-force="hover"] .calendar td button:not(:disabled):not([aria-pressed="true"]) { background: color-mix(in oklab, var(--k-ink) 7%, transparent); }
 
-[data-force="focus"] :is(.btn, .key, .check, .radio, .switch, .range, .nav-item, .lcd-action) { outline: 2px solid var(--k-focus); outline-offset: 3px; }
+[data-force="focus"] :is(.btn, .key, .check, .radio, .switch, .nav-item, .lcd-action) { outline: 2px solid var(--k-focus); outline-offset: 3px; }
+[data-force="focus"] .range::-webkit-slider-runnable-track { outline: 2px solid var(--k-focus); outline-offset: 3px; }
+@supports not selector(::-webkit-slider-runnable-track) { [data-force="focus"] .range { outline: 2px solid var(--k-focus); outline-offset: 3px; } }
 [data-force="focus"] .avatar-group > button.avatar { outline: 2px solid var(--k-focus); outline-offset: 2px; }
 [data-force="focus"] :is(.field, .input-group, .choice-card, .dropzone, .accordion summary, .breadcrumbs a) { outline: 2px solid var(--k-focus); outline-offset: 2px; }
 [data-force="focus"] .field[aria-invalid="true"] { outline-offset: 3px; }
