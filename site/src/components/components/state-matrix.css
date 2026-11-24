@@ -15,6 +15,7 @@
 [data-force="hover"] .breadcrumbs a { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
 [data-force="hover"] .menu > a, [data-force="hover"] .menu > button, [data-force="hover"] .listbox [role="option"] { background: var(--k-housing); }
 [data-force="hover"] .lcd-action { background: rgb(0 0 0 / 0.08); }
+[data-force="hover"] .accordion summary { background: var(--k-housing-up); }
 [data-force="hover"] .tooltip::after { opacity: 1; translate: -50% 0; scale: 1; }
 [data-force="hover"] .ktable tbody tr:not(:has(input[type="checkbox"]:checked)) { background: var(--k-housing-up); }
 [data-force="hover"] .bar-chart > .bar:not([data-current]) { background: color-mix(in oklab, var(--k-ink-2) 34%, transparent); }
