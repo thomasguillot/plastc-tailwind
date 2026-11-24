@@ -42,11 +42,3 @@
 [data-force="active"] .btn-quiet:not(:disabled) { color: var(--k-ink); border-color: var(--k-seam); }
 [data-force="active"] .pressable { translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
 [data-force="active"] .key:not(:disabled, [aria-disabled="true"]) { translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
-
-.sm-table th, .sm-table td { vertical-align: middle; }
-.sm-table thead th { white-space: nowrap; }
-.sm-table tbody th { position: sticky; left: 0; z-index: 1; background: var(--k-housing); }
-.sm-table td { position: relative; padding: 16px 8px; }
-.sm-table thead th, .sm-table tbody th { padding-inline: 8px; }
-.sm-table td[data-pad] { padding-top: 48px; }
-.sm-na { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--k-ink-3); }
