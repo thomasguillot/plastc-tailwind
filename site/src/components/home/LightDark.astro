@@ -23,6 +23,7 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
   .annot{display:block;height:0;margin-top:0;overflow:hidden;opacity:0;visibility:hidden;font:500 11px/1.4 var(--font-mono);color:var(--k-ink-2);interpolate-size:allow-keywords;transition:height 240ms var(--ease-out),margin-top 240ms var(--ease-out),opacity 180ms var(--ease-out),visibility 0s 240ms}
   #themes[data-labels] .annot{height:auto;margin-top:6px;opacity:1;visibility:visible;transition:height 240ms var(--ease-out),margin-top 240ms var(--ease-out),opacity 180ms var(--ease-out),visibility 0s}
   @media (prefers-reduced-motion:reduce){.annot,#themes[data-labels] .annot{transition:opacity 180ms var(--ease-out),visibility 0s}}
+  @media (max-width:767.98px){[data-pane-seg]>button,[data-terms]>button{height:44px;min-width:44px}#themes .btn,#themes .field{min-height:44px}#themes .btn-icon{width:44px;height:44px}#themes label.cursor-pointer{min-height:44px}}
   @media (max-width:767.98px){[data-panes][data-show="light"]>[data-pane="dark"],[data-panes][data-show="dark"]>[data-pane="light"]{display:none}}
 </style>
 

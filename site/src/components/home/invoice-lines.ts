@@ -13,9 +13,9 @@ export function lineHTML(prefix: string, i: number, l: InvoiceLine) {
   return (
     `<li class="py-3 grid gap-2" data-line="${i}"><label class="sr-only" for="${id}">Description</label><input id="${id}" class="field" value="${n}" data-desc>` +
     `<div class="flex items-center gap-3"><div class="flex items-center gap-2" role="group" aria-label="Quantity">` +
-    `<button type="button" class="key w-8 h-8" data-step="-1" aria-label="Decrease quantity for ${n}"${l.q <= QTY_MIN ? ' disabled' : ''}>${MINUS}</button>` +
+    `<button type="button" class="key w-11 h-11 md:w-8 md:h-8" data-step="-1" aria-label="Decrease quantity for ${n}"${l.q <= QTY_MIN ? ' disabled' : ''}>${MINUS}</button>` +
     `<span class="font-mono text-sm font-semibold tabular-nums w-6 text-center" data-qty>${l.q}</span>` +
-    `<button type="button" class="key w-8 h-8" data-step="1" aria-label="Increase quantity for ${n}"${l.q >= QTY_MAX ? ' disabled' : ''}>${PLUS}</button></div>` +
+    `<button type="button" class="key w-11 h-11 md:w-8 md:h-8" data-step="1" aria-label="Increase quantity for ${n}"${l.q >= QTY_MAX ? ' disabled' : ''}>${PLUS}</button></div>` +
     `<span class="text-sm text-ink-2 tabular-nums">&times; ${money.format(l.p)}</span><span class="ml-auto font-semibold text-sm tabular-nums" data-total>${money.format(l.p * l.q)}</span></div></li>`
   );
 }
