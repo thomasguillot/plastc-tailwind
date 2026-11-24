@@ -26,11 +26,11 @@ Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ri
 A press and a latch are different states and never look the same.
 
 - **Press** (`:active`, momentary): the part drops 1px, shrinks to 0.985 and its shadow turns to `--k-pressed` on its own plastic (`housing` for neutral parts, the cap color for `.btn-signal` and `.btn-go`). It comes back up on release.
-- **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, and sits in a dark well with an edge ring (see below). Pressing a latched part shrinks it while the well stays.
+- **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, and sits in a darker well (see below). Pressing a latched part shrinks it while the well stays.
 - **Chosen** (`.seg`, exclusive choice): the channel looks exactly like a latched button (`--k-well` with `--k-latched`), and the chosen item is the one raised part in it, with a cast body and a light shadow (`--k-cast`, specular top edge, short contact and mid shadows) and an ink label. It does not travel, because picking one option is a selection, not a toggle.
-- **Chosen key** (a group of exclusive `.key`s): mark the group up as radios, not toggles. The wrapper is `role="radiogroup"` with a label, each key is `role="radio"` with `aria-checked`, and only the checked key is in the tab order (`tabindex="0"`, the rest `-1`); arrow keys move to the next key and check it. `.key[aria-checked="true"]` sinks into the same well as a latched key (down 1px, `--k-well` with the edge ring), with no extra mark. The others stay raised. Never use `aria-pressed` for a choice of one: every key would latch on its own.
+- **Chosen key** (a group of exclusive `.key`s): mark the group up as radios, not toggles. The wrapper is `role="radiogroup"` with a label, each key is `role="radio"` with `aria-checked`, and only the checked key is in the tab order (`tabindex="0"`, the rest `-1`); arrow keys move to the next key and check it. `.key[aria-checked="true"]` sinks into the same well as a latched key (down 1px, `--k-well` with `--k-latched`), with no extra mark. The others stay raised. Never use `aria-pressed` for a choice of one: every key would latch on its own.
 
-The latched look comes from the plastic alone, with no light, dot or glow. The body drops into `--k-well`, a darker fill than `housing-down` (`#c1bbaf` light, `#171613` dark), and takes `--k-latched`: a 1px edge ring (`--k-well-edge`, a 56% umber in light, 60% black in dark), a deep inner shadow from the top, a lit lip on the inside bottom edge (`--k-well-lip`) and a highlight under the outside edge. Colored caps darken their own color instead (`--btn-latched-bg`, the cap mixed 14% toward black) and take `--btn-latched-shadow`. On a `.btn-danger` the label moves halfway to ink so it keeps Lc 60 in the darker well. Padding is the same latched or not, so the label never shifts. A disabled latched part shows the dashed outline only, the same as any disabled part.
+The latched look comes from the plastic alone, with no light, dot or glow. The body drops into `--k-well`, a darker fill than `housing-down` (`#c1bbaf` light, `#171613` dark), and takes `--k-latched`: a deep inner shadow from the top and a highlight under the outside edge. Colored caps keep their own color (`--btn-latched-bg`) and take the same inner shadow (`--btn-latched-shadow`). Padding is the same latched or not, so the label never shifts. A disabled latched part shows the dashed outline only, the same as any disabled part.
 
 Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per theme, so one recipe works in both themes. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-theme]`, `.depth-soft` and `.depth-deep` so they resolve locally.
 
@@ -73,9 +73,7 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | LCD labels (11px caps) | 6.9:1 | 62 | 8.6:1 | 67 |
 | Focus ring vs housing | 11.8:1 | 81 | 12.3:1 | 92 |
 | Latched label (ink on `--k-well`) | 8.8:1 | 65 | 15.5:1 | 95 |
-| Latched `.btn-danger` label (danger mixed halfway to ink, on `--k-well`) | 6.6:1 | 60 | 13.2:1 | 85 |
 | Latched vs unlatched face, measured (non-text) | 1.37–1.43:1 (caps 1.47–1.53:1) | n/a | 1.26–1.31:1 (caps 1.47–1.53:1) | n/a |
-| Latched edge ring vs the surface around it, measured (non-text) | 3.1:1 | n/a | 1.4:1 | n/a |
 | Switch slot on vs off (`--k-switch-on` vs `housing-down`) | 4.0:1 | 52 | 4.3:1 | 34 |
 | Switch thumb vs on slot | 5.0:1 | 69 | 3.8:1 | 34 |
 
