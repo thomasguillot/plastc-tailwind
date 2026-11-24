@@ -34,8 +34,22 @@ const screen = (key: string, text: string, icon: Icon, hash = ''): CommandItem =
   attrs: { href: `/screens/${key}.html${hash}`, 'data-open-screen': `${key}${hash}` },
 });
 
-const keywords = (page: (typeof PAGES)[number]) =>
-  [...new Set([page.title, page.classes, ...page.rows.map((r) => r.cls)].join(' ').replace(/[.,]/g, ' ').split(/\s+/).filter(Boolean))].join(' ');
+const SIZES = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
+const STOPWORDS = new Set(['to', 'and', 'or', 'the', 'a', 'of', 'on', 'in']);
+
+const expandRanges = (text: string) =>
+  text.replace(/\.([a-z-]+)-(\w+) to \.\1-(\w+)/g, (all, base: string, from: string, to: string) => {
+    const a = SIZES.indexOf(from);
+    const b = SIZES.indexOf(to);
+    return a < 0 || b < a ? all : SIZES.slice(a, b + 1).map((s) => `.${base}-${s}`).join(' ');
+  });
+
+const keywords = (page: (typeof PAGES)[number]) => {
+  const noted = page.rows.flatMap((r) => expandRanges(r.notes).match(/\.[a-z][\w-]*/g) ?? []);
+  const text = expandRanges([page.title, page.classes, ...page.rows.map((r) => r.cls), ...noted].join(' '));
+  const words = text.replace(/[.,]/g, ' ').split(/\s+/).filter((w) => w && !STOPWORDS.has(w.toLowerCase()));
+  return [...new Set(words)].join(' ');
+};
 
 export function siteCommands(onThisPage: CommandItem[] = []): CommandGroup[] {
   const marketing = MARKETING_SCREENS.flatMap(({ key, title }) => [
