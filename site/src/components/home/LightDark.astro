@@ -4,8 +4,8 @@ import { DEPTHS, TINTS } from '../../data/home';
 
 const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
 ---
-<section id="themes" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="hou-h">
-  <h2 id="hou-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">Light and dark</h2>
+<section id="themes" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="themes-h">
+  <h2 id="themes-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">Light and dark</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Set the depth and the LCD tint here. Both panes follow, and so does the rest of the page.</p>
   <div class="raised rounded-[24px] p-5 sm:p-6 mt-8 grid gap-x-8 gap-y-7 sm:grid-cols-2" role="group" aria-label="Depth and LCD tint">
     <div class="grid gap-3 content-start"><p class="engraved" id="c-depth">Depth</p><div class="grid grid-cols-3 gap-3" role="group" aria-labelledby="c-depth">{DEPTHS.map(({ value, label }) => <button type="button" class={keyClass} data-set-depth={value} aria-pressed={String(value === '1')}>{label}</button>)}</div></div>
