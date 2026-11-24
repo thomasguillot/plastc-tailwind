@@ -1,0 +1,21 @@
+---
+import Components from '../../layouts/Components.astro';
+import { PAGES } from '../../components/components/pages';
+
+const description = 'Every Plastc part, grouped by what it does. Each page has live examples to copy, a table of classes and a grid of how each part looks in every state.';
+---
+<Components title="Components · Plastc" description={description}>
+  <h1 class="display text-[44px] sm:text-[56px] md:text-[64px]">Components</h1>
+  <p class="text-lg text-ink-2 max-w-[56ch] mt-5 leading-relaxed">One page per group. Each has live examples you can copy as HTML, a table of its classes, and a grid of how each part looks in every state.</p>
+  <ul class="grid gap-4 sm:grid-cols-2 mt-10 list-none p-0">
+    {PAGES.map((p) => (
+      <li class="contents">
+        <article class="post-card">
+          <h2><a href={`/components/${p.slug}/`}>{p.title}</a></h2>
+          <p class="text-sm text-ink-2">{p.summary}</p>
+          <code class="font-mono text-[11px] text-ink-2 break-words mt-auto">{p.classes}</code>
+        </article>
+      </li>
+    ))}
+  </ul>
+</Components>

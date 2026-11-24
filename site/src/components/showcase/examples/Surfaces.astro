@@ -1,0 +1,9 @@
+---
+import Spec from '../Spec.astro';
+---
+<div class="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+  <Spec name="Plane" classes=".panel  .seam" rule="The page and every layout container. Flush, separated by a parting line."><div class="panel w-full max-w-[220px] !p-4 text-left"><p class="text-[13px] font-bold">INV-0193</p><div class="flex justify-between mt-2 text-[13px]"><span class="badge lamp-ok">Paid</span><span class="font-semibold tabular-nums">$4,820.00</span></div></div></Spec>
+  <Spec name="Raised" classes=".btn  .key  .raised" rule="Parts you press. Lit from the top, with a contact shadow. Pressing sets them flush."><button class="btn btn-lg" type="button">Press me</button></Spec>
+  <Spec name="Recessed" classes=".field  .lcd  .recessed" rule="Parts that hold input or output: fields, tracks, wells and readouts."><input class="field !w-44" placeholder="Type here" aria-label="Example field"></Spec>
+  <Spec name="Float" classes=".menu  .dialog  .toast" rule="Overlays only. The one level with a long shadow, because it sits above the page."><div class="menu !min-w-0 w-40"><a href="#surfaces">Rename</a><a href="#surfaces">Duplicate</a></div></Spec>
+</div>

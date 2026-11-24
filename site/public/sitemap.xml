@@ -3,4 +3,31 @@
   <url>
     <loc>https://plastc.space.fast/</loc>
   </url>
+  <url>
+    <loc>https://plastc.space.fast/components/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/surfaces/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/buttons/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/fields/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/selection/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/status/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/overlays/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/navigation/</loc>
+  </url>
+  <url>
+    <loc>https://plastc.space.fast/components/data/</loc>
+  </url>
 </urlset>

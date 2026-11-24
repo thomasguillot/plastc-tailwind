@@ -27,6 +27,11 @@ export const GROUPS = {
   navigation: group('Navigation & data', '.nav-item  .seg  .ktable  .kbd  .lcd', true),
 } satisfies Record<string, ShowcaseGroupInfo>;
 
+export const SURFACE_GROUPS = {
+  depth: group('Depth levels', '.panel  .raised  .recessed  .float'),
+  panels: group('Panels and seams', '.panel  .seam  .depth-deep'),
+} satisfies Record<string, ShowcaseGroupInfo>;
+
 export const SCREENS = [
   { key: 'dashboard', title: 'Dashboard' },
   { key: 'invoices', title: 'Invoices' },
