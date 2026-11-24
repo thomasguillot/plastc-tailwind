@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Plastc">
+<defs><filter id="lift-l" x="-30%" y="-30%" width="160%" height="160%">
+<feDropShadow dx="-2.2" dy="-2.2" stdDeviation="2.2" flood-color="#fffdf8" flood-opacity=".95"/>
+<feDropShadow dx="2.6" dy="3.4" stdDeviation="3" flood-color="#6e5f46" flood-opacity=".42"/>
+<feDropShadow dx="0" dy="1" stdDeviation=".6" flood-color="#6e5f46" flood-opacity=".3"/>
+</filter>
+<filter id="cut-l" x="-10%" y="-10%" width="120%" height="120%">
+<feOffset in="SourceAlpha" dy="1.4" result="o"/><feGaussianBlur in="o" stdDeviation=".7" result="b"/>
+<feComposite in="SourceAlpha" in2="b" operator="out" result="e"/>
+<feFlood flood-color="#000" flood-opacity=".6"/><feComposite in2="e" operator="in" result="s"/>
+<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="s"/></feMerge>
+</filter>
+<linearGradient id="dome-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9e6df"/><stop offset="1" stop-color="#d2cdc3"/></linearGradient>
+<linearGradient id="rim-l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<rect x="11" y="10" width="42" height="42" rx="12" fill="url(#dome-l)" filter="url(#lift-l)"/>
+<rect x="11.5" y="10.5" width="41" height="41" rx="11.5" fill="none" stroke="url(#rim-l)"/>
+<path d="M21.75 44.5V18.95H27.95L28.06 23.14L27.58 22.96Q28.32 20.8 29.98 19.65Q31.63 18.5 33.89 18.5Q36.61 18.5 38.46 19.86Q40.32 21.21 41.29 23.57Q42.25 25.93 42.25 28.94Q42.25 31.91 41.27 34.29Q40.28 36.66 38.41 38.02Q36.53 39.37 33.82 39.37Q32.37 39.37 31.13 38.84Q29.88 38.3 28.97 37.31Q28.06 36.33 27.65 34.99L28.14 34.77V44.5ZM31.89 34.66Q33.63 34.66 34.66 33.12Q35.68 31.57 35.68 28.94Q35.68 26.3 34.66 24.76Q33.63 23.22 31.89 23.22Q30.7 23.22 29.86 23.87Q29.03 24.52 28.58 25.78Q28.14 27.04 28.14 28.94Q28.14 30.83 28.58 32.09Q29.03 33.36 29.86 34.01Q30.7 34.66 31.89 34.66Z" fill="#fffdf8" fill-opacity=".95" transform="translate(0 1)"/>
+<path d="M21.75 44.5V18.95H27.95L28.06 23.14L27.58 22.96Q28.32 20.8 29.98 19.65Q31.63 18.5 33.89 18.5Q36.61 18.5 38.46 19.86Q40.32 21.21 41.29 23.57Q42.25 25.93 42.25 28.94Q42.25 31.91 41.27 34.29Q40.28 36.66 38.41 38.02Q36.53 39.37 33.82 39.37Q32.37 39.37 31.13 38.84Q29.88 38.3 28.97 37.31Q28.06 36.33 27.65 34.99L28.14 34.77V44.5ZM31.89 34.66Q33.63 34.66 34.66 33.12Q35.68 31.57 35.68 28.94Q35.68 26.3 34.66 24.76Q33.63 23.22 31.89 23.22Q30.7 23.22 29.86 23.87Q29.03 24.52 28.58 25.78Q28.14 27.04 28.14 28.94Q28.14 30.83 28.58 32.09Q29.03 33.36 29.86 34.01Q30.7 34.66 31.89 34.66Z" fill="#625b50" filter="url(#cut-l)"/>
+</svg>

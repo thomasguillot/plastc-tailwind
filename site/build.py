@@ -82,6 +82,9 @@ HEAD = """<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{root}dist.css">
+<link rel="icon" href="{root}favicon.ico" sizes="32x32">
+<link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <script>(function(){{var r=document.documentElement,h=null;try{{h=localStorage.getItem('plastc-housing')}}catch(e){{}}if(h!=='light'&&h!=='dark'){{var t=r.getAttribute('data-theme');h=(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light'}}r.dataset.housing=h}})();</script>
 </head>
 """
@@ -102,9 +105,11 @@ def housing_seg(light="Light", dark="Dark", extra=""):
   <button type="button" data-set-housing="dark" aria-pressed="false">{dark}</button>
 </div>'''
 
-LOGO = '<svg class="w-7 h-7 text-ink" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="25" rx="8" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="14" r="5.5" fill="currentColor"/></svg>'
-def wordmark(href):
-    return f'<a href="{href}" class="flex items-center gap-2.5 no-underline text-ink font-extrabold tracking-[-0.02em] text-[17px]">{LOGO}Plastc</a>'
+def mark(root="", size="w-10 h-10 -m-1.5"):
+    return (f'<img src="{root}mark-light.svg" alt="" class="{size} shrink-0 [[data-housing=dark]_&]:hidden">'
+            f'<img src="{root}mark-dark.svg" alt="" class="{size} shrink-0 hidden [[data-housing=dark]_&]:block">')
+def wordmark(href, root="../"):
+    return f'<a href="{href}" class="flex items-center gap-2.5 no-underline text-ink font-extrabold tracking-[-0.02em] text-[17px]">{mark(root)}Plastc</a>'
 
 SKIP = '<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 btn btn-sm">Skip to content</a>'
 
@@ -368,7 +373,7 @@ for key, label, ic in NAV[2:]:
 signin = f'''<body class="min-h-screen grid place-items-center px-4 py-12">
 <main id="main" class="w-full max-w-[400px]">
   <div class="flex flex-col items-center text-center">
-    <svg class="w-11 h-11 text-ink" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="25" rx="8" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="5.5" fill="currentColor"/></svg>
+    {mark("../", "w-16 h-16 -m-2")}
     <h1 class="text-[28px] font-bold tracking-[-0.015em] mt-6">Sign in to Plastc</h1>
     <p class="text-ink-2 mt-1.5">Welcome back. Enter your details.</p>
   </div>
@@ -416,7 +421,7 @@ SHOWNAV = '<a class="btn btn-quiet btn-sm" href="#depth">Depth</a><a class="btn 
 showcase = f'''<body>
 {SKIP}
 <header class="max-w-[1240px] mx-auto px-4 md:px-8 pt-6 pb-2 md:pb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-  {wordmark("#top")}
+  {wordmark("#top", "")}
   <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Sections">{SHOWNAV}</nav>
   {housing_seg(extra="ml-auto")}
 </header>
