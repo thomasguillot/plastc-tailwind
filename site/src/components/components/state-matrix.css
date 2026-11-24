@@ -41,7 +41,7 @@
 }
 [data-force="active"] .btn-quiet:not(:disabled) { color: var(--k-ink); border-color: var(--k-seam); }
 [data-force="active"] .pressable { translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
-[data-force="active"] .key { translate: 0 1px; scale: 0.985; background: var(--k-housing-down); box-shadow: var(--k-pressed), inset 0 0 0 1px var(--k-edge); }
+[data-force="active"] .key:not(:disabled, [aria-disabled="true"]) { translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
 
 .sm-table th, .sm-table td { vertical-align: middle; }
 .sm-table thead th { white-space: nowrap; }
