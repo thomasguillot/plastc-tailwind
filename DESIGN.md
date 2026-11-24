@@ -13,7 +13,7 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 
 Never extrude data (chart bars, table rows, stat cards) or containers. If a thing is neither pressed nor filled, it is plane.
 
-State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row (any checked checkbox in its cells) sinks to `housing-down` with a recessed top edge and ignores the hover tint; a latched `.key` or `.btn` (`aria-pressed="true"`) stays down and lights a lamp (see Latching). Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
+State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row (any checked checkbox in its cells) sinks to `housing-down` with a recessed top edge and ignores the hover tint; a latched `.key` or `.btn` (`aria-pressed="true"`) stays down in a dark well (see Latching). Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
 
 One sanctioned exception: the showcase hero unit is a raised housing because it depicts a physical device. Product screens never raise a container.
 
@@ -26,11 +26,11 @@ Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ri
 A press and a latch are different states and never look the same.
 
 - **Press** (`:active`, momentary): the part drops 1px, shrinks to 0.985 and its shadow turns to `--k-pressed` on its own plastic (`housing` for neutral parts, the cap color for `.btn-signal` and `.btn-go`). It comes back up on release.
-- **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, sits in the darker well (`--btn-latched-bg`, `housing-down` by default; colored caps keep their color) with an edge ring, and lights a lamp. Pressing a latched part shrinks it while the well and lamp stay.
-- **Chosen** (`.seg`, exclusive choice): the chosen item is the one raised part of its recessed channel, with its own lighter body (`--k-chosen-top` to `--k-chosen`) and ink label; the others sit flat in the channel. It does not travel and has no lamp, because picking one option is a selection, not a toggle.
-- **Chosen key** (a group of exclusive `.key`s): mark the group up as radios, not toggles. The wrapper is `role="radiogroup"` with a label, each key is `role="radio"` with `aria-checked`, and only the checked key is in the tab order (`tabindex="0"`, the rest `-1`); arrow keys move to the next key and check it. `.key[aria-checked="true"]` stays raised, takes the lighter chosen body and shows a short ink bar under its label (3px, at most 16px wide), the same mark as the current tab. It does not travel and has no lamp. Never use `aria-pressed` for a choice of one: every key would latch and light its own lamp.
+- **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, and sits in a dark well with an edge ring (see below). Pressing a latched part shrinks it while the well stays.
+- **Chosen** (`.seg`, exclusive choice): the chosen item is the one raised part of its recessed channel, with its own lighter body (`--k-chosen-top` to `--k-chosen`) and ink label; the others sit flat in the channel. It does not travel, because picking one option is a selection, not a toggle.
+- **Chosen key** (a group of exclusive `.key`s): mark the group up as radios, not toggles. The wrapper is `role="radiogroup"` with a label, each key is `role="radio"` with `aria-checked`, and only the checked key is in the tab order (`tabindex="0"`, the rest `-1`); arrow keys move to the next key and check it. `.key[aria-checked="true"]` stays raised, takes the lighter chosen body and shows a short ink bar under its label (3px, at most 16px wide), the same mark as the current tab. It does not travel. Never use `aria-pressed` for a choice of one: every key would latch on its own.
 
-The lamp is a 6px dot with a bright core, a dark rim (`--k-lamp-rim`) and a soft glow, colored `--k-lamp-lit` (green, never orange, so orange stays the one primary action). Set `--lamp` to change it. It sits in the top-left of a `.key` (24% in from each edge, at most 10px from the left on wide keys) and in the left end of a pill `.btn`, so it never sits over the label. A `.btn` that carries `aria-pressed` (either value) keeps room for it: its left padding is at least the lamp's width plus a 6px gap, whatever padding utility it has, so a latched `btn-sm px-2` still clears its first letter and the label does not shift when it latches. On a disabled latched part it turns `--k-ink-off`. It appears at once: an indicator light switches on, it does not fade.
+The latched look comes from the plastic alone, with no light, dot or glow. The body drops into `--k-well`, a darker fill than `housing-down` (`#c1bbaf` light, `#171613` dark), and takes `--k-latched`: a 1px edge ring (`--k-well-edge`, a 56% umber in light, 60% black in dark), a deep inner shadow from the top, a lit lip on the inside bottom edge (`--k-well-lip`) and a highlight under the outside edge. Colored caps darken their own color instead (`--btn-latched-bg`, the cap mixed 14% toward black) and take `--btn-latched-shadow`. On a `.btn-danger` the label moves halfway to ink so it keeps Lc 60 in the darker well. Padding is the same latched or not, so the label never shifts. A disabled latched part keeps its dashed outline and fills with a faint `ink-off` tint, so it still reads as held.
 
 Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per theme, so one recipe works in both themes. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-theme]`, `.depth-soft` and `.depth-deep` so they resolve locally.
 
@@ -72,9 +72,10 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | LCD text | 8.9:1 | 67 | 10.8:1 | 81 |
 | LCD labels (11px caps) | 6.9:1 | 62 | 8.6:1 | 67 |
 | Focus ring vs housing | 11.8:1 | 81 | 12.3:1 | 92 |
-| Latched key label (ink on the `housing-down` well) | 10.5:1 | 74 | 13.9:1 | 94 |
-| Latched lamp: rim vs well (light), core vs well (dark); non-text, 3:1 target | 5.1:1 | 59 | 9.9:1 | 72 |
-| Latched lamp core vs its rim (light) | 3.4:1 | 40 | n/a | n/a |
+| Latched label (ink on `--k-well`) | 8.8:1 | 65 | 15.5:1 | 95 |
+| Latched `.btn-danger` label (danger mixed halfway to ink, on `--k-well`) | 6.6:1 | 60 | 13.2:1 | 85 |
+| Latched vs unlatched face, measured (non-text) | 1.37–1.43:1 (caps 1.47–1.53:1) | n/a | 1.26–1.31:1 (caps 1.47–1.53:1) | n/a |
+| Latched edge ring vs the surface around it, measured (non-text) | 3.1:1 | n/a | 1.4:1 | n/a |
 | Chosen `.seg` label (ink on `--k-chosen`) | 12.9:1 | 86 | 6.2–7.7:1 | 78–83 |
 | Chosen `.seg` body vs its channel (non-text) | 1.2–1.4:1 plus its shadow | 11–21 | 1.8–2.3:1 | 10–15 |
 | Switch slot on vs off (`--k-switch-on` vs `housing-down`) | 4.0:1 | 52 | 4.3:1 | 34 |
@@ -84,7 +85,7 @@ Disabled text (`--k-ink-off`) is deliberately below these (about 3:1); WCAG exem
 
 Orange is only the primary action (plus the range fill). Overdue counts use `danger` (matching the red lamps); links are ink and underlined; the chart highlight is ink; text selection is an ink tint.
 
-Focus is its own token: a 2px ink ring (light ink in dark) with an offset, never orange, so it can't be confused with the primary action or an error. Orange means "the primary action" (plus the range fill); radio dots are ink. Field edges carry a 30% umber ring; a `forced-colors` block gives every part a real border in Windows High Contrast. There, a disabled `.btn` or `.key` takes a dashed `GrayText` border and `GrayText` label; a latched or chosen `.btn`, `.key` or `.choice-card` takes a `Highlight` border and outline, and on focus the outline turns `CanvasText` 3px out while the border stays `Highlight`; a chosen `.seg` item, the current `.nav-item` and the chosen calendar day fill with `Highlight` and `HighlightText`, with a `HighlightText` focus ring inside the chosen segment; the `.range` fill is `Highlight` and its thumb `ButtonText` with a `Canvas` ring. The themes are called light and dark everywhere: labels, docs and the `data-theme` values.
+Focus is its own token: a 2px ink ring (light ink in dark) with an offset, never orange, so it can't be confused with the primary action or an error. Orange means "the primary action" (plus the range fill); radio dots are ink. Field edges carry a 30% umber ring; a `forced-colors` block gives every part a real border in Windows High Contrast. There, a disabled `.btn` or `.key` takes a dashed `GrayText` border and `GrayText` label; a latched or chosen `.btn`, `.key` or `.choice-card` takes a `Highlight` border and outline, and a disabled latched `.btn` or `.key` takes a 2px dashed `GrayText` border instead of 1px, and on focus the outline turns `CanvasText` 3px out while the border stays `Highlight`; a chosen `.seg` item, the current `.nav-item` and the chosen calendar day fill with `Highlight` and `HighlightText`, with a `HighlightText` focus ring inside the chosen segment; the `.range` fill is `Highlight` and its thumb `ButtonText` with a `Canvas` ring. The themes are called light and dark everywhere: labels, docs and the `data-theme` values.
 
 Pressing a coloured button keeps its colour: variants set `--btn-pressed-bg` / `--btn-pressed-shadow`, which `.btn:active` reads.
 
@@ -134,7 +135,7 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | What | Timing | Notes |
 |---|---|---|
 | Press (`.btn`, `.key`, `.pressable`) | 80ms down, 160ms up | 1px drop, scale 0.985, shadow reverses to `--k-pressed`. Asymmetric: the `:active` state carries the shorter duration. No bounce. |
-| Latch (`aria-pressed` on `.btn`, `.key`) | 160ms into the well; lamp at once | The body settles into the well on the press-up timing. The lamp has no transition. Reduced motion: no 1px drop, the well and lamp still change. |
+| Latch (`aria-pressed` on `.btn`, `.key`) | 160ms into the well | The body and its shadow settle into the well on the press-up timing. Reduced motion: no 1px drop, the well still changes. |
 | Hover | 160ms | Gated to `(hover: hover) and (pointer: fine)`. Light catches the top edge (`--k-raised-hover`); geometry does not move. |
 | Toggles (switch, check, radio, choice card, seg) | 160–200ms | Marks scale from 0.5, never from 0. Seg selection latches without travel. |
 | Menu (`[popover]`) | 180ms in, 120ms out | Opacity + scale 0.96 from the trigger corner. When it flips above its trigger, the origin flips with it (the reference script sets `transform-origin` on `toggle`). Native popover: Esc and outside click close it. Items are plain buttons (no `role=menu`), so Tab works and nothing promises arrow keys. |
