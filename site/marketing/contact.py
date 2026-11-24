@@ -1,0 +1,41 @@
+CONTACT_TOPICS = [
+    ("support", "Using Plastc", "A question about an invoice, a reminder or a setting."),
+    ("pricing", "Pricing and plans", "Which plan fits, or moving between plans."),
+    ("careers", "Careers", "A role on the about page, or one that is not."),
+    ("other", "Something else", "Press, partnerships, or anything we missed."),
+]
+contact_topics = "".join(f'<label class="choice-card"><input type="radio" name="topic" value="{v}" class="radio mt-0.5"{" checked" if k == 0 else ""}><span><span class="block text-sm font-bold">{t}</span><span class="block text-sm text-ink-2">{d}</span></span></label>' for k, (v, t, d) in enumerate(CONTACT_TOPICS))
+
+contact = f'''{page_header("Write to us", "Questions about the product, your plan or a role. A person on the team reads every message.")}
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-10 grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16 items-start">
+  <div>
+    <form class="grid gap-6" novalidate data-contact aria-label="Contact form">
+      <div><label class="label" for="c-name">Your name</label><input id="c-name" class="field" type="text" autocomplete="name" placeholder="Your full name" required data-empty="Enter your name." aria-describedby="c-name-err"><span id="c-name-err" class="hint-error" hidden></span></div>
+      <div><label class="label" for="c-email">Email</label><input id="c-email" class="field" type="email" autocomplete="email" placeholder="you@studio.com" required data-empty="Enter an email address so we can reply." aria-describedby="c-email-hint c-email-err"><span id="c-email-hint" class="hint">We only use it to answer this message.</span><span id="c-email-err" class="hint-error" hidden></span></div>
+      <fieldset class="min-w-0">
+        <legend class="label">What is it about?</legend>
+        <div class="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Topic">{contact_topics}</div>
+      </fieldset>
+      <div><label class="label" for="c-message">Message</label><textarea id="c-message" class="field field-area" rows="6" placeholder="Tell us what you are trying to do." required data-empty="Write a short message so we know how to help." aria-describedby="c-message-err"></textarea><span id="c-message-err" class="hint-error" hidden></span></div>
+      <div class="flex flex-wrap items-center gap-4"><button type="submit" class="btn btn-signal btn-lg">Send message</button><p class="text-sm text-ink-2">Demo only. Nothing is sent.</p></div>
+    </form>
+    <div class="alert lamp-ok" role="status" tabindex="-1" data-contact-done hidden>{i("check")}<div class="alert-body"><b>Thanks, <span data-contact-name></span>. Your message is in.</b><span class="block text-ink-2">We reply within one working day, usually sooner.</span></div><div class="alert-actions"><button type="button" class="btn btn-sm" data-contact-again>Send another</button></div></div>
+  </div>
+
+  <aside class="grid gap-8" aria-label="Contact details">
+    <div class="lcd px-5 py-4 grid grid-cols-2 gap-4">
+      <div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Average reply</p><p class="text-lg sm:text-xl font-semibold mt-1.5">3 h 40 m</p></div>
+      <div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Support hours</p><p class="text-lg sm:text-xl font-semibold mt-1.5">8 AM to 6 PM</p></div>
+      <p class="col-span-2 text-xs text-lcd-dim">Monday to Friday, Pacific time. Sample figures.</p>
+    </div>
+    <dl class="desc-list">
+      <div><dt>Support</dt><dd><a class="underline underline-offset-3" href="mailto:support@plastc.example">support@plastc.example</a></dd></div>
+      <div><dt>Careers</dt><dd><a class="underline underline-offset-3" href="mailto:careers@plastc.example">careers@plastc.example</a></dd></div>
+      <div><dt>Post</dt><dd>Plastc Invoicing<br>400 Alder Street, Suite 6<br>Portland, OR 97205</dd></div>
+    </dl>
+    <p class="text-sm text-ink-2">Looking for an answer now? The <a class="font-bold text-ink underline underline-offset-3" href="landing.html#faq">questions on the home page</a> cover the common ones.</p>
+  </aside>
+</section>
+'''
+mkt_page("screens/contact.html", "Contact · Plastc", contact, active="contact")

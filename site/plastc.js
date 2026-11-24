@@ -413,6 +413,35 @@
     $$('[data-price-unit]').forEach(u => { u.textContent = yearly ? '/ year' : '/ month'; });
   });
 
+  const contact = $('form[data-contact]');
+  if (contact) {
+    const done = $('[data-contact-done]'), topic = new URLSearchParams(location.search).get('topic');
+    if (topic) { const r = $('input[name=topic][value="' + topic + '"]', contact); if (r) r.checked = true; }
+    const check = f => {
+      const v = f.value.trim(), err = $('#' + f.id + '-err');
+      let msg = '';
+      if (!v) msg = f.dataset.empty;
+      else if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = 'That email looks incomplete. Use the form name@example.com.';
+      f.setAttribute('aria-invalid', String(!!msg)); err.textContent = msg; err.hidden = !msg;
+      return !msg;
+    };
+    $$('[data-empty]', contact).forEach(f => f.addEventListener('input', () => { if (f.getAttribute('aria-invalid') === 'true') check(f); }));
+    contact.addEventListener('submit', e => {
+      e.preventDefault();
+      const bad = $$('[data-empty]', contact).filter(f => !check(f));
+      if (bad.length) { bad[0].focus(); return; }
+      const btn = $('[type=submit]', contact);
+      btn.setAttribute('aria-busy', 'true'); btn.disabled = true;
+      setTimeout(() => {
+        btn.removeAttribute('aria-busy'); btn.disabled = false;
+        $('[data-contact-name]', done).textContent = $('#c-name', contact).value.trim().split(/\s+/)[0];
+        contact.hidden = true; done.hidden = false; done.focus();
+      }, 700);
+    });
+    const again = $('[data-contact-again]');
+    if (again) again.addEventListener('click', () => { contact.reset(); $$('[data-empty]', contact).forEach(f => { f.removeAttribute('aria-invalid'); $('#' + f.id + '-err').hidden = true; }); done.hidden = true; contact.hidden = false; $('#c-name', contact).focus(); });
+  }
+
   /* ---------- generic table filter: a search box and a .seg, both pointing at one table */
   function applyFilter(id) {
     const table = document.getElementById(id); if (!table) return;

@@ -1,0 +1,20 @@
+notfound = f'''<section class="max-w-[640px] mx-auto px-4 md:px-8 pt-16 md:pt-28 pb-16 md:pb-24 flex flex-col items-center text-center">
+  <div class="lcd readout !px-8 !py-6 sm:!px-14 sm:!py-9" role="img" aria-label="Error 404, page not found">
+    <span class="readout-value !text-[72px] sm:!text-[128px] !font-medium tracking-[0.06em]" aria-hidden="true">404</span>
+    <span class="readout-unit !mt-4" aria-hidden="true">Page not found</span>
+  </div>
+  <h1 class="text-[28px] md:text-[34px] font-bold tracking-[-0.02em] mt-10 text-balance">We can't find that page</h1>
+  <p class="text-lg text-ink-2 mt-3 max-w-[42ch] text-pretty">The link may be old, or the address mistyped. Search the blog, or go back to somewhere that exists.</p>
+  <form class="w-full max-w-[420px] mt-8 text-left" role="search" action="blog.html" method="get">
+    <label class="label sr-only" for="nf-q">Search the blog</label>
+    <div class="input-group">{i("search")}<input id="nf-q" name="q" type="search" placeholder="Search the blog" autocomplete="off"><button type="submit" class="btn btn-sm">Search</button></div>
+  </form>
+  <nav class="flex flex-wrap justify-center gap-3 mt-8" aria-label="Pages">
+    <a class="btn btn-signal" href="landing.html">Home</a>
+    <a class="btn" href="pricing.html">Pricing</a>
+    <a class="btn" href="blog.html">Blog</a>
+    <a class="btn" href="contact.html">Contact</a>
+  </nav>
+</section>
+'''
+mkt_page("screens/404.html", "Page not found · Plastc", notfound, banner=False)
