@@ -12,7 +12,7 @@ export interface WallRow {
   tiles: WallTile[];
 }
 
-export const WALL_LABEL = 'A wall of 24 tiles showing 20 Plastc screens: the sample invoicing app, its marketing site and its blog.';
+export const WALL_LABEL = 'A wall of Plastc screens: the sample invoicing app, its marketing site and its blog.';
 
 export const WALL: WallRow[] = [
   {

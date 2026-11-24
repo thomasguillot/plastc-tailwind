@@ -3,7 +3,7 @@ import { WALL, WALL_LABEL } from '../../data/home';
 
 const indent = ['', 'ml-[calc(var(--tw)*.45)]', 'ml-[calc(var(--tw)*.15)]', 'ml-[calc(var(--tw)*.3)]'];
 ---
-<div id="screens" class="stage mt-16 md:mt-28 mb-8 md:mb-16" role="img" aria-label={WALL_LABEL}>
+<div id="screens" class="stage mt-16 md:mt-28 mb-8 md:mb-16" role="img" aria-label={WALL_LABEL} inert>
   <div class="wall">{WALL.map(({ dx, dy, tiles }, r) => (
     <div class:list={['row flex gap-[clamp(20px,2.8vw,40px)]', indent[r], r === 0 && 'max-md:hidden']} style={`--dx:${dx}px;--dy:${dy}px`}>{tiles.map(({ key, title, eager }, t) => (
       <div class:list={['tile block w-(--tw)', t !== 2 && t !== 3 && 'max-md:hidden']}><span class="block rounded-[20px] p-[10px] recessed"><span class="tile-view"><iframe data-src={`screens/${key}.html`} title={`${title} preview`} tabindex="-1" aria-hidden="true" loading={eager ? 'eager' : 'lazy'}></iframe></span></span></div>
