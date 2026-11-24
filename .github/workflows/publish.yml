@@ -19,10 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -32,16 +28,9 @@ jobs:
 
       - run: npm run build
 
-      - name: Stage the site
-        run: |
-          mkdir -p out/screens
-          cd site
-          cp index.html dist.css plastc.js plastc.css favicon.svg favicon.ico apple-touch-icon.png mark-light.svg mark-dark.svg robots.txt sitemap.xml sf.jsonc ../out/
-          cp screens/*.html ../out/screens/
-
       - run: npm install -g spacefast@0.5
 
       - name: Publish to Spacefast
         env:
           SPACEFAST_TOKEN: ${{ secrets.SPACEFAST_TOKEN }}
-        run: sf publish out --space spc_9600ceba8b0447a587ecba2a7cbf9ce6 --prebuilt --wait --json -m "Deploy ${GITHUB_SHA::7}"
+        run: sf publish site/dist --space spc_9600ceba8b0447a587ecba2a7cbf9ce6 --prebuilt --wait --json -m "Deploy ${GITHUB_SHA::7}"
