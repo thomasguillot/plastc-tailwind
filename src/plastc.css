@@ -873,6 +873,34 @@
   & .chart-caption { font-size: 12px; }
 }
 
+@utility bar-chart {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: end; column-gap: 8px;
+  height: var(--chart-h, 160px); padding-top: 22px;
+  border-bottom: 1px solid var(--k-seam);
+  box-shadow: 0 1px 0 rgb(var(--k-hl) / calc(0.55 * var(--k-hl-a)));
+  & > .bar {
+    position: relative; justify-self: center;
+    width: min(100%, 26px); height: var(--v, 0%); min-height: 3px;
+    border-radius: 7px 7px 2px 2px;
+    background: color-mix(in oklab, var(--k-ink-2) 20%, transparent);
+    transition: background-color 160ms var(--ease-out);
+  }
+  & > .bar[data-current] { background: var(--k-ink-2); }
+  @media (hover: hover) and (pointer: fine) { & > .bar:not([data-current]):hover { background: color-mix(in oklab, var(--k-ink-2) 34%, transparent); } }
+  & > .bar > span {
+    position: absolute; left: 50%; bottom: calc(100% + 6px); translate: -50% 0;
+    font-size: 12px; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--k-ink-2);
+  }
+  & > .bar[data-current] > span { font-weight: 700; color: var(--k-ink); }
+}
+
+@utility bar-chart-axis {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 8px;
+  margin-top: 8px; text-align: center;
+  font-size: 12px; color: var(--k-ink-2); font-variant-numeric: tabular-nums;
+  & > [data-current] { font-weight: 700; color: var(--k-ink); }
+}
+
 @utility sparkline {
   display: block; width: 100%; height: 32px; overflow: visible;
   & polyline, & path { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }

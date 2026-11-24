@@ -83,16 +83,12 @@ def line_chart(values, labels, highlight=9, cls="h-[220px] sm:h-[260px]"):
 </div>'''
 
 def bar_chart(values, labels, label, current=-1, w=360, h=190):
-    top, bottom, n = 24, 26, len(values)
-    slot = (w - 8) / n; bw = slot * 0.56; hi = max(values) * 1.08
-    y = lambda v: top + (1 - v / hi) * (h - top - bottom)
-    bars = ""
-    for k, v in enumerate(values):
-        x = 4 + k * slot + (slot - bw) / 2; cur = ' data-current=""' if k == (current % n) else ""
-        bars += f'<rect class="chart-bar"{cur} x="{x:.1f}" y="{y(v):.1f}" width="{bw:.1f}" height="{h - bottom - y(v):.1f}" rx="5"/>'
-        bars += f'<text x="{x + bw / 2:.1f}" y="{h - 8}" text-anchor="middle">{labels[k]}</text>'
-        if k == (current % n): bars += f'<text class="chart-value" x="{x + bw / 2:.1f}" y="{y(v) - 8:.1f}" text-anchor="middle">{v}</text>'
-    return f'<svg class="chart" viewBox="0 0 {w} {h}" role="img" aria-label="{label}"><line class="chart-grid" x1="0" x2="{w}" y1="{h - bottom}" y2="{h - bottom}"/>{bars}</svg>'
+    n, hi = len(values), max(values)
+    cur = current % n
+    bars = "".join(f'<div class="bar" style="--v:{v / hi * 100:.1f}%"{" data-current" if k == cur else ""}><span>{v}</span></div>' for k, v in enumerate(values))
+    axis = "".join(f'<span{" data-current" if k == cur else ""}>{l}</span>' for k, l in enumerate(labels))
+    return (f'<div class="bar-chart" style="--chart-h:{h - 40}px" role="img" aria-label="{label}">{bars}</div>'
+            f'<div class="bar-chart-axis" aria-hidden="true">{axis}</div>')
 
 def donut(segments, total, caption, label, r=54, sw=14):
     import math
@@ -431,8 +427,8 @@ settings = shell("settings", "Settings", "Manage your studio profile, team and b
 page("screens/settings.html", "Settings · Plastc", settings, "../")
 
 # ------------------------------------------------------------------ customers, reports, products
-def money(v):
-    return f"${v:,.2f}" if v % 1 else f"${v:,.0f}"
+def money(v, cents=True):
+    return f"${v:,.2f}" if cents else f"${v:,.0f}"
 
 def row_actions(rid, label, items):
     body = "".join(items)
@@ -469,7 +465,7 @@ CLIENTS = [
 
 def client_row(n, c):
     name, ini, email, count, owed, billed, last, group = c
-    if not owed: owed_cell = '<span class="text-ink-2">$0</span>'
+    if not owed: owed_cell = '<span class="text-ink-2">$0.00</span>'
     elif "overdue" in group: owed_cell = f'<div class="flex flex-col items-end gap-1"><span class="text-danger font-bold">{money(owed)}</span><span class="badge lamp-danger !text-[13px] !font-semibold !text-ink-2">Overdue</span></div>'
     else: owed_cell = f'<span class="font-semibold">{money(owed)}</span>'
     menu = row_actions(f"cm{n}", name, [
@@ -528,7 +524,7 @@ reports = shell("reports", "Reports", "How invoicing has gone over the last twel
     <button class="btn" data-toast="Export started. We’ll email the CSV.">{i("down")}Export</button>''',
     f'''
 <section class="lcd px-6 py-5 grid gap-5 grid-cols-2 lg:grid-cols-4" aria-label="Key figures, last twelve months">
-  {"".join(f'<div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{k}</p><p class="text-[28px] font-semibold leading-none mt-2 tracking-[-0.02em]">{v}</p><p class="text-xs mt-2">{d}</p></div>' for k, v, d in (("Revenue", money(TOTAL), "▲ 31% on the year before"), ("Invoices sent", str(sum(INVOICES_SENT)), "18 in October"), ("Avg. days to pay", "18.2", "▼ 2.1 days faster"), ("Paid on time", "86%", "of invoices due")))}
+  {"".join(f'<div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{k}</p><p class="text-[28px] font-semibold leading-none mt-2 tracking-[-0.02em]">{v}</p><p class="text-xs mt-2">{d}</p></div>' for k, v, d in (("Revenue", money(TOTAL, cents=False), "▲ 31% on the year before"), ("Invoices sent", str(sum(INVOICES_SENT)), "18 in October"), ("Avg. days to pay", "18.2", "▼ 2.1 days faster"), ("Paid on time", "86%", "of invoices due")))}
 </section>
 
 <section class="panel !p-5 sm:!p-6 mt-8" aria-labelledby="rr-h">
@@ -1080,7 +1076,7 @@ showcase = f'''<body>
         <li><b>Viewed</b> by Halden Studio<time datetime="2026-10-03T14:31">Oct 3 · 2:31 PM</time></li>
         <li><b>Sent</b> by Mira Okafor<time datetime="2026-10-01T10:02">Oct 1 · 10:02 AM</time></li>
       </ol>""")}
-    {group("Charts", ".chart  .sparkline", f"""
+    {group("Charts", ".bar-chart  .chart  .sparkline", f"""
       <div class="grid gap-x-10 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr] items-start">
         <figure><figcaption><span class="block font-bold">Invoices sent</span><span class="block text-sm text-ink-2">Last six months</span></figcaption><div class="mt-4">{bar_chart([18, 22, 19, 27, 24, 31], ["May", "Jun", "Jul", "Aug", "Sep", "Oct"], "Invoices sent per month, May to October 2026. October: 31, the most in six months.")}</div></figure>
         <figure><figcaption><span class="block font-bold">Where it stands</span><span class="block text-sm text-ink-2">By status, this quarter</span></figcaption>
