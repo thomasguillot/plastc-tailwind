@@ -862,14 +862,15 @@
 
 @utility chart {
   display: block; width: 100%; height: auto; overflow: visible;
-  & text { fill: var(--k-ink-2); font-family: var(--font-sans); font-size: 12px; }
+  & text { fill: var(--k-ink-2); font-family: var(--font-sans); font-size: 13px; }
   & .chart-grid { stroke: var(--k-seam); stroke-width: 1; }
   & .chart-bar { fill: color-mix(in oklab, var(--k-ink-2) 24%, transparent); }
   & .chart-bar[data-current] { fill: var(--k-ink); }
   & .chart-value { fill: var(--k-ink); font-weight: 700; }
   & .chart-track { fill: none; stroke: var(--k-housing-down); }
   & .chart-seg { fill: none; stroke: var(--lamp, var(--k-ink-2)); }
-  & .chart-total { fill: var(--k-ink); font-weight: 700; }
+  & .chart-total { fill: var(--k-ink); font-size: 19px; font-weight: 700; }
+  & .chart-caption { font-size: 12px; }
 }
 
 @utility sparkline {

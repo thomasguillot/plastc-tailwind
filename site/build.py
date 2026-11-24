@@ -88,7 +88,7 @@ def donut(segments, total, caption, label, r=54, sw=14):
         arcs += f'<circle class="chart-seg {lamp}" cx="70" cy="70" r="{r}" stroke-width="{sw}" stroke-dasharray="{max(ln - gap, 0.1):.2f} {c:.2f}" stroke-dashoffset="{-off:.2f}" transform="rotate(-90 70 70)"/>'
         off += ln
     return (f'<svg class="chart" viewBox="0 0 140 140" role="img" aria-label="{label}"><circle class="chart-track" cx="70" cy="70" r="{r}" stroke-width="{sw}"/>{arcs}'
-            f'<text class="chart-total" x="70" y="70" text-anchor="middle" font-size="19">{total}</text><text x="70" y="88" text-anchor="middle" font-size="11">{caption}</text></svg>')
+            f'<text class="chart-total" x="70" y="70" text-anchor="middle">{total}</text><text class="chart-caption" x="70" y="89" text-anchor="middle">{caption}</text></svg>')
 
 def sparkline(values, w=120, h=32):
     lo, hi = min(values), max(values)
@@ -736,7 +736,7 @@ def group(title, classes, body, wide=False):
 
 CB_SEEN = {}
 for row_ in CUSTOMERS: CB_SEEN.setdefault(row_[1], row_[2])
-CB_OPTS = "".join(f'<div role="option" id="cb1-o{n}" aria-selected="false" data-value="{name}"><span class="avatar !w-6 !h-6 !text-[10px]">{ini}</span>{name}</div>' for n, (name, ini) in enumerate(CB_SEEN.items()))
+CB_OPTS = "".join(f'<div role="option" id="cb1-o{n}" aria-selected="false" data-value="{name}"><span class="avatar !w-7 !h-7 !text-[11px]">{ini}</span>{name}</div>' for n, (name, ini) in enumerate(CB_SEEN.items()))
 screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("settings", "Settings"), ("sign-in", "Sign in")]
 viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in screens)
 VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference screens">
