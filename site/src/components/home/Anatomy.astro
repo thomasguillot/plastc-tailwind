@@ -7,8 +7,12 @@ import { LAYERS, layerNumber } from '../../data/home';
   <h2 id="anat-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">What one screen is made of</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Six layers make up this dashboard. Pick one to see its parts and the classes behind them.</p>
   <div class="seg mt-8 lg:hidden" role="group" aria-label="Layer" data-layer-seg><button type="button" aria-pressed="true" data-seg-layer="all">All</button>{LAYERS.map(({ key, name }) => <button type="button" aria-pressed="false" data-seg-layer={key} aria-label={`${layerNumber(key)} ${name}`}>{layerNumber(key)}</button>)}</div>
+  <div class="recessed rounded-2xl px-4 py-3 mt-3 min-h-[76px] md:hidden" role="status" data-layer-cap>
+    <p class="m-0 text-sm font-bold" data-cap="all">All six layers</p>
+    {LAYERS.map(({ key, name, classes }) => <p class="m-0" data-cap={key} hidden><span class="flex items-center gap-2 font-bold"><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span>{name}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></p>)}
+  </div>
   <div data-track>
-    <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10 lg:sticky lg:top-[max(24px,calc(50vh_-_var(--xh,700px)/2))]" data-ex>
+    <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-3 lg:mt-10 lg:sticky lg:top-[max(24px,calc(50vh_-_var(--xh,700px)/2))]" data-ex>
       <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
       <div class="flex flex-col gap-3 min-w-0">
         <div class="hidden lg:flex items-center gap-3"><button type="button" class="key text-[13px] !aspect-auto h-10 px-5 !rounded-2xl" data-layer-auto aria-pressed="true">Auto</button><p class="text-sm text-ink-2">Steps through the layers as you scroll. Pick a layer to pin it.</p></div>
@@ -46,7 +50,7 @@ import { LAYERS, layerNumber } from '../../data/home';
   .xr:not([data-active="6"]) .mock [data-layer="6"]{opacity:0!important;visibility:hidden;transition:opacity 180ms var(--ease-out),scale 180ms var(--ease-out),translate 180ms var(--ease-out),visibility 0s 180ms}
   .xr[data-active="6"] .mock [data-layer="6"]{transition:opacity 180ms var(--ease-out),scale 180ms var(--ease-out),translate 180ms var(--ease-out),visibility 0s}
   @media (prefers-reduced-motion:no-preference){.xr:not([data-active="6"]) .mock .menu[data-layer="6"]{scale:.96}.xr:not([data-active="6"]) .mock .toast[data-layer="6"]{translate:0 8px}}
-  @container (max-width:599px){.xr .d-cust{display:none}.xr .mock dl.lcd{grid-template-columns:repeat(2,minmax(0,1fr))}.xr .d-search{flex-basis:100%}.xr .d-side{width:auto;padding:12px 8px}.xr .d-side>p{display:none}.xr .d-side .nav-item{width:40px;padding:0;gap:0;justify-content:center;font-size:0}}
+  @container (max-width:599px){.xr .d-cust{display:none}.xr .mock dl.lcd{grid-template-columns:repeat(2,minmax(0,1fr))}.xr .d-search{flex-basis:100%}.xr .d-side{width:auto;padding:12px 8px}.xr .d-side>p{display:none}.xr .d-side .nav-item{width:40px;padding:0;gap:0;justify-content:center}.xr .d-side .d-nl{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
   .lrow{display:flex;align-items:stretch;border-radius:16px;border:1px solid var(--k-seam);box-shadow:var(--k-seam-line);transition:background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
   .lrow[data-current]{background:var(--k-housing-down);box-shadow:var(--k-recessed)}
   .lrow:has(.lbtn:focus-visible){outline:2px solid var(--k-focus);outline-offset:2px}
@@ -57,6 +61,7 @@ import { LAYERS, layerNumber } from '../../data/home';
   .lbtn:focus-visible{outline:none}
   .lbtn .num{flex:none}
   @media (min-width:768px){.lbtn{align-items:center}}
+  @media (max-width:767.98px){[data-layer-seg]>button{height:44px;min-width:44px}.llink{min-height:44px}}
   .llink{flex:none;align-self:center;display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 6px;font-size:13px;font-weight:600;color:var(--k-ink);text-decoration:underline;text-underline-offset:3px;border-radius:12px}
   .llink:focus-visible{outline:2px solid var(--k-focus);outline-offset:-2px}
 </style>
@@ -66,6 +71,7 @@ import { LAYERS, layerNumber } from '../../data/home';
   const xr = document.querySelector<HTMLElement>('[data-xr]');
   const legend = document.querySelector<HTMLElement>('[data-legend]');
   const seg = document.querySelector<HTMLElement>('[data-layer-seg]');
+  const caps = $$('[data-cap]');
   const autoKey = document.querySelector<HTMLElement>('[data-layer-auto]');
   const track = document.querySelector<HTMLElement>('[data-track]');
   const grid = track?.querySelector<HTMLElement>('[data-ex]');
@@ -91,6 +97,7 @@ import { LAYERS, layerNumber } from '../../data/home';
         b.parentElement!.toggleAttribute('data-current', k === shown);
       });
       if (seg) $$<HTMLButtonElement>('button', seg).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.segLayer === (pin || 'all'))));
+      caps.forEach((c) => { c.hidden = c.dataset.cap !== (pin || 'all'); });
       if (autoKey) autoKey.setAttribute('aria-pressed', String(!pin));
     };
     const step = () => {
