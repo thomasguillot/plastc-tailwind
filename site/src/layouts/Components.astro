@@ -31,7 +31,7 @@ const nav = [{ slug: '', title: 'Overview' }, ...PAGES];
 
 <div class="max-w-[1240px] mx-auto px-4 md:px-8 pt-4 pb-16 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[200px_minmax(0,1fr)] gap-x-14 gap-y-8">
   <nav aria-label="Component groups" class="lg:sticky lg:top-6 lg:self-start">
-    <ul class="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-5 lg:grid-cols-1 gap-1">{nav.map((p) => <li><a class="nav-item" href={p.slug ? `/components/${p.slug}/` : '/components/'} aria-current={p.slug === current ? 'page' : undefined}>{p.title}</a></li>)}</ul>
+    <ul class="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-5 lg:grid-cols-1 gap-1">{nav.map((p) => <li><a class="btn btn-quiet btn-sm w-full !justify-start aria-[current=page]:!bg-[var(--k-well)] aria-[current=page]:!shadow-[var(--k-latched)] aria-[current=page]:!text-ink aria-[current=page]:!border-transparent" href={p.slug ? `/components/${p.slug}/` : '/components/'} aria-current={p.slug === current ? 'page' : undefined}>{p.title}</a></li>)}</ul>
   </nav>
   <main id="main" class="min-w-0"><slot /></main>
 </div>
