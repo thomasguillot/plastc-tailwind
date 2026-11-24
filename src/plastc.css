@@ -1554,15 +1554,37 @@
 /* Windows High Contrast drops every shadow, so parts get real edges. */
 @media (forced-colors: active) {
   .btn, .key, .seg, .field, .input-group, .dropzone, .progress, .popover, .combobox > .listbox, .check, .radio, .switch, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
-  .range::-webkit-slider-runnable-track { border: 1px solid CanvasText; }
-  .range::-moz-range-track { border: 1px solid CanvasText; }
   .btn-signal, .btn-go { border: 2px solid ButtonText; }
-  .seg > [aria-pressed="true"], .seg > [aria-selected="true"], .seg > [aria-current="page"], .nav-item[aria-current="page"], .key[aria-pressed="true"], .btn[aria-pressed="true"], .choice-card:has(:checked) { outline: 2px solid Highlight; }
+  .btn:is(:disabled, [aria-disabled="true"]):not([aria-busy="true"]), .key:is(:disabled, [aria-disabled="true"]) { color: GrayText; border: 1px dashed GrayText; }
+  .seg:is(:disabled, [aria-disabled="true"]) > *, .seg > :is(:disabled, [aria-disabled="true"]), .nav-item:is(:disabled, [aria-disabled="true"]), .calendar td button:disabled { color: GrayText; }
+  .range { forced-color-adjust: none; }
+  .range::-webkit-slider-runnable-track { border: 1px solid CanvasText; background: linear-gradient(to right, Highlight 0 var(--fill, 50%), Canvas var(--fill, 50%)); box-shadow: none; }
+  .range::-moz-range-track { border: 1px solid CanvasText; background: linear-gradient(to right, Highlight 0 var(--fill, 50%), Canvas var(--fill, 50%)); box-shadow: none; }
+  .range::-webkit-slider-thumb { box-sizing: border-box; background: ButtonText; border: 2px solid Canvas; box-shadow: none; }
+  .range::-moz-range-thumb { box-sizing: border-box; background: ButtonText; border: 2px solid Canvas; box-shadow: none; }
+  .range:focus-visible::-webkit-slider-runnable-track { outline-color: CanvasText; }
+  .range:focus-visible::-moz-range-track { outline-color: CanvasText; }
+  .range:disabled::-webkit-slider-runnable-track { border-color: GrayText; background: linear-gradient(to right, GrayText 0 var(--fill, 50%), Canvas var(--fill, 50%)); }
+  .range:disabled::-moz-range-track { border-color: GrayText; background: linear-gradient(to right, GrayText 0 var(--fill, 50%), Canvas var(--fill, 50%)); }
+  .range:disabled::-webkit-slider-thumb { background: Canvas; border: 1px dashed GrayText; }
+  .range:disabled::-moz-range-thumb { background: Canvas; border: 1px dashed GrayText; }
+  :is(.btn, .key)[aria-pressed="true"]:not(:disabled, [aria-disabled="true"]), .key[aria-checked="true"]:not(:disabled, [aria-disabled="true"]), .choice-card:has(:checked) { border-color: Highlight; outline: 2px solid Highlight; outline-offset: 0; }
+  :is(.btn, .key)[aria-pressed="true"]:focus-visible, .key[aria-checked="true"]:focus-visible, .choice-card:has(:checked):has(:focus-visible) { outline: 2px solid CanvasText; outline-offset: 3px; }
+  .seg > :is([aria-pressed="true"], [aria-selected="true"], [aria-current="page"]), .nav-item[aria-current="page"], .calendar td button[aria-pressed="true"] { forced-color-adjust: none; color: HighlightText; background: Highlight; box-shadow: none; }
+  .seg > :is([aria-pressed="true"], [aria-selected="true"], [aria-current="page"]):focus-visible { outline: 2px solid HighlightText; outline-offset: -4px; }
+  .nav-item[aria-current="page"]:focus-visible, .calendar td button[aria-pressed="true"]:focus-visible { outline-color: CanvasText; }
+  .seg:is(:disabled, [aria-disabled="true"]) > :is([aria-pressed="true"], [aria-selected="true"], [aria-current="page"]), .seg > :is([aria-pressed="true"], [aria-selected="true"], [aria-current="page"]):is(:disabled, [aria-disabled="true"]) {
+    color: GrayText; background: Canvas;
+    &:not(:focus-visible) { outline: 1px dashed GrayText; outline-offset: -1px; }
+    &:focus-visible { outline-color: CanvasText; }
+  }
   .tabs > [aria-selected="true"]::after, .tabs > [aria-current="page"]::after { background: Highlight; }
-  .listbox [role="option"][data-active], .calendar td button[aria-pressed="true"] { outline: 2px solid Highlight; }
+  .listbox [role="option"][data-active] { outline: 2px solid Highlight; }
   .check:checked, .radio:checked, .switch:checked { background: Highlight; }
   .switch::before { border: 1px solid CanvasText; }
   .badge::before, .key[aria-pressed="true"]::after, .btn[aria-pressed="true"]::after { forced-color-adjust: none; }
+  .key[aria-checked="true"]::after { forced-color-adjust: none; background: Highlight; }
+  .key[aria-checked="true"]:is(:disabled, [aria-disabled="true"])::after { background: GrayText; box-shadow: none; }
   .ktable tbody tr:has(input[type="checkbox"]:checked) { outline: 2px solid Highlight; outline-offset: -2px; }
 }
 
