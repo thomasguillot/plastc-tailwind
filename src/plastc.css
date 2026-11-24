@@ -485,7 +485,6 @@
     background: transparent; box-shadow: none;
     border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
   }
-  &[aria-pressed="true"]:is(:disabled, [aria-disabled="true"]):not([aria-busy="true"]) { background: color-mix(in oklab, var(--k-ink-off) 18%, transparent); }
   &[aria-busy="true"] { cursor: progress; }
   &[aria-busy="true"]::before {
     content: ""; width: 14px; height: 14px; border-radius: 50%;
@@ -582,7 +581,6 @@
     border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
     translate: none; scale: none;
   }
-  &:is([aria-pressed="true"], [aria-checked="true"]):is(:disabled, [aria-disabled="true"]) { background: color-mix(in oklab, var(--k-ink-off) 18%, transparent); }
 }
 
 /* ---------------------------------------------------------------- fields */
