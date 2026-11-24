@@ -115,9 +115,34 @@
       if (seg.getAttribute('role') === 'tablist') return selectTab(s);
       if (s.hasAttribute('aria-current')) return;
       [...seg.children].forEach(x => x.tagName === 'BUTTON' && x.setAttribute(s.hasAttribute('aria-pressed') ? 'aria-pressed' : 'aria-current', String(x === s)));
-      if (seg.getAttribute('aria-label') === 'Pages') { [...seg.children].forEach(x => x.toggleAttribute('aria-current', x === s)); s.setAttribute('aria-current', 'page'); }
+      if (seg.getAttribute('aria-label') === 'Pages') return goToPage(seg, Number(s.textContent));
+    }
+
+    const tb = t.closest('.tabs > [role=tab]'); if (tb) return selectTab(tb);
+    const tl = t.closest('.tabs > a[href^="#"]');
+    if (tl) { e.preventDefault(); [...tl.parentElement.children].forEach(x => x.removeAttribute('aria-current')); tl.setAttribute('aria-current', 'page'); return; }
+
+    const step = t.closest('[data-page-step]');
+    if (step && !step.disabled) {
+      const seg = step.closest('.pager').querySelector('.pager-pages');
+      const cur = Number(seg.querySelector('[aria-current]').textContent);
+      goToPage(seg, cur + Number(step.dataset.pageStep));
     }
   });
+  function goToPage(seg, cur) {
+    const total = Number(seg.dataset.total || [...seg.querySelectorAll('button')].at(-1).textContent);
+    seg.dataset.total = total;
+    cur = Math.min(Math.max(cur, 1), total);
+    const hadFocus = seg.contains(document.activeElement);
+    const lo = Math.max(1, Math.min(cur - 1, total - 4)), hi = Math.min(total, Math.max(cur + 1, 5));
+    const nums = [...new Set([1, ...Array.from({ length: hi - lo + 1 }, (_, n) => lo + n), total])].sort((a, b) => a - b);
+    seg.innerHTML = nums.map((n, k) => (k && n - nums[k - 1] > 1 ? '<span aria-hidden="true">…</span>' : '') +
+      `<button type="button"${n === cur ? ' aria-current="page"' : ''}>${n}</button>`).join('');
+    if (hadFocus) seg.querySelector('[aria-current]').focus();
+    const pager = seg.closest('.pager');
+    const status = pager.querySelector('.pager-status'); if (status) status.textContent = `Page ${cur} of ${total}`;
+    pager.querySelectorAll('[data-page-step]').forEach(b => { b.disabled = b.dataset.pageStep === '-1' ? cur === 1 : cur === total; });
+  }
   const closePopovers = () => $$('[popover]:popover-open').forEach(p => p !== toastEl && p.hidePopover());
   const dedent = html => {
     const lines = html.replace(/^\n+|\s+$/g, '').split('\n');
@@ -168,7 +193,7 @@
       r.style.display = ok ? '' : 'none'; if (ok && !r.hidden) shown++;
     });
     if (empty) {
-      wrap.style.display = shown ? '' : 'none'; empty.classList.toggle('hidden', !!shown); empty.classList.toggle('flex', !shown);
+      wrap.style.display = shown ? '' : 'none'; empty.hidden = !!shown;
       if (!shown) {
         const label = { all: 'invoices', paid: 'paid invoices', open: 'open invoices', overdue: 'overdue invoices', draft: 'drafts' }[filter];
         const set = (sel, txt) => { const el = $(sel, empty); if (el) el.textContent = txt; };

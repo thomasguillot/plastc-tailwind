@@ -155,7 +155,7 @@ def table(rows, select=True, actions=True, dates=True, selected=()):
     return f'<table class="ktable">\n<thead><tr>{head}</tr></thead>\n<tbody>{"".join(body)}</tbody></table>'
 
 def lcd_empty(n, unit):
-    return f'<div class="lcd inline-flex flex-col items-center px-6 py-3"><span class="text-[32px] font-semibold leading-none">{n}</span><span class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim mt-1.5">{unit}</span></div>'
+    return f'<div class="lcd readout"><span class="readout-value">{n}</span><span class="readout-unit">{unit}</span></div>'
 
 # ------------------------------------------------------------------ dialogs shared by app screens
 NEW_INVOICE = f'''<dialog class="dialog" id="new-invoice" aria-labelledby="ni-h">
@@ -196,11 +196,7 @@ def nav_block(active):
     </div>'''
 
 def search():
-    return f'''<label class="relative block"><span class="sr-only">Search</span>
-      {i("search","w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-2 pointer-events-none")}
-      <input class="field !h-10 !pl-10 !text-sm" placeholder="Search" data-search>
-      <span class="kbd absolute right-2.5 top-1/2 -translate-y-1/2" aria-hidden="true">/</span>
-    </label>'''
+    return f'''<label class="input-group">{i("search")}<span class="sr-only">Search</span><input placeholder="Search" data-search><span class="kbd" aria-hidden="true">/</span></label>'''
 
 def shell(active, title, sub, actions, content):
     return f'''<body class="min-h-screen">
@@ -292,7 +288,7 @@ inv = shell("invoices", "Invoices", "Create, send and track every invoice in one
     <button role="tab" aria-selected="false" data-filter="overdue">Overdue <span class="text-danger" data-count="overdue">2</span></button><button role="tab" aria-selected="false" data-filter="draft">Draft</button>
   </div>
   <div class="flex gap-3 flex-1 sm:flex-none min-w-0">
-    <label class="relative flex-1 sm:w-72 min-w-0"><span class="sr-only">Search invoices</span>{i("search","w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-2 pointer-events-none")}<input class="field !pl-10" placeholder="Search by customer or number" data-search data-table-search></label>
+    <label class="input-group flex-1 sm:w-72 min-w-0">{i("search")}<span class="sr-only">Search invoices</span><input placeholder="Search by customer or number" data-search data-table-search></label>
     <button class="btn btn-icon sm:!w-auto sm:!px-4" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Sep 1 to Oct 31" data-range-btn>{i("cal")}<span class="hidden sm:inline" data-range-label>Sep 1 – Oct 31</span></button>
     <div class="menu" popover id="range-menu" style="position-anchor:--range-menu" aria-label="Date range"><button type="button" data-range="Last 30 days">Last 30 days</button><button type="button" data-range="Sep 1 – Oct 31">Sep 1 – Oct 31</button><button type="button" data-range="This quarter">This quarter</button><button type="button" data-range="This year">This year</button></div>
   </div>
@@ -302,18 +298,18 @@ inv = shell("invoices", "Invoices", "Create, send and track every invoice in one
 
 <section class="panel !p-0">
   <div class="table-scroll px-2 pt-1" data-table-wrap>{table(CUSTOMERS)}</div>
-  <div class="hidden flex-col items-center text-center px-6 py-14" data-empty>
-    <div class="lcd inline-flex flex-col items-center px-6 py-3"><span class="text-[32px] font-semibold leading-none">0</span><span class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim mt-1.5" data-empty-unit>Drafts</span></div>
-    <h2 class="font-bold mt-5" data-empty-title>Nothing waiting to send</h2>
-    <p class="text-sm text-ink-2 mt-1 max-w-[40ch]" data-empty-text>Invoices you start but don’t send wait here. Everything you’ve started has gone out.</p>
-    <button class="btn btn-sm mt-5" data-open-dialog="new-invoice" data-empty-new>{i("plus","", "2.2")}Start a draft</button>
-    <button class="btn btn-sm mt-5" data-clear-search hidden>{i("x")}Clear search</button>
+  <div class="empty" data-empty hidden>
+    <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit" data-empty-unit>Drafts</span></div>
+    <h2 data-empty-title>Nothing waiting to send</h2>
+    <p data-empty-text>Invoices you start but don’t send wait here. Everything you’ve started has gone out.</p>
+    <button class="btn btn-sm" data-open-dialog="new-invoice" data-empty-new>{i("plus","", "2.2")}Start a draft</button>
+    <button class="btn btn-sm" data-clear-search hidden>{i("x")}Clear search</button>
   </div>
-  <div class="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 py-4 border-t border-[color:var(--k-seam)]" data-pager>
+  <nav class="pager px-5 sm:px-6 py-4 border-t border-[color:var(--k-seam)]" aria-label="Pagination" data-pager>
     <button class="btn btn-sm" disabled>{i("left")}Previous</button>
-    <p class="text-sm text-ink-2 tabular-nums" data-showing>Showing all 10 invoices</p>
+    <p class="pager-status" data-showing>Showing all 10 invoices</p>
     <button class="btn btn-sm" disabled>Next{i("right")}</button>
-  </div>
+  </nav>
 </section>
 ''')
 page("screens/invoices.html", "Invoices · Plastc", inv, "../")
@@ -340,7 +336,7 @@ TABS = [("profile", "Profile"), ("notifications", "Notifications"), ("billing", 
 tabs = "".join(f'<button role="tab" id="tab-{k}" aria-controls="tp-{k}" aria-selected="{"true" if n == 0 else "false"}"{TI if n else ""}>{l}</button>' for n, (k, l) in enumerate(TABS))
 
 settings = shell("settings", "Settings", "Manage your studio profile, team and billing.", "", f'''
-<div class="seg mb-6" role="tablist" aria-label="Settings sections">{tabs}</div>
+<div class="tabs mb-6" role="tablist" aria-label="Settings sections">{tabs}</div>
 <section class="panel !px-5 !py-2 md:!px-8">
   {tabpanel("profile", "Profile", f"""
   {row("Studio name", "Shown on every invoice you send.", '<label class="sr-only" for="sn">Studio name</label><input id="sn" class="field" value="Halden Studio">')}
@@ -360,12 +356,12 @@ page("screens/settings.html", "Settings · Plastc", settings, "../")
 # ------------------------------------------------------------------ stub screens (honest: not in the reference set)
 for key, label, ic in NAV[2:]:
     stub = shell(key, label, f"{label} isn’t one of the reference screens yet.", "", f'''
-<section class="panel !p-10 flex flex-col items-center text-center">
+<section class="panel !p-0"><div class="empty">
   {lcd_empty("--", label)}
-  <h2 class="font-bold mt-5">Not built yet</h2>
-  <p class="text-sm text-ink-2 mt-1 max-w-[44ch]">The reference set covers the dashboard, invoices, settings and sign-in. {label} would reuse the same table, filters and empty states.</p>
-  <div class="flex flex-wrap justify-center gap-3 mt-5"><a class="btn btn-sm" href="dashboard.html">{i("left")}Back to dashboard</a><a class="btn btn-sm" href="invoices.html">See invoices</a></div>
-</section>''')
+  <h2>Not built yet</h2>
+  <p>The reference set covers the dashboard, invoices, settings and sign-in. {label} would reuse the same table, filters and empty states.</p>
+  <div class="empty-actions"><a class="btn btn-sm" href="dashboard.html">{i("left")}Back to dashboard</a><a class="btn btn-sm" href="invoices.html">See invoices</a></div>
+</div></section>''')
     page(f"screens/{key}.html", f"{label} · Plastc", stub, "../")
 
 # ------------------------------------------------------------------ sign in
@@ -399,10 +395,11 @@ def spec(name, cls, rule, specimen):
 </div>'''
 
 GN = [0]
-def group(title, classes, body):
+def group(title, classes, body, wide=False):
     GN[0] += 1
     gid = f"g{GN[0]}"
-    return f'''<section class="py-7 border-t border-[color:var(--k-seam)] shadow-[inset_0_1px_0_rgb(var(--k-hl)/calc(.55*var(--k-hl-a)))] min-w-0">
+    span = " lg:col-span-2" if wide else ""
+    return f'''<section class="py-7{span} border-t border-[color:var(--k-seam)] shadow-[inset_0_1px_0_rgb(var(--k-hl)/calc(.55*var(--k-hl-a)))] min-w-0">
   <div class="flex flex-wrap items-center justify-between gap-2 mb-5"><h3 class="engraved">{title}</h3><div class="flex items-center gap-3 min-w-0"><code class="font-mono text-[11px] text-ink-2 break-words min-w-0 hidden sm:block">{classes}</code><button class="btn btn-quiet btn-sm" data-copy-from="{gid}">{i("copy")}Copy HTML</button></div></div>
   <div id="{gid}">{body}</div>
 </section>'''
@@ -482,6 +479,13 @@ showcase = f'''<body>
         <div><label class="label" for="c3">Email</label><input id="c3" class="field" value="billing@halden" aria-invalid="true" aria-describedby="c3e"><span id="c3e" class="hint-error">Add a domain, for example .studio</span></div>
         <div><label class="label" for="c4">Invoice number</label><input id="c4" class="field" value="INV-0194" disabled aria-describedby="c4h"><span id="c4h" class="hint">Assigned automatically.</span></div>
       </div>""")}
+    {group("Input groups", ".input-group  .input-affix", f"""
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="label" for="ig1">Search</label><label class="input-group">{i("search")}<input id="ig1" placeholder="Search invoices"><span class="kbd" aria-hidden="true">/</span></label></div>
+        <div><label class="label" for="ig2">Website</label><div class="input-group"><span class="input-affix">https://</span><input id="ig2" value="halden.studio"></div></div>
+        <div><label class="label" for="ig3">Late fee</label><div class="input-group"><input id="ig3" inputmode="decimal" value="4"><span class="input-affix">% a month</span></div></div>
+        <div><label class="label" for="ig4">API key</label><div class="input-group"><input id="ig4" class="!font-mono !text-[14px]" value="plc_live_4f2a…9c1e" readonly><button type="button" class="btn btn-sm" data-copy="plc_live_4f2a9c1e">{i("copy")}Copy</button></div></div>
+      </div>""")}
     {group("Selection", ".check  .radio  .switch  .choice-card  .seg  .range", """
       <div class="flex flex-wrap gap-x-8 gap-y-4">
         <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" class="check" checked>Send copy</label>
@@ -498,6 +502,13 @@ showcase = f'''<body>
       <div class="flex flex-wrap items-center gap-x-6 gap-y-3"><span class="badge lamp-ok">Paid</span><span class="badge lamp-warn">Open</span><span class="badge lamp-danger">Overdue</span><span class="badge lamp-off">Draft</span><span class="tag">Net 30</span><span class="tag">USD</span></div>
       <div class="mt-5"><div class="flex justify-between text-[13px] mb-2"><span class="font-semibold">Storage</span><span class="text-ink-2">6.2 of 10 GB</span></div><div class="meter" role="meter" aria-label="Storage" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6.2"><span style="--v:62%"></span></div></div>
       <div class="alert lamp-warn mt-5">{i("alert")}<div class="alert-body"><b>Two invoices are due this week.</b><span class="block text-ink-2">Juno Park and Priya Nair. Reminders go out automatically.</span></div></div>""")}
+    {group("Empty states", ".empty  .readout  .empty-actions", f"""
+      <div class="empty seam rounded-[20px] !py-10">
+        <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit">Customers</span></div>
+        <h4>No customers yet</h4>
+        <p>Customers appear here after you send their first invoice. You can also add one now.</p>
+        <div class="empty-actions"><button class="btn btn-sm" data-toast="Customer form is not part of this demo">{i("plus","", "2.2")}Add customer</button><button class="btn btn-sm btn-quiet" data-toast="Import is not part of this demo">{i("down")}Import CSV</button></div>
+      </div>""")}
     {group("Overlays", ".menu  .dialog  .toast  .tooltip", f"""
       <p class="text-sm text-ink-2 mb-4 max-w-[52ch]" data-demo-note>The only parts that float. Menus grow from their button, the dialog settles in from the centre, and toasts rise from the bottom. Each leaves faster than it arrives. All native: popover and &lt;dialog&gt;, so Esc and outside-click work without a script.</p>
       <div class="flex flex-wrap gap-3">
@@ -507,6 +518,15 @@ showcase = f'''<body>
         <button class="btn" data-toast="Invoice INV-0193 sent">Show toast</button>
       </div>
       <dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete">{i("trash")}Delete</button></div></form></dialog>""")}
+    {group("Tabs &amp; pagination", ".tabs  .pager  .pager-pages  .pager-status", f"""
+      <nav class="tabs" aria-label="Customer sections"><a href="#components" aria-current="page">Overview</a><a href="#components">Invoices <span class="text-ink-2 font-semibold">12</span></a><a href="#components">Payments</a><a href="#components">Activity</a></nav>
+      <p class="text-sm text-ink-2 mt-4 max-w-[52ch]" data-demo-note>Tabs switch the panels of one page. For filters and view modes inside a panel, use <code class="font-mono">.seg</code>.</p>
+      <nav class="pager mt-7" aria-label="Pagination">
+        <button type="button" class="btn btn-sm" data-page-step="-1" disabled>{i("left")}Previous</button>
+        <div class="seg pager-pages" role="group" aria-label="Pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><span aria-hidden="true">…</span><button type="button">8</button></div>
+        <p class="pager-status" aria-live="polite">Page 1 of 8</p>
+        <button type="button" class="btn btn-sm" data-page-step="1">Next{i("right")}</button>
+      </nav>""")}
     {group("Navigation &amp; data", ".nav-item  .seg  .ktable  .kbd  .lcd", f"""
       <div class="grid sm:grid-cols-[180px_1fr] gap-6 items-start">
         <nav class="flex flex-col gap-1" aria-label="Example"><a class="nav-item" href="#components" aria-current="page">{i("home")}Dashboard</a><a class="nav-item" href="#components">{i("file")}Invoices</a><a class="nav-item" href="#components">{i("users")}Customers</a></nav>
@@ -515,7 +535,7 @@ showcase = f'''<body>
           <p class="text-sm text-ink-2">Shortcut hints use <code class="font-mono">.kbd</code>. For example <span class="kbd">N</span> for a new invoice.</p>
         </div>
       </div>
-      <div class="table-scroll mt-5">{table(CUSTOMERS[:3], select=False, actions=False, dates=False)}</div>""")}
+      <div class="table-scroll mt-5">{table(CUSTOMERS[:3], select=False, actions=False, dates=False)}</div>""", wide=True)}
   </div>
 </section>
 
