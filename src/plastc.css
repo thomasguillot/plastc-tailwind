@@ -565,7 +565,7 @@
   &[aria-invalid="true"]:focus-visible { outline-offset: 3px; }
 }
 
-@utility field-area { height: auto; min-height: 108px; padding: 11px 14px; resize: vertical; line-height: 1.5; }
+@utility field-area { &, &.field { height: auto; min-height: 108px; padding: 11px 14px; resize: vertical; line-height: 1.5; } }
 
 @utility field-select {
   appearance: none;
