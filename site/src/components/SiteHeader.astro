@@ -10,7 +10,7 @@ interface Props {
   path?: string;
 }
 const { section, path = '' } = Astro.props;
-const componentsCurrent = path === '/components/' ? 'page' : section === 'components' ? 'true' : undefined;
+const componentsCurrent = section === 'components' ? 'true' : undefined;
 const active = 'aria-[current]:!text-ink aria-[current]:!bg-[var(--k-housing-down)] aria-[current]:!shadow-[var(--k-recessed)]';
 ---
 <header class="max-w-[1240px] mx-auto px-4 md:px-8 pt-6 pb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
