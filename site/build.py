@@ -753,6 +753,14 @@ previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underlin
   <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
 </a>''' for k, t in screens)
 
+DEPTH_ROWS = (
+    ("Plane", "--k-seam-line", "background:var(--k-housing);border:1px solid var(--k-seam);box-shadow:var(--k-seam-line)", "Flush. Panels, tabs, tables.", "box-shadow: var(--k-seam-line);"),
+    ("Raised", "--k-raised", "background:var(--k-housing);box-shadow:var(--k-raised)", "A part you press.", "box-shadow: var(--k-raised);"),
+    ("Pressed", "--k-pressed", "background:var(--k-housing);box-shadow:var(--k-pressed)", "A raised part, pushed in.", "box-shadow: var(--k-pressed);"),
+    ("Recessed", "--k-recessed", "background:var(--k-housing);box-shadow:var(--k-recessed)", "Holds input or output.", "box-shadow: var(--k-recessed);"),
+    ("Float", "--k-float", "background:var(--k-housing-up);box-shadow:var(--k-float)", "Overlays only.", "box-shadow: var(--k-float);"))
+DEPTH = "".join(f'<div class="min-w-0"><div class="rounded-[18px] seam p-5"><div class="h-20 rounded-[14px] grid place-items-center text-[13px] font-bold" style="{st}">{name}</div></div><p class="font-mono text-[13px] font-bold mt-3">{tok}</p><p class="text-sm text-ink-2 mt-1">{note}</p><button class="btn btn-quiet btn-sm mt-2" data-copy="{decl}" aria-label="Copy {decl}">{i("copy")}Copy</button></div>' for name, tok, st, note, decl in DEPTH_ROWS)
+
 IMPORT = '@import "tailwindcss";\n@import "./plastc.css";'
 SHOWNAV = '<a class="btn btn-quiet btn-sm" href="#depth">Depth</a><a class="btn btn-quiet btn-sm" href="#components">Components</a><a class="btn btn-quiet btn-sm" href="#screens">Screens</a><a class="btn btn-quiet btn-sm" href="#install">Install</a>'
 
@@ -829,16 +837,22 @@ showcase = f'''<body>
         <div><label class="label" for="ig3">Late fee</label><div class="input-group"><input id="ig3" inputmode="decimal" value="4"><span class="input-affix">% a month</span></div></div>
         <div><label class="label" for="ig4">API key</label><div class="input-group"><input id="ig4" class="!font-mono !text-[14px]" value="plc_live_4f2a…9c1e" readonly><button type="button" class="btn btn-sm" data-copy="plc_live_4f2a9c1e">{i("copy")}Copy</button></div></div>
       </div>""")}
+    {group("Status &amp; feedback", ".badge  .lamp-*  .tag  .meter  .alert", f"""
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-3"><span class="badge lamp-ok">Paid</span><span class="badge lamp-warn">Open</span><span class="badge lamp-danger">Overdue</span><span class="badge lamp-off">Draft</span><span class="tag">Net 30</span><span class="tag">USD</span></div>
+      <div class="mt-5"><div class="flex justify-between text-[13px] mb-2"><span class="font-semibold">Storage</span><span class="text-ink-2">6.2 of 10 GB</span></div><div class="meter" role="meter" aria-label="Storage" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6.2"><span style="--v:62%"></span></div></div>
+      <div class="alert lamp-warn mt-5">{i("alert")}<div class="alert-body"><b>Two invoices are due this week.</b><span class="block text-ink-2">Juno Park and Priya Nair. Reminders go out automatically.</span></div></div>""")}
     {group("Combobox &amp; date picker", ".combobox  .calendar  .popover", f"""
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div><label class="label" id="cb1-l" for="cb1">Customer</label>
-          <div class="combobox"><div class="input-group"><input id="cb1" role="combobox" aria-expanded="false" aria-controls="cb1-list" aria-autocomplete="list" autocomplete="off" placeholder="Search customers"><button type="button" class="btn btn-quiet btn-sm btn-icon" tabindex="-1" aria-label="Show customers" data-combobox-toggle>{i("chevron")}</button></div>
-          <div class="listbox" role="listbox" id="cb1-list" aria-labelledby="cb1-l" hidden>{CB_OPTS}<p class="listbox-empty" hidden>No customers match.</p></div></div></div>
-        <div><label class="label" for="dp1">Due date</label>
-          <div class="input-group" style="anchor-name:--dp1"><input id="dp1" value="Nov 28, 2026"><button type="button" class="btn btn-quiet btn-sm btn-icon" popovertarget="dp1-cal" aria-label="Choose due date">{i("cal")}</button></div>
-          <div class="popover" popover id="dp1-cal" style="position-anchor:--dp1"><div class="calendar" data-calendar data-for="dp1" data-value="2026-11-28"></div></div></div>
-      </div>
-      <div class="mt-6 w-fit max-w-full overflow-x-auto rounded-[20px] seam p-4"><div class="calendar" data-calendar data-value="2026-11-24"></div></div>""")}
+      <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_auto] items-start">
+        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-1">
+          <div><label class="label" id="cb1-l" for="cb1">Customer</label>
+            <div class="combobox"><div class="input-group"><input id="cb1" role="combobox" aria-expanded="false" aria-controls="cb1-list" aria-autocomplete="list" autocomplete="off" placeholder="Search customers"><button type="button" class="btn btn-quiet btn-sm btn-icon" tabindex="-1" aria-label="Show customers" data-combobox-toggle>{i("chevron")}</button></div>
+            <div class="listbox" role="listbox" id="cb1-list" aria-labelledby="cb1-l" hidden>{CB_OPTS}<p class="listbox-empty" hidden>No customers match.</p></div></div></div>
+          <div><label class="label" for="dp1">Due date</label>
+            <div class="input-group" style="anchor-name:--dp1"><input id="dp1" value="Nov 28, 2026"><button type="button" class="btn btn-quiet btn-sm btn-icon" popovertarget="dp1-cal" aria-label="Choose due date">{i("cal")}</button></div>
+            <div class="popover" popover id="dp1-cal" style="position-anchor:--dp1;position-area:bottom span-left;transform-origin:top right"><div class="calendar" data-calendar data-for="dp1" data-value="2026-11-28"></div></div></div>
+        </div>
+        <div class="min-w-0"><p class="text-[13px] font-bold mb-2" id="cal-solo-l">Calendar, on its own</p><div class="w-fit max-w-full overflow-x-auto rounded-[20px] seam p-4" role="group" aria-labelledby="cal-solo-l"><div class="calendar" data-calendar data-value="2026-11-24"></div></div></div>
+      </div>""")}
     {group("Selection", ".check  .radio  .switch  .choice-card  .seg  .range", """
       <div class="flex flex-wrap gap-x-8 gap-y-4">
         <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" class="check" checked>Send copy</label>
@@ -851,10 +865,6 @@ showcase = f'''<body>
       </div>
       <div class="flex flex-wrap items-end gap-5 mt-6"><div class="seg" role="group" aria-label="View"><button aria-pressed="true">Grid</button><button aria-pressed="false">List</button></div>
       <div class="flex-1 min-w-[200px]"><label class="label" for="rg">Late fee · <span data-range-out>4</span>%</label><input id="rg" type="range" min="0" max="10" value="4" class="range" style="--fill:40%"></div></div>""")}
-    {group("Status &amp; feedback", ".badge  .lamp-*  .tag  .meter  .alert", f"""
-      <div class="flex flex-wrap items-center gap-x-6 gap-y-3"><span class="badge lamp-ok">Paid</span><span class="badge lamp-warn">Open</span><span class="badge lamp-danger">Overdue</span><span class="badge lamp-off">Draft</span><span class="tag">Net 30</span><span class="tag">USD</span></div>
-      <div class="mt-5"><div class="flex justify-between text-[13px] mb-2"><span class="font-semibold">Storage</span><span class="text-ink-2">6.2 of 10 GB</span></div><div class="meter" role="meter" aria-label="Storage" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6.2"><span style="--v:62%"></span></div></div>
-      <div class="alert lamp-warn mt-5">{i("alert")}<div class="alert-body"><b>Two invoices are due this week.</b><span class="block text-ink-2">Juno Park and Priya Nair. Reminders go out automatically.</span></div></div>""")}
     {group("Empty states", ".empty  .readout  .empty-actions", f"""
       <div class="empty seam rounded-[20px] !py-10">
         <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit">Customers</span></div>
@@ -961,14 +971,19 @@ showcase = f'''<body>
 
 <section id="tokens" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <h2 class="display text-[40px] md:text-[56px]">Tokens</h2>
+  <div class="mt-10">
+    <h3 class="engraved mb-4">Depth · four levels and the pressed state</h3>
+    <div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-8">{DEPTH}</div>
+    <p class="text-sm text-ink-2 max-w-[64ch] mt-6"><code class="font-mono">--k-depth</code> scales every offset and blur: <code class="font-mono">.depth-soft</code> sets it to 0.5 and <code class="font-mono">.depth-deep</code> to 1.7, on any region.</p>
+  </div>
   <div class="grid gap-10 lg:grid-cols-2 mt-10">
     <div>
       <h3 class="engraved mb-4">Gray · warm, tuned to the light housing</h3>
-      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{"".join(f'<div class="h-12 rounded-md seam bg-gray-{n}" title="gray-{n}"></div>' for n in (25,50,100,200,300,400,500,600,700,800,900,950))}</div>
+      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{"".join(f'<div class="min-w-0"><div class="h-12 rounded-md seam bg-gray-{n}" title="gray-{n}"></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>' for n in (25,50,100,200,300,400,500,600,700,800,900,950))}</div>
       <h3 class="engraved mt-7 mb-4">Brand · signal orange</h3>
-      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{"".join(f'<div class="h-12 rounded-md seam bg-brand-{n}" title="brand-{n}"></div>' for n in (25,50,100,200,300,400,500,600,700,800,900,950))}</div>
+      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{"".join(f'<div class="min-w-0"><div class="h-12 rounded-md seam bg-brand-{n}" title="brand-{n}"></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>' for n in (25,50,100,200,300,400,500,600,700,800,900,950))}</div>
       <h3 class="engraved mt-7 mb-4">Success · Warning · Error</h3>
-      <div class="grid grid-cols-6 gap-1.5">{"".join(f'<div class="h-10 rounded-md seam bg-{c}-{n}"></div>' for c in ("success","warning","error") for n in (50,300,600))}</div>
+      <div class="grid grid-cols-6 gap-1.5">{"".join(f'<div class="min-w-0"><div class="h-10 rounded-md seam bg-{c}-{n}" title="{c}-{n}"></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>' for c in ("success","warning","error") for n in (50,300,600))}</div>
     </div>
     <div>
       <h3 class="engraved mb-4">Type · Geist and Geist Mono</h3>
