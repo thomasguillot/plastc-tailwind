@@ -879,11 +879,11 @@ VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="R
 </dialog>'''
 previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink" data-open-screen="{k}">
   <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
-  <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
+  <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0">{i("right","w-4 h-4")}</span></p>
 </a>''' for k, t in screens)
 public_previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink" data-open-screen="{k}">
   <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
-  <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
+  <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 ease-out group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0">{i("right","w-4 h-4")}</span></p>
 </a>''' for k, t in (("landing", "Landing page"), ("pricing", "Pricing"), ("blog", "Blog"), ("article", "Article"), ("about", "About"), ("contact", "Contact"), ("sign-in", "Sign in"), ("404", "404")))
 
 DEPTH_ROWS = (

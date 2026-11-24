@@ -117,16 +117,18 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Press (`.btn`, `.key`, `.pressable`) | 80ms down, 160ms up | 1px drop, scale 0.985, shadow reverses to `--k-pressed`. Asymmetric: the `:active` state carries the shorter duration. No bounce. |
 | Hover | 160ms | Gated to `(hover: hover) and (pointer: fine)`. Light catches the top edge (`--k-raised-hover`); geometry does not move. |
 | Toggles (switch, check, radio, choice card, seg) | 160–200ms | Marks scale from 0.5, never from 0. Seg selection latches without travel. |
-| Menu (`[popover]`) | 180ms in, 120ms out | Opacity + scale 0.96 from the trigger corner. Native popover: Esc and outside click close it. Items are plain buttons (no `role=menu`), so Tab works and nothing promises arrow keys. |
+| Menu (`[popover]`) | 180ms in, 120ms out | Opacity + scale 0.96 from the trigger corner. When it flips above its trigger, the origin flips with it (the reference script sets `transform-origin` on `toggle`). Native popover: Esc and outside click close it. Items are plain buttons (no `role=menu`), so Tab works and nothing promises arrow keys. |
 | Dialog (`<dialog>`) | 240ms in, 160ms out | Opacity + scale 0.96 from centre; backdrop fades with it. |
 | Sheet | 300ms in, 220ms out | Slides from the left edge on `--ease-drawer`. |
 | Toast (`[popover=manual]`) | 360ms in, 240ms out, `ease` | Rises from the bottom (bottom-right on desktop) and leaves the same way. Stays 6s, pauses on hover or focus; Undo also on `Z`. |
 | Keyboard shortcuts | none | Overlays opened by a shortcut get `.no-motion`. |
 | Popover, combobox list | 180ms in; the popover leaves in 120ms, the list closes at once | Opacity + scale 0.96–0.97 from the anchored edge. |
-| Progress, spinner, skeleton | 300ms fill, 700ms spin, 1.5–1.6s loops | Reduced motion: the indeterminate bar and skeletons breathe in place instead of sweeping; the spinner slows. |
+| Progress, spinner, skeleton | 300ms fill, 700ms spin, 1.5–1.6s loops | The fill reveals with `clip-path`, not `width`, so it never triggers layout. Loops run `linear`. Reduced motion: the indeterminate bar and skeletons breathe in place instead of sweeping; the spinner slows. |
 | Accordion | 240ms open, 200ms chevron | Height animates with `interpolate-size` where supported. Reduced motion opens at once. |
 | Tabs | 120ms colour, 160ms indicator | The indicator appears under the new tab; it never slides across. |
-| Tooltip | 125ms, 400ms hover delay | Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
+| Tooltip | 125ms, 400ms hover delay | Hover is gated to fine pointers, so a tap never leaves it stuck open; keyboard focus shows it at once. Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
+| Banner dismiss | 220ms | Collapses its height and fades, so the page closes the gap instead of jumping. Reduced motion: a 120ms fade. |
+| Pricing toggle | 180ms | Changed figures fade in from a 2px blur and a 4px drop. Reduced motion: fade only. |
 
 Nothing animates on scroll. Reduced motion keeps fades and colour changes and drops translate/scale; the sheet fades instead of sliding; the busy spinner slows to 1.6s instead of stopping.
 

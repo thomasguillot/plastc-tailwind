@@ -471,7 +471,13 @@
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-billing]'); if (!b) return;
     const yearly = b.dataset.billing === 'yearly';
-    $$('[data-price]').forEach(p => { p.textContent = yearly ? p.dataset.yearly : p.dataset.monthly; });
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $$('[data-price]').forEach(p => {
+      const v = yearly ? p.dataset.yearly : p.dataset.monthly;
+      if (p.textContent === v) return;
+      p.textContent = v;
+      if (p.animate && v !== '$0') p.animate(still ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, filter: 'blur(2px)', translate: '0 4px' }, { opacity: 1, filter: 'blur(0)', translate: '0 0' }], { duration: 180, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+    });
     $$('[data-price-unit]').forEach(u => { u.textContent = yearly ? '/ year' : '/ month'; });
   });
 
@@ -657,6 +663,16 @@
     });
   });
 
+  /* ---------- popovers grow from the edge that touches their trigger, also when flipped */
+  $$('.menu[popover], .popover[popover]').forEach(m => m.addEventListener('toggle', e => {
+    if (e.newState !== 'open') return;
+    const t = document.querySelector(`[popovertarget="${m.id}"]`); if (!t) return;
+    const r = t.getBoundingClientRect(), p = m.getBoundingClientRect();
+    const y = p.top < r.top ? 'bottom' : 'top';
+    const x = Math.abs(p.right - r.right) < Math.abs(p.left - r.left) ? 'right' : 'left';
+    m.style.transformOrigin = `${y} ${x}`;
+  }));
+
   /* ---------- popover anchoring fallback (browsers without CSS anchor positioning) */
   if (!CSS.supports('position-area: bottom')) {
     $$('.menu[popover], .popover[popover]').forEach(m => m.addEventListener('toggle', e => {
@@ -675,8 +691,14 @@
   });
   document.addEventListener('click', e => {
     const x = e.target.closest('[data-banner-dismiss]'); if (!x) return;
-    const b = x.closest('[data-banner]'); if (b) b.hidden = true;
+    const b = x.closest('[data-banner]');
     save('plastc-banner', 'dismissed');
+    if (!b) return;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!b.animate) { b.hidden = true; return; }
+    b.style.overflow = 'hidden';
+    const frames = still ? [{ opacity: 1 }, { opacity: 0 }] : [{ blockSize: b.offsetHeight + 'px', opacity: 1 }, { blockSize: '0px', paddingBlock: '0px', opacity: 0 }];
+    b.animate(frames, { duration: still ? 120 : 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }).finished.then(() => { b.hidden = true; }, () => { b.hidden = true; });
   });
 
   /* ---------- screen previews scale to their frame */

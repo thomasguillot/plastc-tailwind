@@ -844,11 +844,12 @@
   background: var(--k-housing-down);
   box-shadow: var(--k-recessed);
   & > span {
-    display: block; height: 100%; width: var(--v, 0%); border-radius: inherit;
+    display: block; height: 100%; width: 100%; border-radius: inherit;
+    clip-path: inset(0 calc(100% - var(--v, 0%)) 0 0 round 999px);
     background: linear-gradient(180deg, color-mix(in oklab, var(--k-ink-2) 78%, var(--k-housing-up)), var(--k-ink-2));
-    transition: width 300ms var(--ease-out);
+    transition: clip-path 300ms var(--ease-out);
   }
-  &:not([aria-valuenow]) > span { width: 38%; animation: plastc-indeterminate 1.5s var(--ease-out) infinite; }
+  &:not([aria-valuenow]) > span { width: 38%; clip-path: none; animation: plastc-indeterminate 1.5s linear infinite; }
 }
 
 @utility spinner {
@@ -865,7 +866,7 @@
   background: var(--k-housing-down);
   background-image: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--k-housing-up) 75%, transparent) 50%, transparent 100%);
   background-size: 200% 100%; background-repeat: no-repeat;
-  animation: plastc-shimmer 1.6s ease-in-out infinite;
+  animation: plastc-shimmer 1.6s linear infinite;
 }
 
 @utility dropzone {
@@ -1402,7 +1403,7 @@
     pointer-events: none;
     transition: opacity 125ms var(--ease-out), translate 125ms var(--ease-out), scale 125ms var(--ease-out);
   }
-  &:hover::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 400ms; }
+  @media (hover: hover) and (pointer: fine) { &:hover::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 400ms; } }
   &:has(:focus-visible)::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 0ms; }
   &[data-tip-off]::after { opacity: 0 !important; transition-delay: 0ms !important; }
 }
