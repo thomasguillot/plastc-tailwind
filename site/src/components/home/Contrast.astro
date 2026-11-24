@@ -1,0 +1,18 @@
+---
+import { CONTRAST, CONTRAST_RULES } from '../../data/home';
+
+const light = '[[data-theme=dark]_&]:hidden';
+const dark = 'hidden [[data-theme=dark]_&]:inline';
+---
+<section id="contrast" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="con-h">
+  <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr] items-start [&>*]:min-w-0">
+    <div>
+      <h2 id="con-h" class="display text-[40px] md:text-[56px] max-w-[12ch]">Contrast, measured</h2>
+      <p class="text-ink-2 text-lg max-w-[44ch] mt-5">Each text token has a WCAG 2 ratio and an APCA score. The readout shows the figures for the theme and LCD tint you're viewing, so switch either and read again.</p>
+      <ul class="list-none p-0 m-0 mt-6 grid gap-3 text-[15px] max-w-[46ch]">{CONTRAST_RULES.map((rule) => <li>{rule}</li>)}</ul>
+    </div>
+    <dl class="lcd px-5 py-6 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-7" aria-label="Contrast figures for the current theme and LCD tint">{CONTRAST.map((f) => (
+      <div class="px-1 py-1"><dt class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{f.label}</dt><dd class="font-mono text-[22px] font-medium leading-none mt-2 tabular-nums whitespace-nowrap"><span class={light} data-lcd-w={f.lcd ? 'light' : undefined}>{f.light[0]}</span><span class={dark} data-lcd-w={f.lcd ? 'dark' : undefined}>{f.dark[0]}</span></dd><dd class="font-mono text-[14px] mt-1.5 tabular-nums">Lc <span class={light} data-lcd-lc={f.lcd ? 'light' : undefined}>{f.light[1]}</span><span class={dark} data-lcd-lc={f.lcd ? 'dark' : undefined}>{f.dark[1]}</span></dd></div>
+    ))}</dl>
+  </div>
+</section>

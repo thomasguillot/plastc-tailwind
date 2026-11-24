@@ -1,0 +1,16 @@
+---
+import Icon from '../Icon.astro';
+import ScreensWall from './ScreensWall.astro';
+import { CSS_KB, VERSION } from '../../data/site';
+---
+<section id="top" aria-labelledby="hero-h">
+  <div class="max-w-[1240px] mx-auto px-4 md:px-8 pt-12 md:pt-20 lg:pt-16 grid gap-10 lg:gap-16 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+    <h1 id="hero-h" class="display text-[44px] sm:text-[64px] lg:text-[80px] max-w-[14ch]">Your product, molded in soft plastic.</h1>
+    <div>
+      <p class="text-lg text-ink-2 max-w-[42ch] leading-relaxed">Plastc is a neumorphic UI library for Tailwind CSS v4, in one CSS file. Every screen below is built from its classes and Tailwind utilities, with sample data.</p>
+      <div class="flex flex-wrap gap-3 mt-7"><a class="btn btn-signal btn-xl" href="plastc.css" download><Icon name="down" />Download plastc.css</a><a class="btn btn-xl" href="screens/dashboard.html" data-open-screen="dashboard">Try the live screens</a></div>
+      <p class="text-sm text-ink-2 mt-4 tabular-nums">plastc.css · v{VERSION} · {CSS_KB} KB · MIT-Licensed</p>
+    </div>
+  </div>
+  <ScreensWall />
+</section>

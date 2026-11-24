@@ -1,0 +1,82 @@
+---
+import { WALL, WALL_LABEL } from '../../data/home';
+
+const indent = ['', 'ml-[calc(var(--tw)*.45)]', 'ml-[calc(var(--tw)*.15)]', 'ml-[calc(var(--tw)*.3)]'];
+---
+<div id="screens" class="stage mt-16 md:mt-28 mb-8 md:mb-16" role="img" aria-label={WALL_LABEL}>
+  <div class="wall">{WALL.map(({ dx, dy, tiles }, r) => (
+    <div class:list={['row flex gap-[clamp(20px,2.8vw,40px)]', indent[r], r === 0 && 'max-md:hidden']} style={`--dx:${dx}px;--dy:${dy}px`}>{tiles.map(({ key, title, eager }, t) => (
+      <div class:list={['tile block w-(--tw)', t !== 2 && t !== 3 && 'max-md:hidden']}><span class="block rounded-[20px] p-[10px] recessed"><span class="tile-view"><iframe data-src={`screens/${key}.html`} title={`${title} preview`} tabindex="-1" aria-hidden="true" loading={eager ? 'eager' : 'lazy'}></iframe></span></span></div>
+    ))}</div>
+  ))}</div>
+</div>
+
+<style is:global>
+  .stage{position:relative;overflow:hidden;height:clamp(520px,78vw,1040px);perspective:2600px;perspective-origin:50% 30%;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 8%,#000 88%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 8%,#000 88%,transparent 100%)}
+  .wall{--tw:clamp(280px,34vw,540px);position:absolute;left:50%;top:-30%;display:flex;flex-direction:column;gap:clamp(20px,2.8vw,40px);width:max-content;transform:translateX(-50%) rotateX(42deg) rotateZ(-16deg) scale(1.05);transform-style:preserve-3d}
+  .tile-view{display:block;position:relative;overflow:hidden;border-radius:12px;aspect-ratio:16/10;background:var(--k-housing)}
+  .tile-view iframe{position:absolute;top:0;left:0;width:1440px;height:900px;border:0;transform-origin:0 0;transform:scale(var(--s,.33));pointer-events:none;opacity:0;transition:opacity 200ms var(--ease-out)}
+  .tile-view iframe[data-loaded]{opacity:1}
+  .tile-view::before,.tile-view::after{content:"";position:absolute;inset:0;pointer-events:none;transition:opacity 200ms var(--ease-out)}
+  .tile-view::before{background:linear-gradient(var(--k-housing-down),var(--k-housing-down)) 0 0/17% 100% no-repeat,linear-gradient(var(--k-housing-down),var(--k-housing-down)) 30% 9.5%/30% 5% no-repeat,linear-gradient(var(--k-housing-down),var(--k-housing-down)) 84% 22.7%/75% 12% no-repeat,linear-gradient(var(--k-housing-down),var(--k-housing-down)) 32.8% 76%/36% 50% no-repeat,linear-gradient(var(--k-housing-down),var(--k-housing-down)) 93.75% 76%/36% 50% no-repeat;opacity:.8}
+  .tile-view::after{right:auto;width:200%;background-image:linear-gradient(90deg,transparent 0%,color-mix(in oklab,var(--k-housing-up) 70%,transparent) 50%,transparent 100%);animation:tile-sweep 1.6s linear infinite}
+  .tile-view:not([data-near])::before,.tile-view:not([data-near])::after{animation-play-state:paused}
+  .tile-view:has(iframe[data-loaded])::before,.tile-view:has(iframe[data-loaded])::after{opacity:0;animation-play-state:paused}
+  @media (prefers-reduced-motion:reduce){.tile-view::after{animation:none;background-image:none}.tile-view::before{animation:plastc-breathe 1.6s ease-in-out infinite}}
+  @keyframes tile-sweep{from{translate:-75% 0}to{translate:25% 0}}
+  @media (max-width:767.98px){.stage{height:440px}.wall{top:-12%}}
+  @keyframes drift{to{translate:var(--dx) var(--dy)}}
+  @supports (animation-timeline:scroll()){@media (prefers-reduced-motion:no-preference){.row{will-change:translate;animation:drift linear both;animation-timeline:scroll(root block);animation-range:0 100vh}}}
+</style>
+
+<script>
+  const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wide768 = matchMedia('(min-width:768px)');
+  const tileOf = (f: Element) => f.closest<HTMLElement>('.tile')!;
+
+  const near = 'IntersectionObserver' in window ? new IntersectionObserver((en) => en.forEach((x) => x.target.toggleAttribute('data-near', x.isIntersecting))) : null;
+  $$('.tile-view').forEach((v) => (near ? near.observe(v) : v.setAttribute('data-near', '')));
+
+  const scaleTiles = () =>
+    $$<HTMLIFrameElement>('.tile-view iframe').forEach((f) => {
+      const tw = tileOf(f).offsetWidth - 20;
+      if (tw > 0) f.style.setProperty('--s', (tw / 1440).toFixed(4));
+    });
+  const loadTiles = () =>
+    $$<HTMLIFrameElement>('.tile-view iframe[data-src]').forEach((f) => {
+      if (f.hasAttribute('src') || !tileOf(f).offsetWidth) return;
+      f.addEventListener('load', () => { f.setAttribute('data-loaded', ''); if (near) near.unobserve(f.parentElement!); }, { once: true });
+      f.setAttribute('src', f.dataset.src!);
+    });
+  scaleTiles();
+  loadTiles();
+  addEventListener('resize', scaleTiles);
+  wide768.addEventListener('change', () => { scaleTiles(); loadTiles(); });
+
+  const stage = document.querySelector('.stage');
+  if (stage && !reduce && !(window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()'))) {
+    const rows = $$('.wall > .row');
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const p = Math.min(1, Math.max(0, scrollY / Math.max(1, innerHeight)));
+      rows.forEach((r) => {
+        const dx = parseFloat(r.style.getPropertyValue('--dx')) || 0;
+        const dy = parseFloat(r.style.getPropertyValue('--dy')) || 0;
+        r.style.translate = `${dx * p}px ${dy * p}px`;
+      });
+    };
+    const onDrift = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    new IntersectionObserver((en) => {
+      if (en[en.length - 1].isIntersecting) {
+        rows.forEach((r) => (r.style.willChange = 'translate'));
+        addEventListener('scroll', onDrift, { passive: true });
+        update();
+      } else {
+        removeEventListener('scroll', onDrift);
+        rows.forEach((r) => (r.style.willChange = ''));
+      }
+    }).observe(stage);
+  }
+</script>

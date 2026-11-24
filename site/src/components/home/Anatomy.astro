@@ -1,0 +1,171 @@
+---
+import Icon from '../Icon.astro';
+import AnatomyMock from './AnatomyMock.astro';
+import { LAYERS, layerNumber } from '../../data/home';
+---
+<section id="anatomy" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="anat-h">
+  <h2 id="anat-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">What one screen is made of</h2>
+  <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Six layers make up this dashboard. Pick one to see its parts and the classes behind them.</p>
+  <div class="seg mt-8 lg:hidden" role="group" aria-label="Layer" data-layer-seg><button type="button" aria-pressed="true" data-seg-layer="all">All</button>{LAYERS.map(({ key, name }) => <button type="button" aria-pressed="false" data-seg-layer={key} aria-label={`${layerNumber(key)} ${name}`}>{layerNumber(key)}</button>)}</div>
+  <div data-track>
+    <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-stretch mt-4 lg:mt-10 lg:sticky lg:top-[max(24px,calc(50vh_-_var(--xh,700px)/2))]" data-ex>
+      <div class="xr @container min-w-0 md:h-full" data-xr data-active="all"><AnatomyMock /></div>
+      <div class="flex flex-col gap-3 min-w-0">
+        <div class="hidden lg:flex items-center gap-3"><button type="button" class="key text-[13px] !aspect-auto h-10 px-5 !rounded-2xl" data-layer-auto aria-pressed="true">Auto</button><p class="text-sm text-ink-2">Steps through the layers as you scroll. Pick a layer to pin it.</p></div>
+        <ul class="grid gap-2 sm:grid-cols-2 md:grid-cols-1 md:grid-rows-[repeat(6,minmax(0,1fr))] md:flex-1 md:min-h-0 list-none p-0 m-0" aria-label="Layers of the dashboard" data-legend>{LAYERS.map(({ key, name, description, classes, link }) => (
+          <li class="lrow"><button type="button" class="lbtn" data-layer-key={key} aria-pressed="false"><span class="lcd px-2 py-1 text-[11px] font-semibold num">{layerNumber(key)}</span><span class="min-w-0"><span class="flex flex-wrap items-center gap-x-2.5 font-bold">{name}<span class="lpin badge lamp-ok" aria-hidden="true">Pinned</span></span><span class="block text-sm text-ink-2">{description}</span><span class="flex flex-wrap gap-1.5 mt-2">{classes.map((c) => <code class="font-mono text-[11px] font-medium leading-none px-1.5 py-1 rounded-md recessed text-ink">{c}</code>)}</span></span></button><a class="llink" href={link.href} aria-label={`${link.label} components`}>{link.label}<Icon name="right" class="w-3.5 h-3.5" /></a></li>
+        ))}</ul>
+      </div>
+    </div>
+    <div class="hidden lg:block lg:h-[240vh]" aria-hidden="true"></div>
+  </div>
+  <div class="mt-10"><a class="btn btn-lg" href="/components/">Browse all components<Icon name="right" class="w-4 h-4" /></a></div>
+</section>
+
+<style is:global>
+  .xr .mock *,.xr .mock{transition:opacity 180ms var(--ease-out),background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out),border-color 180ms var(--ease-out)}
+  .xr[data-active="1"] .mock:has([data-layer="1"])>:not([data-layer="1"],[data-layer="1"] *,:has([data-layer="1"])),.xr[data-active="1"] .mock :has([data-layer="1"])>:not([data-layer="1"],[data-layer="1"] *,:has([data-layer="1"])){opacity:.15}
+  .xr[data-active="1"] .mock:not([data-layer="1"]),.xr[data-active="1"] .mock *:not([data-layer="1"],[data-layer="1"] *):has([data-layer="1"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr[data-active="2"] .mock:has([data-layer="2"])>:not([data-layer="2"],[data-layer="2"] *,:has([data-layer="2"])),.xr[data-active="2"] .mock :has([data-layer="2"])>:not([data-layer="2"],[data-layer="2"] *,:has([data-layer="2"])){opacity:.15}
+  .xr[data-active="2"] .mock:not([data-layer="2"]),.xr[data-active="2"] .mock *:not([data-layer="2"],[data-layer="2"] *):has([data-layer="2"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr[data-active="3"] .mock:has([data-layer="3"])>:not([data-layer="3"],[data-layer="3"] *,:has([data-layer="3"])),.xr[data-active="3"] .mock :has([data-layer="3"])>:not([data-layer="3"],[data-layer="3"] *,:has([data-layer="3"])){opacity:.15}
+  .xr[data-active="3"] .mock:not([data-layer="3"]),.xr[data-active="3"] .mock *:not([data-layer="3"],[data-layer="3"] *):has([data-layer="3"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr[data-active="4"] .mock:has([data-layer="4"])>:not([data-layer="4"],[data-layer="4"] *,:has([data-layer="4"])),.xr[data-active="4"] .mock :has([data-layer="4"])>:not([data-layer="4"],[data-layer="4"] *,:has([data-layer="4"])){opacity:.15}
+  .xr[data-active="4"] .mock:not([data-layer="4"]),.xr[data-active="4"] .mock *:not([data-layer="4"],[data-layer="4"] *):has([data-layer="4"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr[data-active="5"] .mock:has([data-layer="5"])>:not([data-layer="5"],[data-layer="5"] *,:has([data-layer="5"])),.xr[data-active="5"] .mock :has([data-layer="5"])>:not([data-layer="5"],[data-layer="5"] *,:has([data-layer="5"])){opacity:.15}
+  .xr[data-active="5"] .mock:not([data-layer="5"]),.xr[data-active="5"] .mock *:not([data-layer="5"],[data-layer="5"] *):has([data-layer="5"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr[data-active="6"] .mock:has([data-layer="6"])>:not([data-layer="6"],[data-layer="6"] *,:has([data-layer="6"])),.xr[data-active="6"] .mock :has([data-layer="6"])>:not([data-layer="6"],[data-layer="6"] *,:has([data-layer="6"])){opacity:.15}
+  .xr[data-active="1"] .mock>:not([data-layer="1"]),.xr[data-active="1"] .mock [data-layer="1"] [data-layer]:not([data-layer="1"],:has([data-layer="1"])){opacity:.15}
+  .xr[data-active="2"] .mock [data-layer="2"] [data-layer]:not([data-layer="2"],:has([data-layer="2"])){opacity:.15}
+  .xr[data-active="3"] .mock [data-layer="3"] [data-layer]:not([data-layer="3"],:has([data-layer="3"])){opacity:.15}
+  .xr[data-active="4"] .mock [data-layer="4"] [data-layer]:not([data-layer="4"],:has([data-layer="4"])){opacity:.15}
+  .xr[data-active="5"] .mock [data-layer="5"] [data-layer]:not([data-layer="5"],:has([data-layer="5"])){opacity:.15}
+  .xr[data-active="6"] .mock [data-layer="6"] [data-layer]:not([data-layer="6"],:has([data-layer="6"])){opacity:.15}
+  .xr[data-active="6"] .mock:not([data-layer="6"]),.xr[data-active="6"] .mock *:not([data-layer="6"],[data-layer="6"] *):has([data-layer="6"]){background-color:transparent!important;box-shadow:none!important;border-color:transparent!important;outline-color:transparent!important}
+  .xr .mock .menu[data-layer="6"]{transform-origin:top right}
+  .xr:not([data-active="6"]) .mock [data-layer="6"]{opacity:0!important;visibility:hidden;transition:opacity 180ms var(--ease-out),scale 180ms var(--ease-out),translate 180ms var(--ease-out),visibility 0s 180ms}
+  .xr[data-active="6"] .mock [data-layer="6"]{transition:opacity 180ms var(--ease-out),scale 180ms var(--ease-out),translate 180ms var(--ease-out),visibility 0s}
+  @media (prefers-reduced-motion:no-preference){.xr:not([data-active="6"]) .mock .menu[data-layer="6"]{scale:.96}.xr:not([data-active="6"]) .mock .toast[data-layer="6"]{translate:0 8px}}
+  @container (max-width:599px){.xr .d-cust{display:none}.xr .mock dl.lcd{grid-template-columns:repeat(2,minmax(0,1fr))}.xr .d-search{flex-basis:100%}.xr .d-side{width:auto;padding:12px 8px}.xr .d-side>p{display:none}.xr .d-side .nav-item{width:40px;padding:0;gap:0;justify-content:center;font-size:0}}
+  .lrow{display:flex;align-items:stretch;border-radius:16px;border:1px solid var(--k-seam);box-shadow:var(--k-seam-line);transition:background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
+  .lrow[data-current]{background:var(--k-housing-down);box-shadow:var(--k-recessed)}
+  .lrow:has(.lbtn:focus-visible){outline:2px solid var(--k-focus);outline-offset:2px}
+  @media (hover:hover) and (pointer:fine){.lrow:not([data-current]):hover{background:var(--k-housing-up)}}
+  .lpin{display:none}
+  .lrow:has(.lbtn[aria-pressed=true]) .lpin{display:inline-flex}
+  .lbtn{flex:1;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px 8px 12px 14px;background:none;border:0;border-radius:16px;font:inherit;color:inherit;cursor:pointer}
+  .lbtn:focus-visible{outline:none}
+  .lbtn .num{flex:none}
+  @media (min-width:768px){.lbtn{align-items:center}}
+  .llink{flex:none;align-self:center;display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 6px;font-size:13px;font-weight:600;color:var(--k-ink);text-decoration:underline;text-underline-offset:3px;border-radius:12px}
+  .llink:focus-visible{outline:2px solid var(--k-focus);outline-offset:-2px}
+</style>
+
+<script>
+  const $$ = <T extends Element = HTMLElement>(s: string, el: ParentNode = document) => [...el.querySelectorAll<T>(s)];
+  const xr = document.querySelector<HTMLElement>('[data-xr]');
+  const legend = document.querySelector<HTMLElement>('[data-legend]');
+  const seg = document.querySelector<HTMLElement>('[data-layer-seg]');
+  const autoKey = document.querySelector<HTMLElement>('[data-layer-auto]');
+  const track = document.querySelector<HTMLElement>('[data-track]');
+  const grid = track?.querySelector<HTMLElement>('[data-ex]');
+
+  if (xr && legend && track && grid) {
+    const keys = $$<HTMLButtonElement>('.lbtn', legend);
+    const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+    const wide = matchMedia('(min-width:1024px)');
+    let pin: string | null = null;
+    let hover: string | null = null;
+    let focus: string | null = null;
+    let auto: string | null = null;
+    let busy = false;
+    let jumping = false;
+    let gridH = grid.offsetHeight;
+
+    const paint = () => {
+      const shown = hover || focus || pin || auto || 'all';
+      xr.dataset.active = shown;
+      keys.forEach((b) => {
+        const k = b.dataset.layerKey;
+        b.setAttribute('aria-pressed', String(k === pin));
+        b.parentElement!.toggleAttribute('data-current', k === shown);
+      });
+      if (seg) $$<HTMLButtonElement>('button', seg).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.segLayer === (pin || 'all'))));
+      if (autoKey) autoKey.setAttribute('aria-pressed', String(!pin));
+    };
+    const step = () => {
+      busy = false;
+      if (jumping) return;
+      let k: string | null = null;
+      if (wide.matches) {
+        const r = track.getBoundingClientRect();
+        const top = Math.max(24, innerHeight / 2 - gridH / 2);
+        const p = (top - r.top) / (r.height - gridH);
+        if (p >= 0 && p <= 1) k = String(Math.min(6, Math.floor(p * 6) + 1));
+      }
+      if (k !== auto) { auto = k; paint(); }
+    };
+    const setPin = (k: string | null) => { pin = k; paint(); if (!pin) step(); };
+
+    autoKey?.addEventListener('click', () => setPin(null));
+    keys.forEach((b, i) => {
+      const k = b.dataset.layerKey!;
+      const row = b.parentElement!;
+      b.addEventListener('click', () => setPin(pin === k ? null : k));
+      if (fine) {
+        row.addEventListener('pointermove', () => { if (hover !== k) { hover = k; paint(); } });
+        row.addEventListener('mouseleave', () => { if (hover) { hover = null; paint(); } });
+      }
+      b.addEventListener('focus', () => { if (b.matches(':focus-visible')) { focus = k; paint(); } });
+      b.addEventListener('blur', () => { if (focus === k) { focus = null; paint(); } });
+      b.addEventListener('keydown', (e) => {
+        const d = ({ ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 } as Record<string, number>)[e.key];
+        if (!d) return;
+        e.preventDefault();
+        keys[(i + d + keys.length) % keys.length].focus();
+      });
+    });
+    seg?.addEventListener('click', (e) => {
+      const b = (e.target as Element).closest<HTMLElement>('[data-seg-layer]');
+      if (b) setPin(b.dataset.segLayer === 'all' ? null : b.dataset.segLayer!);
+    });
+    new ResizeObserver(() => { gridH = grid.offsetHeight; track.style.setProperty('--xh', `${gridH}px`); }).observe(grid);
+    const onStep = () => { if (!busy) { busy = true; requestAnimationFrame(step); } };
+    new IntersectionObserver((en) => {
+      if (en[en.length - 1].isIntersecting) {
+        addEventListener('scroll', onStep, { passive: true });
+        step();
+      } else {
+        removeEventListener('scroll', onStep);
+        if (wide.matches) pin = null;
+        auto = null;
+        hover = null;
+        paint();
+      }
+    }).observe(track);
+    addEventListener('resize', onStep);
+
+    const hasScrollEnd = 'onscrollend' in window;
+    let jumpTimer = 0;
+    let jumpY = 0;
+    const jumpDone = () => {
+      clearTimeout(jumpTimer);
+      removeEventListener('scrollend', jumpDone);
+      if (!jumping) return;
+      jumping = false;
+      step();
+    };
+    document.addEventListener('click', (e) => {
+      if (!(e.target as Element).closest('a[href^="#"]')) return;
+      clearTimeout(jumpTimer);
+      removeEventListener('scrollend', jumpDone);
+      jumping = true;
+      jumpY = scrollY;
+      // A jump to where the page already is never scrolls, so scrollend would never come.
+      if (hasScrollEnd) {
+        addEventListener('scrollend', jumpDone);
+        jumpTimer = window.setTimeout(() => { if (scrollY === jumpY) jumpDone(); }, 150);
+      } else jumpTimer = window.setTimeout(jumpDone, 2000);
+    });
+  }
+</script>
