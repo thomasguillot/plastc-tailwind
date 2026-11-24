@@ -54,7 +54,8 @@ pricing_billing = '<div class="seg" role="group" aria-label="Billing period"><bu
 
 pricing_body = f'''{page_header("Pay for the invoices you send", "Every plan has pay links, reminders and the dashboard. Start free, and move up when your team or your client list grows.", pricing_billing)}
 
-<section class="max-w-[1200px] mx-auto px-4 md:px-8 pb-16 md:pb-24" aria-label="Plans">
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pb-16 md:pb-24" aria-labelledby="plans-h">
+  <h2 id="plans-h" class="sr-only">Plans</h2>
   <div class="grid gap-5 md:grid-cols-3 items-stretch">{plan_cards}</div>
   <p class="mt-6 text-sm text-ink-2">Prices are in US dollars, per workspace. Sales tax is added at checkout where it applies.</p>
 </section>

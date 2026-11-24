@@ -87,9 +87,11 @@ landing = f'''<section id="top" class="max-w-[1200px] mx-auto px-4 md:px-8 pt-14
   <h2 id="how-h" class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">One invoice, from draft to paid</h2>
   <p class="text-ink-2 text-lg mt-4 max-w-[48ch] text-pretty">Each step shows the part of the app that does the work. The controls are real, so try them.</p>
   <div class="tabs mt-10" role="tablist" aria-label="How it works">{lp_tabs}</div>
+  <div class="md:grid md:min-h-[560px] md:items-start md:[&>*]:col-start-1 md:[&>*]:row-start-1 md:[&>[hidden]]:!grid md:[&>[hidden]]:invisible">
   {lp_step("send", 1, "Send it in a minute", "Pick the customer and the work, choose the terms, and send. The invoice arrives by email with a pay link.", ["Line items from your saved products", "Terms remembered for each customer", "A PDF copy for their records"], lp_send, hidden=False)}
   {lp_step("remind", 2, "Let the reminders follow up", "Once the due date passes, reminders go out on a schedule you set. They stop the moment the invoice is paid.", ["Set the schedule once, or per customer", "Pause for one customer at any time", "See every reminder on the invoice"], lp_remind)}
   {lp_step("paid", 3, "Get paid and see it land", "Card payments mark the invoice paid in seconds. Bank transfers are matched when they arrive.", ["Card and bank transfer on every invoice", "Payouts on a set schedule", "An alert for every payment"], lp_paid)}
+  </div>
 </section>
 
 <section class="max-w-[1200px] mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-4 md:pb-8" aria-labelledby="numbers-h">

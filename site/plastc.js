@@ -64,20 +64,20 @@
   /* ---------- screen viewer (showcase) */
   const viewer = document.getElementById('screen-viewer');
   const frame = viewer && $('[data-screen-frame]', viewer);
-  function syncViewer(k) {
-    $$('[data-screen]', viewer).forEach(b => b.dataset.screen === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-    const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html`;
-    const b = $(`[data-screen="${k}"]`, viewer); frame.title = b ? b.textContent : 'Landing page';
-    const sel = $('[data-screen-select]', viewer); if (sel) sel.value = k;
+  function syncViewer(k, hash = '') {
+    const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html${hash}`;
+    const sel = $('[data-screen-select]', viewer);
+    if (sel) { sel.value = k; const o = sel.selectedOptions[0]; if (o) frame.title = o.textContent; }
   }
   function showScreen(k) {
-    const url = `screens/${k}.html`;
+    const [name, h] = k.split('#'), hash = h ? `#${h}` : '';
+    const url = `screens/${name}.html${hash}`;
     if (frame.getAttribute('src') !== url) frame.src = url;
-    syncViewer(k);
+    syncViewer(name, hash);
   }
   if (viewer) {
     frame.addEventListener('load', () => {
-      try { const m = frame.contentWindow.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1]); } catch (e) {}
+      try { const m = frame.contentWindow.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1], frame.contentWindow.location.hash); } catch (e) {}
     });
     const sel = $('[data-screen-select]', viewer); if (sel) sel.addEventListener('change', () => showScreen(sel.value));
     viewer.addEventListener('close', () => {
@@ -126,7 +126,6 @@
     if (os && viewer && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
       e.preventDefault(); showScreen(os.dataset.openScreen); viewer.showModal(); return;
     }
-    const sc = t.closest('[data-screen]'); if (sc) return showScreen(sc.dataset.screen);
 
     const ts = t.closest('[data-toast]'); if (ts) { closePopovers(); return toast(ts.dataset.toast); }
     if (t.closest('[data-toast-undo]')) return runUndo();
@@ -381,9 +380,11 @@
     applyPostFilter(id);
   });
   $$('.seg[data-post-filter]').forEach(seg => {
-    const want = new URLSearchParams(location.search).get('category');
-    const b = want && $(`[data-category-filter="${CSS.escape(want)}"]`, seg); if (!b) return;
-    [...seg.children].forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const params = new URLSearchParams(location.search), want = params.get('category'), q = params.get('q');
+    const b = want && $(`[data-category-filter="${CSS.escape(want)}"]`, seg);
+    if (!b && !q) return;
+    if (b) [...seg.children].forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const inp = $(`input[data-post-filter="${seg.dataset.postFilter}"]`); if (q && inp) inp.value = q;
     applyPostFilter(seg.dataset.postFilter, false);
   });
   document.addEventListener('submit', e => {

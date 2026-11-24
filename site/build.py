@@ -44,6 +44,12 @@ I = {
     "grid": '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
     "x": '<path d="M6 6l12 12M18 6 6 18"/>',
     "chevron": '<path d="m6 9 6 6 6-6"/>',
+    "tag": '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
+    "book": '<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 2h13v-4M9 8h6"/>',
+    "mail": '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+    "briefcase": '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/>',
+    "article": '<path d="M5 4h14M5 9h14M5 14h8M5 19h11"/>',
+    "compass": '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
     "hash": '<path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/>',
     "external": '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     "code": '<path d="m8 7-5 5 5 5M16 7l5 5-5 5"/>',
@@ -694,7 +700,8 @@ def mkt_page(path, title, body, active="", banner=True):
 {body}
 </main>
 
-<footer class="max-w-[1200px] mx-auto px-4 md:px-8 pt-12 pb-10 mt-6 border-t border-[color:var(--k-seam)]">
+<footer class="max-w-[1200px] mx-auto px-4 md:px-8 mt-6">
+ <div class="pt-12 pb-10 border-t border-[color:var(--k-seam)]">
   <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
     <div>{wordmark("landing.html")}<p class="text-sm text-ink-2 mt-4 max-w-[32ch]">Invoicing for studios and small practices.</p></div>
     {FOOTER_NAV}
@@ -703,6 +710,7 @@ def mkt_page(path, title, body, active="", banner=True):
     <p>Sample page built with Plastc. The product, prices and copy are made up.</p>
     {housing_seg()}
   </div>
+ </div>
 </footer>
 '''
     page(path, title, html, "../")
@@ -856,13 +864,14 @@ CB_SEEN = {}
 for row_ in CUSTOMERS: CB_SEEN.setdefault(row_[1], row_[2])
 CB_OPTS = "".join(f'<div role="option" id="cb1-o{n}" aria-selected="false" data-value="{name}"><span class="avatar !w-7 !h-7 !text-[11px]">{ini}</span>{name}</div>' for n, (name, ini) in enumerate(CB_SEEN.items()))
 screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("customers", "Customers"), ("reports", "Reports"), ("products", "Products"), ("settings", "Settings")]
-VIEWER_SCREENS = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("customers", "Customers"), ("reports", "Reports"), ("products", "Products"), ("settings", "Settings"), ("sign-in", "Sign in"), ("landing", "Landing page")]
-viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in VIEWER_SCREENS)
-viewer_options = "".join(f'<option value="{k}">{t}</option>' for k, t in VIEWER_SCREENS)
-VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference screens">
+VIEWER_GROUPS = [
+    ("App screens", [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("customers", "Customers"), ("reports", "Reports"), ("products", "Products"), ("settings", "Settings")]),
+    ("Marketing pages", [("landing", "Landing page"), ("pricing", "Pricing"), ("blog", "Blog"), ("article", "Article"), ("about", "About"), ("contact", "Contact"), ("sign-in", "Sign in"), ("404", "404")]),
+]
+viewer_options = "".join(f'<optgroup label="{g}">' + "".join(f'<option value="{k}">{t}</option>' for k, t in opts) + '</optgroup>' for g, opts in VIEWER_GROUPS)
+VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference pages">
   <div class="flex items-center gap-3 px-3 sm:px-4 py-2.5 border-b border-[color:var(--k-seam)]">
-    <div class="hidden xl:block min-w-0"><div class="seg" role="group" aria-label="Screens">{viewer_tabs}</div></div>
-    <label class="xl:hidden flex-1 min-w-0 max-w-[280px]"><span class="sr-only">Screen</span><select class="field field-select !h-10 !text-sm" data-screen-select>{viewer_options}</select></label>
+    <label class="flex-1 min-w-0 max-w-[280px]"><span class="sr-only">Page</span><select class="field field-select !h-10 !text-sm" data-screen-select>{viewer_options}</select></label>
     <a class="btn btn-quiet btn-sm ml-auto shrink-0" href="screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab>{i("external")}<span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
     <button type="button" class="btn btn-sm btn-icon" data-close-dialog aria-label="Close">{i("x")}</button>
   </div>
@@ -875,7 +884,7 @@ previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underlin
 public_previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink" data-open-screen="{k}">
   <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
   <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
-</a>''' for k, t in (("landing", "Landing page"), ("sign-in", "Sign in")))
+</a>''' for k, t in (("landing", "Landing page"), ("pricing", "Pricing"), ("blog", "Blog"), ("article", "Article"), ("about", "About"), ("contact", "Contact"), ("sign-in", "Sign in"), ("404", "404")))
 
 DEPTH_ROWS = (
     ("Plane", "--k-seam-line", "background:var(--k-housing);border:1px solid var(--k-seam);box-shadow:var(--k-seam-line)", "Flush. Panels, tabs, tables.", "box-shadow: var(--k-seam-line);"),
@@ -1094,8 +1103,8 @@ showcase = f'''<body>
 
 <section id="marketing" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <h2 class="display text-[40px] md:text-[56px]">Marketing sections</h2>
-  <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">A landing page for the invoicing app above, and the sign-in it leads to: hero, features, pricing, questions, a call to action and a footer, built from the same parts.</p>
-  <div class="grid gap-8 sm:grid-cols-2">{public_previews}</div>
+  <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">A small marketing site for a made-up invoicing product: landing page, pricing, blog, article, about, contact, sign-in and a 404. The product, people and copy are samples, and every page is built from the same parts.</p>
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">{public_previews}</div>
 </section>
 
 <section id="tokens" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
@@ -1147,7 +1156,8 @@ showcase = f'''<body>
 </main>
 {VIEWER}
 {command_dialog([
-    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("users", "Customers", 'href="screens/customers.html" data-open-screen="customers"', ""), ("chart", "Reports", 'href="screens/reports.html" data-open-screen="reports"', ""), ("box", "Products", 'href="screens/products.html" data-open-screen="products"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("send", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', "")]),
+    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("users", "Customers", 'href="screens/customers.html" data-open-screen="customers"', ""), ("chart", "Reports", 'href="screens/reports.html" data-open-screen="reports"', ""), ("box", "Products", 'href="screens/products.html" data-open-screen="products"', "")]),
+    ("Marketing pages", [("send", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', ""), ("tag", "Pricing", 'href="screens/pricing.html" data-open-screen="pricing"', ""), ("book", "Blog", 'href="screens/blog.html" data-open-screen="blog"', ""), ("article", "Article", 'href="screens/article.html" data-open-screen="article"', ""), ("info", "About", 'href="screens/about.html" data-open-screen="about"', ""), ("briefcase", "Careers", 'href="screens/about.html#careers" data-open-screen="about#careers"', ""), ("mail", "Contact", 'href="screens/contact.html" data-open-screen="contact"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("compass", "404", 'href="screens/404.html" data-open-screen="404"', "")]),
     ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("marketing", "Marketing sections"), ("tokens", "Tokens"), ("install", "Install"))]),
     ("Actions", [HOUSING_CMD, ("down", "Download plastc.css", 'href="plastc.css" download', ""), ("copy", "Copy the import line", f"data-copy='{IMPORT}'", ""), ("external", "Source on GitHub", f'href="{REPO}"', "")]),
     ("Components", [("grid", title, f'href="#{gid}" data-keywords="{" ".join(re.findall(r"[.]([a-z][a-z0-9-]*)", classes))}"', "") for gid, title, classes in GROUPS]),

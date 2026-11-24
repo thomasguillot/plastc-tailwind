@@ -1,8 +1,8 @@
 BLOG_CATEGORIES = [("product", "Product updates"), ("guides", "Guides"), ("stories", "Studio stories")]
 BLOG_AUTHORS = {
-    "ines": ("Ines Carvalho", "IC", "Product lead"),
-    "sam": ("Sam Adeyemi", "SA", "Support lead"),
-    "hana": ("Hana Ota", "HO", "Engineer"),
+    "ines": ("Ines Varga", "IV", "Design"),
+    "sam": ("Tobias Oyelaran", "TO", "Head of support"),
+    "hana": ("Hana Lindqvist", "HL", "Payments engineering"),
 }
 
 def blog_lcd_cell(label, value):
