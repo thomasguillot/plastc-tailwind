@@ -727,14 +727,13 @@
   &:disabled { cursor: not-allowed; opacity: 0.5; }
 }
 
-/* Segmented selector / tabs: a channel sunk into the well like a latched key; the
-   chosen segment is the one raised part. Selection latches without travel, like
-   interlocking hi-fi buttons. */
+/* Segmented selector / tabs: a recessed channel; the chosen segment is the one
+   raised part. Selection latches without travel, like interlocking hi-fi buttons. */
 @utility seg {
   display: inline-flex; gap: 2px; padding: 3px;
   border-radius: 999px;
-  background: var(--k-well);
-  box-shadow: var(--k-latched);
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
   max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
@@ -751,7 +750,10 @@
   & > [aria-pressed="true"], & > [aria-selected="true"], & > [aria-current="page"] {
     color: var(--k-ink);
     background: var(--k-cast);
-    box-shadow: var(--k-raised);
+    box-shadow:
+      inset 0 1px 0 rgb(var(--k-hl) / calc(0.85 * var(--k-hl-a))),
+      0 1px 1px rgb(var(--k-sh) / calc(0.14 * var(--k-sh-a))),
+      0 2px 5px -1px rgb(var(--k-sh) / calc(0.16 * var(--k-sh-a)));
   }
   &:is(:disabled, [aria-disabled="true"]) { background: transparent; box-shadow: inset 0 0 0 1px var(--k-seam); }
   &:is(:disabled, [aria-disabled="true"]) > *, & > :is(:disabled, [aria-disabled="true"]) { color: var(--k-ink-off); cursor: not-allowed; }

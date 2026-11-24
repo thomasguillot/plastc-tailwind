@@ -8,7 +8,7 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 |---|---|---|---|
 | Plane | The housing and every layout container | `.panel`, `.seam`, `.tabs`, `.empty`, `.accordion`, `.desc-list`, `.timeline`, `.chart`, tables, charts, sidebars, page sections | Flush. Moulded seam: 1px parting line + highlight lip. No drop shadow. |
 | Raised | A part you press | `.btn*`, `.key`, switch/range thumbs, selected `.seg` item, `.kbd` | `--k-raised`: specular top edge, lower lip, contact shadow, mid shadow, ambient falloff, faint top-left light bounce. Pressing swaps to `--k-pressed` and moves 1px. |
-| Recessed | A part that holds input or output | `.field`, `.input-group`, `.check`, `.radio`, `.switch` slot, `.range` track, `.lcd`, a checked `.choice-card`, the selected `.calendar` day, `.progress`, `.dropzone`, `.meter`, the current `.nav-item` | `--k-recessed`: inner contact at top, soft inner fill, highlight lip on the lower outside edge. |
+| Recessed | A part that holds input or output | `.field`, `.input-group`, `.check`, `.radio`, `.switch` slot, `.seg` channel, `.range` track, `.lcd`, a checked `.choice-card`, the selected `.calendar` day, `.progress`, `.dropzone`, `.meter`, the current `.nav-item` | `--k-recessed`: inner contact at top, soft inner fill, highlight lip on the lower outside edge. |
 | Float | An overlay | `.menu`, `.popover`, an open `.combobox` list, `.dialog`, `.sheet`, `.toast`, `.tooltip` | `--k-float`: hairline, short + long ambient shadows. The only level with a long shadow. |
 
 Never extrude data (chart bars, table rows, stat cards) or containers. If a thing is neither pressed nor filled, it is plane.
@@ -27,7 +27,7 @@ A press and a latch are different states and never look the same.
 
 - **Press** (`:active`, momentary): the part drops 1px, shrinks to 0.985 and its shadow turns to `--k-pressed` on its own plastic (`housing` for neutral parts, the cap color for `.btn-signal` and `.btn-go`). It comes back up on release.
 - **Latched** (`aria-pressed="true"` on a `.key` or a `.btn`, held): the part stays down 1px without shrinking, and sits in a dark well with an edge ring (see below). Pressing a latched part shrinks it while the well stays.
-- **Chosen** (`.seg`, exclusive choice): the channel sits in the same well as a latched key (`--k-well` with `--k-latched`), and the chosen item is the one raised part in it, with the body and shadow of an unpressed `.btn` (`--k-cast`, `--k-raised`) and an ink label; the others sit flat in the well. It does not travel, because picking one option is a selection, not a toggle.
+- **Chosen** (`.seg`, exclusive choice): the channel is recessed, and the chosen item is the one raised part in it, with a cast body and a light shadow (`--k-cast`, specular top edge, short contact and mid shadows) and an ink label. It does not travel, because picking one option is a selection, not a toggle.
 - **Chosen key** (a group of exclusive `.key`s): mark the group up as radios, not toggles. The wrapper is `role="radiogroup"` with a label, each key is `role="radio"` with `aria-checked`, and only the checked key is in the tab order (`tabindex="0"`, the rest `-1`); arrow keys move to the next key and check it. `.key[aria-checked="true"]` sinks into the same well as a latched key (down 1px, `--k-well` with the edge ring), with no extra mark. The others stay raised. Never use `aria-pressed` for a choice of one: every key would latch on its own.
 
 The latched look comes from the plastic alone, with no light, dot or glow. The body drops into `--k-well`, a darker fill than `housing-down` (`#c1bbaf` light, `#171613` dark), and takes `--k-latched`: a 1px edge ring (`--k-well-edge`, a 56% umber in light, 60% black in dark), a deep inner shadow from the top, a lit lip on the inside bottom edge (`--k-well-lip`) and a highlight under the outside edge. Colored caps darken their own color instead (`--btn-latched-bg`, the cap mixed 14% toward black) and take `--btn-latched-shadow`. On a `.btn-danger` the label moves halfway to ink so it keeps Lc 60 in the darker well. Padding is the same latched or not, so the label never shifts. A disabled latched part keeps its dashed outline and fills with a faint `ink-off` tint, so it still reads as held.
@@ -76,9 +76,6 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | Latched `.btn-danger` label (danger mixed halfway to ink, on `--k-well`) | 6.6:1 | 60 | 13.2:1 | 85 |
 | Latched vs unlatched face, measured (non-text) | 1.37–1.43:1 (caps 1.47–1.53:1) | n/a | 1.26–1.31:1 (caps 1.47–1.53:1) | n/a |
 | Latched edge ring vs the surface around it, measured (non-text) | 3.1:1 | n/a | 1.4:1 | n/a |
-| Chosen `.seg` label (ink on `--k-cast`) | 10.5–13.2:1 | 74–88 | 10.8–13.9:1 | 90–94 |
-| Unchosen `.seg` label (ink-2 on `--k-well`) | 6.6:1 | 60 | 12.6:1 | 82 |
-| Chosen `.seg` body vs its well, measured (non-text) | 1.24–1.49:1 plus its shadow | n/a | 1.17–1.40:1 plus its shadow | n/a |
 | Switch slot on vs off (`--k-switch-on` vs `housing-down`) | 4.0:1 | 52 | 4.3:1 | 34 |
 | Switch thumb vs on slot | 5.0:1 | 69 | 3.8:1 | 34 |
 
