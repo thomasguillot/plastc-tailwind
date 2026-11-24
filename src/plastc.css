@@ -956,7 +956,9 @@
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
     padding: 16px 4px; border-radius: 8px; list-style: none; cursor: pointer;
     font-size: 15px; font-weight: 700; color: var(--k-ink);
+    transition: background-color 120ms ease;
   }
+  @media (hover: hover) and (pointer: fine) { & summary:hover { background: var(--k-housing-up); } }
   & summary::-webkit-details-marker { display: none; }
   & summary::after {
     content: ""; flex: none; width: 16px; height: 16px;
