@@ -1,5 +1,6 @@
 ---
 import Wordmark from './Wordmark.astro';
+import Icon from './Icon.astro';
 import ThemeSeg from './ThemeSeg.astro';
 import { GITHUB_SVG } from '../lib/icons';
 import { REPO } from '../data/site';
@@ -19,6 +20,7 @@ const active = 'aria-[current]:!text-ink aria-[current]:!bg-[var(--k-housing-dow
     <a class="btn btn-quiet btn-sm" href="/screens/dashboard.html" data-open-screen="dashboard">Screens</a>
     <a class="btn btn-quiet btn-sm" href="/#install">Install</a>
   </nav>
-  <a class="btn btn-quiet btn-sm ml-auto" href={REPO}><Fragment set:html={GITHUB_SVG} /><span class="sr-only sm:not-sr-only">GitHub</span></a>
+  <button type="button" class="btn btn-quiet btn-sm ml-auto max-md:!w-11 max-md:!h-11 max-md:!min-h-11 max-md:!px-0" data-open-command><Icon name="search" /><span class="sr-only md:not-sr-only">Search</span><span class="kbd hidden md:inline-flex" data-kbd-mod aria-hidden="true">Ctrl K</span></button>
+  <a class="btn btn-quiet btn-sm" href={REPO}><Fragment set:html={GITHUB_SVG} /><span class="sr-only sm:not-sr-only">GitHub</span></a>
   <ThemeSeg />
 </header>
