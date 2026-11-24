@@ -42,31 +42,36 @@ I = {
 }
 def i(name, cls="", sw="1.8"):
     return ico(I[name], cls, sw)
-def line_chart(values, labels, w=720, h=240, highlight=9, fs=13):
-    lo, hi = 0, max(values) * 1.15
-    px = lambda k: 52 + k * (w - 72) / (len(values) - 1)
-    py = lambda v: h - 28 - (v - lo) / (hi - lo) * (h - 56)
-    pts = [(px(k), py(v)) for k, v in enumerate(values)]
-    # smooth path (Catmull-Rom to Bezier)
-    d = f"M{pts[0][0]:.1f},{pts[0][1]:.1f}"
-    for k in range(len(pts) - 1):
-        p0 = pts[k - 1] if k else pts[k]; p1 = pts[k]; p2 = pts[k + 1]; p3 = pts[k + 2] if k + 2 < len(pts) else p2
+def line_chart(values, labels, highlight=9, cls="h-[220px] sm:h-[260px]"):
+    hi = max(values) * 1.15
+    n = len(values)
+    X = lambda k: k * 100 / (n - 1)
+    Y = lambda v: 100 - v / hi * 100
+    pts = [(X(k), Y(v)) for k, v in enumerate(values)]
+    d = f"M{pts[0][0]:.2f},{pts[0][1]:.2f}"
+    for k in range(n - 1):
+        p0 = pts[k - 1] if k else pts[k]; p1 = pts[k]; p2 = pts[k + 1]; p3 = pts[k + 2] if k + 2 < n else p2
         c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
         c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
-        d += f" C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}"
-    area = d + f" L{pts[-1][0]:.1f},{h-28} L{pts[0][0]:.1f},{h-28} Z"
-    grid = "".join(f'<line x1="52" x2="{w-20}" y1="{py(v):.1f}" y2="{py(v):.1f}" class="stroke-[color:var(--k-seam)]" />' for v in (10000, 20000, 30000, 40000, 50000) if v < hi)
-    gl = "".join(f'<text x="40" y="{py(v)+4:.1f}" text-anchor="end" class="fill-ink-2" font-size="{fs}">${v//1000}k</text>' for v in (10000, 20000, 30000, 40000, 50000) if v < hi)
-    xl = "".join(f'<text x="{px(k):.1f}" y="{h-8}" text-anchor="middle" class="fill-ink-2" font-size="{fs}">{l}</text>' for k, l in enumerate(labels))
+        d += f" C{c1[0]:.2f},{c1[1]:.2f} {c2[0]:.2f},{c2[1]:.2f} {p2[0]:.2f},{p2[1]:.2f}"
+    area = d + f" L{pts[-1][0]:.2f},100 L{pts[0][0]:.2f},100 Z"
+    ticks = [v for v in (10000, 20000, 30000, 40000, 50000) if v < hi]
+    grid = "".join(f'<line x1="0" x2="100" y1="{Y(v):.2f}" y2="{Y(v):.2f}" vector-effect="non-scaling-stroke" class="stroke-[color:var(--k-seam)]"/>' for v in ticks)
+    gl = "".join(f'<span class="absolute right-full pr-2 -translate-y-1/2 text-xs text-ink-2 tabular-nums" style="top:{Y(v):.2f}%">${v//1000}k</span>' for v in ticks)
+    xl = "".join(f'<span class="absolute -translate-x-1/2 text-xs text-ink-2{"" if k % 3 == 2 else " max-sm:hidden"}" style="left:{X(k):.2f}%">{l}</span>' for k, l in enumerate(labels))
     hx, hy = pts[highlight]
-    return f'''<svg viewBox="0 0 {w} {h}" class="w-full h-auto block" role="img" aria-label="Revenue by month, November 2025 to October 2026. October $44,900; peak $48,210 in August.">
-  <defs><linearGradient id="fillg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".10"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-  <g fill="none" stroke-width="1">{grid}</g>{gl}{xl}
-  <path d="{area}" fill="url(#fillg)" class="text-ink"/>
-  <path d="{d}" fill="none" stroke="currentColor" stroke-width="2" class="text-ink" stroke-linejoin="round" stroke-linecap="round"/>
-  <line x1="{hx:.1f}" x2="{hx:.1f}" y1="{hy:.1f}" y2="{h-28}" stroke="currentColor" class="text-ink" stroke-dasharray="2 3"/>
-  <circle cx="{hx:.1f}" cy="{hy:.1f}" r="5" class="fill-ink" stroke="var(--k-housing)" stroke-width="2.5"/>
-</svg>'''
+    return f'''<div class="relative ml-10 mt-3 mb-8 {cls}" role="img" aria-label="Revenue by month, November 2025 to October 2026. October $44,900; peak $48,210 in August.">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+    <defs><linearGradient id="fillg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".10"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+    <g fill="none">{grid}</g>
+    <path d="{area}" fill="url(#fillg)" class="text-ink"/>
+    <path d="{d}" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" class="text-ink" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="{hx:.2f}" x2="{hx:.2f}" y1="{hy:.2f}" y2="100" stroke="currentColor" vector-effect="non-scaling-stroke" class="text-ink" stroke-dasharray="2 3"/>
+  </svg>
+  <span class="absolute size-3.5 -translate-1/2 rounded-full bg-ink border-[2.5px] border-[color:var(--k-housing)]" style="left:{hx:.2f}%;top:{hy:.2f}%" aria-hidden="true"></span>
+  <div aria-hidden="true">{gl}</div>
+  <div class="absolute inset-x-0 top-full pt-2" aria-hidden="true">{xl}</div>
+</div>'''
 
 def bar_chart(values, labels, label, current=-1, w=360, h=190):
     top, bottom, n = 24, 26, len(values)
@@ -297,7 +302,7 @@ NEW_BTN = f'<span class="tooltip" data-tip="Shortcut: N"><button class="btn btn-
 
 # ------------------------------------------------------------------ dashboard
 def attention(ini, name, status, lamp, amt, action):
-    return f'''<li class="flex flex-wrap items-center gap-x-3 gap-y-2 py-3.5"><span class="avatar !w-9 !h-9 !text-xs">{ini}</span><div class="min-w-0 flex-1"><p class="font-semibold text-sm">{name}</p><p class="mt-0.5"><span class="badge {lamp} !font-semibold !text-[13px] !text-ink-2">{status}</span></p></div><p class="font-semibold text-sm tabular-nums">{amt}</p>{action}</li>'''
+    return f'''<li class="flex items-center gap-3 py-3.5"><span class="avatar !w-9 !h-9 !text-xs shrink-0">{ini}</span><div class="min-w-0 flex-1"><p class="font-semibold text-sm truncate">{name}</p><p class="mt-1"><span class="badge {lamp} !font-semibold !text-[13px] !text-ink-2 whitespace-nowrap">{status}</span></p></div><div class="flex flex-col items-end gap-1.5 shrink-0"><p class="font-semibold text-sm tabular-nums">{amt}</p>{action}</div></li>'''
 
 dash = shell("dashboard", "Welcome back, Mira", "Here’s how invoicing is tracking this month.",
     f'<button class="btn" data-toast="Export started. We’ll email the CSV.">{i("down")}Export</button>{NEW_BTN}',
@@ -308,14 +313,13 @@ dash = shell("dashboard", "Welcome back, Mira", "Here’s how invoicing is track
   <div class="sm:pl-6"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Avg. days to pay</p><p class="text-[32px] font-semibold leading-none mt-2 tracking-[-0.02em]">18.2</p><p class="text-xs mt-2">▼ 2.1 days faster</p></div>
 </section>
 
-<div class="grid gap-6 xl:grid-cols-[1.6fr_1fr] xl:items-start mt-8 [&>*]:min-w-0">
-  <section class="panel !p-5 sm:!p-6" aria-labelledby="rev-h">
+<div class="grid gap-6 xl:grid-cols-[1.6fr_1fr] mt-8 [&>*]:min-w-0">
+  <section class="panel !p-5 sm:!p-6 flex flex-col" aria-labelledby="rev-h">
     <div class="flex flex-wrap items-center gap-3 justify-between mb-5">
       <div><h2 id="rev-h" class="font-bold">Revenue</h2><p class="text-sm text-ink-2">Paid invoices by month</p></div>
       <p class="text-sm text-ink-2 tabular-nums">Nov 2025 – Oct 2026</p>
     </div>
-    <div class="hidden sm:block">{line_chart(REV, MONTHS, highlight=11)}</div>
-    <div class="sm:hidden">{line_chart(REV, [m if n % 3 == 2 else "" for n, m in enumerate(MONTHS)], w=360, h=220, highlight=11, fs=12)}</div>
+    {line_chart(REV, MONTHS, highlight=11, cls="h-[220px] sm:h-[260px] xl:h-auto xl:flex-1 xl:min-h-[220px]")}
   </section>
   <section class="panel !p-5 sm:!p-6" aria-labelledby="att-h">
     <div class="flex items-center justify-between mb-2"><h2 id="att-h" class="font-bold">Needs attention</h2><a href="invoices.html" class="btn btn-quiet btn-sm">View all</a></div>
@@ -456,7 +460,9 @@ CLIENTS = [
 
 def client_row(n, c):
     name, ini, email, count, owed, billed, last, group = c
-    owed_cell = '<span class="text-ink-2">$0</span>' if not owed else f'<span class="{"text-danger font-bold" if "overdue" in group else "font-semibold"}">{money(owed)}</span>'
+    if not owed: owed_cell = '<span class="text-ink-2">$0</span>'
+    elif "overdue" in group: owed_cell = f'<div class="flex flex-col items-end gap-1"><span class="text-danger font-bold">{money(owed)}</span><span class="badge lamp-danger !text-[13px] !font-semibold !text-ink-2">Overdue</span></div>'
+    else: owed_cell = f'<span class="font-semibold">{money(owed)}</span>'
     menu = row_actions(f"cm{n}", name, [
         f'<button type="button" data-open-dialog="new-invoice">{i("plus")}New invoice</button>',
         f'<button type="button" data-toast="Statement sent to {email}">{i("send")}Send statement</button>',
@@ -518,8 +524,7 @@ reports = shell("reports", "Reports", "How invoicing has gone over the last twel
 
 <section class="panel !p-5 sm:!p-6 mt-8" aria-labelledby="rr-h">
   <div class="flex flex-wrap items-center gap-3 justify-between mb-5"><div><h2 id="rr-h" class="font-bold">Revenue</h2><p class="text-sm text-ink-2">Paid invoices by month</p></div><p class="text-sm text-ink-2 tabular-nums">Nov 2025 – Oct 2026</p></div>
-  <div class="hidden sm:block">{line_chart(REV, MONTHS, highlight=11)}</div>
-  <div class="sm:hidden">{line_chart(REV, [m if n % 3 == 2 else "" for n, m in enumerate(MONTHS)], w=360, h=220, highlight=11, fs=12)}</div>
+  {line_chart(REV, MONTHS, highlight=11)}
 </section>
 
 <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr] mt-6 [&>*]:min-w-0">

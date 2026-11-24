@@ -13,7 +13,7 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 
 Never extrude data (chart bars, table rows, stat cards) or containers. If a thing is neither pressed nor filled, it is plane.
 
-State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row sinks to `housing-down`; a latched `.key[aria-pressed=true]` stays pressed. Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
+State drives depth: a `.choice-card` is flush until its input is checked, then recessed (`:has(:checked)`); a selected table row (any checked checkbox in its cells) sinks to `housing-down` with a recessed top edge and ignores the hover tint; a latched `.key[aria-pressed=true]` stays pressed. Nothing raised goes inside an `.lcd` (glass); actions printed on glass use `.lcd-action`.
 
 One sanctioned exception: the showcase hero unit is a raised housing because it depicts a physical device. Product screens never raise a container.
 

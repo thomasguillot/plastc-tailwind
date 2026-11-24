@@ -927,8 +927,9 @@
   & td { white-space: nowrap; padding: 13px 16px; border-bottom: 1px solid var(--k-seam); box-shadow: inset 0 -1px 0 rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a))); }
   & tbody tr:last-child td { border-bottom: 0; box-shadow: none; }
   & tbody tr { transition: background-color 120ms ease; }
-  @media (hover: hover) and (pointer: fine) { & tbody tr:hover { background: var(--k-housing-up); } }
-  & tbody tr:has(> td > input[type="checkbox"]:checked) { background: var(--k-housing-down); }
+  @media (hover: hover) and (pointer: fine) { & tbody tr:hover:not(:has(input[type="checkbox"]:checked)) { background: var(--k-housing-up); } }
+  & tbody tr:has(input[type="checkbox"]:checked) { background: var(--k-housing-down); }
+  & tbody tr:has(input[type="checkbox"]:checked) > td { box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.14), inset 0 -1px 0 rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a))); }
   & .num { text-align: right; font-variant-numeric: tabular-nums; }
   @media (max-width: 639px) { & th, & td { padding-inline: 8px; } }
 }
@@ -1237,6 +1238,8 @@
   .check:checked, .radio:checked, .switch:checked { background: Highlight; }
   .switch::before { border: 1px solid CanvasText; }
   .badge::before { forced-color-adjust: none; }
+  .ktable tbody tr:has(input[type="checkbox"]:checked) > td { border-block-color: Highlight; }
+  .ktable tbody tr:has(input[type="checkbox"]:checked) > td:first-child { border-inline-start: 4px solid Highlight; }
 }
 
 /* Keyboard-opened overlays appear instantly: shortcuts are used too often to animate. */
