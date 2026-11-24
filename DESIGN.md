@@ -19,7 +19,7 @@ One sanctioned exception: the showcase hero unit is a raised housing because it 
 
 LCD rule: the LCD is a material. As a readout set into the housing (KPI band, meter, empty-state counter) it is recessed. Toasts and tooltips are LCD labels cut as separate floating parts, so they take `--k-float`; nothing raised ever sits on LCD glass (use `.lcd-action`).
 
-Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined. A latched `.key[aria-pressed=true]` sits in that darker well in both themes.
+Dark recesses use a darker well (`--k-housing-down: #21201c`) and a dark edge ring (`--k-edge: rgb(0 0 0 / .55)`) so sunken parts read as sunken, not outlined. A latched `.key[aria-pressed=true]` sits in that darker well in both themes and lights a 6px lamp at its top edge (`--k-ok`, or set `--lamp`). The well alone is only 1.1:1 against the surface, so the lamp is what marks the state: 5.0:1 in light and 9.2:1 in dark against the well.
 
 Light comes from the top-left. All shadows are alpha over `--k-sh` / `--k-hl`, scaled by `--k-sh-a` / `--k-hl-a` per theme, so one recipe works in both themes. `--k-depth` (0.5 to 1.7; `.depth-soft`, `.depth-deep`) scales offsets and blurs; recipes are re-declared on `[data-theme]`, `.depth-soft` and `.depth-deep` so they resolve locally.
 
@@ -61,6 +61,8 @@ Every text token is checked against both WCAG 2 (ratio) and APCA (Lc, W3C draft 
 | LCD text | 8.9:1 | 67 | 10.8:1 | 81 |
 | LCD labels (11px caps) | 6.9:1 | 62 | 8.6:1 | 67 |
 | Focus ring vs housing | 11.8:1 | 81 | 12.3:1 | 92 |
+| Latched key label (ink on the `housing-down` well) | 10.5:1 | 74 | 13.9:1 | 94 |
+| Latched key lamp vs its well (non-text, 3:1 target) | 5.0:1 | 58 | 9.2:1 | 68 |
 
 Disabled text (`--k-ink-off`) is deliberately below these (about 3:1); WCAG exempts disabled controls.
 
@@ -72,7 +74,7 @@ Pressing a coloured button keeps its colour: variants set `--btn-pressed-bg` / `
 
 ## Components
 
-Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`. A `.key` takes `:disabled` the same way as a button: no body, a dashed outline, faded ink, and it no longer presses or lifts on hover.
+Buttons `.btn` + `.btn-signal | .btn-go | .btn-quiet | .btn-danger`, sizes `.btn-sm | -md | -lg | -xl | -2xl`, `.btn-icon`, states `:disabled`, `aria-busy`, `aria-pressed`. A busy `.btn-icon` hides its icon and shows only the spinner, at the same size. A `.key` takes `:disabled` the same way as a button: no body, a dashed outline, faded ink, and it no longer presses or lifts on hover. Hover never outranks a press: a pressed or latched button or key always shows `--k-pressed`.
 Fields `.field`, `.field-select`, `.field-area`, `.label`, `.hint`, `.hint-error`, invalid via `aria-invalid="true"`.
 Input groups `.input-group` is one recessed well around a bare `<input>`: a leading or trailing icon, `.input-affix` text (a seam divides it from the value), a `.kbd` hint, or a `.btn` set into the well like the raised item in a `.seg` channel, with concentric corners (the well's radius minus the 4px inset) rather than a pill. Focus, invalid and disabled are read from the input. Wrap it in a `<label>` when it holds no button; with a button, use a `<div>` and a separate `<label for>`.
 Tabs `.tabs` switch the panels of one page (`role="tablist"` with `aria-selected`) or the sections of a page (links with `aria-current="page"`): plane, on a seam, with an ink indicator under the current tab. Filters and view modes inside a panel stay `.seg`.
@@ -87,7 +89,7 @@ Command menu `.dialog.command`: a search `.input-group`, a `.listbox` of `role="
 Progress `.progress` is a recessed channel with an ink fill (`role="progressbar"`, `aria-valuenow`, the fill's `--v`). Without `aria-valuenow` it runs indeterminate. It is for a task in progress; `.meter` stays the LCD readout of a level.
 Spinner `.spinner` (`.spinner-lg`, or set `--spinner-size`) for a wait with no measurable progress; pair it with `role="status"` and hidden text. Skeleton `.skeleton` blocks stand in for content while it loads; size them with utilities and label the region (`role="status"`, `aria-label`).
 File upload: `.dropzone` is a recessed `<label>` around a file input, with `data-dragover` while a file is held over it. Each file is a `.file-item` row: `.file-icon`, `.file-name` and `.file-meta` (`.file-error` for a problem), an action button, and an optional `.progress` under the name.
-Accordion `.accordion` holds native `<details>`/`<summary>` rows divided by seams. Browsers with `::details-content` open it smoothly; others open at once.
+Accordion `.accordion` holds native `<details>`/`<summary>` rows divided by seams. A summary tints to `housing-up` on hover, like a table row. Browsers with `::details-content` open it smoothly; others open at once.
 Description list `.desc-list` on a `<dl>` of `<div><dt><dd></div>` rows; it stacks below 640px.
 Avatar group `.avatar-group`: overlapping `.avatar`s with a ring the colour of the surface (`--ring`, the housing by default). A `button.avatar` at the end can open a `.popover` with the rest.
 Timeline `.timeline` on an `<ol>`: each `<li>` gets a lamp dot (`lamp-ok`, `lamp-warn`, …) and a `<time>` underneath.
@@ -103,7 +105,8 @@ Newsletter sign-up is a composition: an `.input-group` with an icon, an email in
 Sample content: on a sample marketing page, every logo strip, quote and figure carries a visible note that it is made up.
 Marketing pages are compositions, not new materials: the reference landing page (`site/src/pages/screens/landing.astro`) builds its hero, feature rows, pricing, questions, call to action and footer from the classes above. Each feature is illustrated with a live part of the kit rather than an icon card. Sample proof (logos, quotes, figures) is allowed only on the sample product's pages and must say on the page that it is made up; the library's own showcase never carries any. The marketing pages live one per file in `site/src/pages/screens/` and share a header, an optional announcement `.banner` and a footer through the `Marketing` layout in `site/src/layouts/Marketing.astro`.
 Empty states `.empty` centre an LCD `.lcd.readout` (`.readout-value`, `.readout-unit`), a heading, a short reason and `.empty-actions`. Say why it is empty and what to do next; the copy depends on the cause (no data yet, a filter, a search).
-Selection `.check`, `.radio` (20px, 24px on coarse pointers), `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`).
+Selection `.check`, `.radio` (20px, 24px on coarse pointers), `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`). `.check` and `.radio` take `aria-invalid="true"` with the same 2px danger ring as a field. Hover is deliberately absent on fields, input groups, checks, radios, switches and ranges.
+Disabled follows one grammar everywhere: faded ink (`--k-ink-off`), a `not-allowed` cursor, and no hover or press response. Raised parts lose their body for a dashed outline (`.btn`, `.key`, the chosen `.seg` item, the `.range` thumb); recessed parts drop their well for a seam ring (`.field`, `.input-group`, a whole `.seg`, the `.range` track, `.dropzone`); flat items only fade (`.tabs` items, `.menu` items, `.nav-item`, listbox options); a `.choice-card` takes the dashed outline and fades everything inside it. Use `:disabled` on form controls and `aria-disabled="true"` elsewhere: `.seg` and its items, `.tabs` items, `.menu` items, `.nav-item`, `.dropzone` and `.choice-card` accept both, and the drop zone and choice card also read a disabled input inside them. `.dropzone` takes invalid from `aria-invalid="true"` on its input.
 Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`; add `.dialog-full` for a 90vw × 90vh dialog that holds a full view, nearly edge to edge on phones), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
 Selection also `.choice-card`. Code `.code`. Tables `.table-scroll` (edge fade on narrow screens).
 Display `.panel`, `.raised`, `.recessed`, `.seam`, `.float`, `.lcd`, `.meter`, `.badge` + `.lamp-ok|warn|danger|signal|off`, `.tag`, `.avatar`, `.alert`, `.banner`, `.ktable` (`.num` cells), `.nav-item`, `.menu`, `.dialog`, `.toast`, `.kbd`, `.key`.
@@ -124,7 +127,7 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Keyboard shortcuts | none | Overlays opened by a shortcut get `.no-motion`. |
 | Popover, combobox list | 180ms in; the popover leaves in 120ms, the list closes at once | Opacity + scale 0.96–0.97 from the anchored edge. |
 | Progress, spinner, skeleton | 300ms fill, 700ms spin, 1.5–1.6s loops | The fill reveals with `clip-path`, not `width`, so it never triggers layout. Loops run `linear`. Reduced motion: the indeterminate bar and skeletons breathe in place instead of sweeping; the spinner slows. |
-| Accordion | 240ms open, 200ms chevron | Height animates with `interpolate-size` where supported. Reduced motion opens at once. |
+| Accordion | 240ms open, 200ms chevron, 120ms hover tint | Height animates with `interpolate-size` where supported. Reduced motion opens at once. |
 | Tabs | 120ms colour, 160ms indicator | The indicator appears under the new tab; it never slides across. |
 | Tooltip | 125ms, 400ms hover delay | Hover is gated to fine pointers, so a tap never leaves it stuck open; keyboard focus shows it at once. Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
 | Banner dismiss | 220ms | Collapses its height and fades, so the page closes the gap instead of jumping. Reduced motion: a 120ms fade. |
