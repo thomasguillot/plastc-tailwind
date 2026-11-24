@@ -13,9 +13,9 @@ const sum = segments.reduce((a, s) => a + s.value, 0);
 const gap = 3;
 let off = 0;
 let arcs = '';
-for (const { value, lamp } of segments) {
+for (const [k, { value, lamp }] of segments.entries()) {
   const ln = (c * value) / sum;
-  arcs += `<circle class="chart-seg ${lamp}" cx="70" cy="70" r="${r}" stroke-width="${sw}" stroke-dasharray="${Math.max(ln - gap, 0.1).toFixed(2)} ${c.toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
+  arcs += `<circle data-k="${k}" class="chart-seg ${lamp}" cx="70" cy="70" r="${r}" stroke-width="${sw}" stroke-dasharray="${Math.max(ln - gap, 0.1).toFixed(2)} ${c.toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
   off += ln;
 }
 const inner = `<circle class="chart-track" cx="70" cy="70" r="${r}" stroke-width="${sw}"/>${arcs}<text class="chart-total" x="70" y="70" text-anchor="middle">${total}</text><text class="chart-caption" x="70" y="89" text-anchor="middle">${caption}</text>`;
