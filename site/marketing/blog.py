@@ -16,7 +16,7 @@ _blog = f'''{page_header("Blog", "Product updates, guides to getting paid on tim
   <article class="post-card" data-featured data-category="{_featured["cat"]}">
     <div class="grid gap-4 content-center">
       <p class="badge lamp-ok">Latest update</p>
-      <h2><a href="article.html">{_featured["title"]}</a></h2>
+      <h2><a href="{_featured["href"]}">{_featured["title"]}</a></h2>
       <p class="text-lg text-ink-2 leading-relaxed max-w-[44ch] text-pretty">{_featured["summary"]}</p>
       {blog_post_meta(_featured)}
       <div class="byline mt-2"><span class="avatar">{_fini}</span><div><strong>{_fname}</strong>{_frole}</div></div>

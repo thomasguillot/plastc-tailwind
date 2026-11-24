@@ -41,7 +41,7 @@ def pricing_cell(v, featured):
 
 pricing_featured = [p[5] for p in PLANS]
 pricing_head = '<th scope="col"><span class="sr-only">Feature</span></th>' + "".join(
-    f'<th scope="col"{" data-featured" if feat else ""}>{"<span class=\"badge lamp-signal\">Recommended</span>" if feat else ""}'
+    f'<th scope="col"{" data-featured" if feat else ""}>{"<span class=\"badge lamp-ok\">Recommended</span>" if feat else ""}'
     f'<span class="compare-plan">{name}</span><span class="compare-price"><span data-price data-monthly="${mo}" data-yearly="${yr}">${mo}</span> <span data-price-unit>/ month</span></span></th>'
     for name, mo, yr, _b, _f, feat, _c in PLANS)
 pricing_groups = "".join(
