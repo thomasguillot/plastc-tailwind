@@ -35,7 +35,7 @@ const commands: CommandGroup[] = [
     label: 'On this page',
     items: [
       ['anatomy', 'What one screen is made of'],
-      ['housings', 'Light and dark'],
+      ['themes', 'Light and dark'],
       ['contrast', 'Contrast, measured'],
       ['install', 'Add it to your project'],
     ].map(([k, label]) => ({ icon: 'hash' as const, text: label, attrs: { href: `#${k}` } })),

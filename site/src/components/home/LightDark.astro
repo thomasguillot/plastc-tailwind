@@ -4,7 +4,7 @@ import { DEPTHS, TINTS } from '../../data/home';
 
 const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
 ---
-<section id="housings" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="hou-h">
+<section id="themes" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="hou-h">
   <h2 id="hou-h" class="display text-[40px] md:text-[56px] max-w-[16ch]">Light and dark</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5">Set the depth and the LCD tint here. Both panes follow, and so does the rest of the page.</p>
   <div class="raised rounded-[24px] p-5 sm:p-6 mt-8 grid gap-x-8 gap-y-7 sm:grid-cols-2" role="group" aria-label="Depth and LCD tint">
@@ -21,8 +21,8 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
 
 <style is:global>
   .annot{display:block;height:0;margin-top:0;overflow:hidden;opacity:0;visibility:hidden;font:500 11px/1.4 var(--font-mono);color:var(--k-ink-2);interpolate-size:allow-keywords;transition:height 240ms var(--ease-out),margin-top 240ms var(--ease-out),opacity 180ms var(--ease-out),visibility 0s 240ms}
-  #housings[data-labels] .annot{height:auto;margin-top:6px;opacity:1;visibility:visible;transition:height 240ms var(--ease-out),margin-top 240ms var(--ease-out),opacity 180ms var(--ease-out),visibility 0s}
-  @media (prefers-reduced-motion:reduce){.annot,#housings[data-labels] .annot{transition:opacity 180ms var(--ease-out),visibility 0s}}
+  #themes[data-labels] .annot{height:auto;margin-top:6px;opacity:1;visibility:visible;transition:height 240ms var(--ease-out),margin-top 240ms var(--ease-out),opacity 180ms var(--ease-out),visibility 0s}
+  @media (prefers-reduced-motion:reduce){.annot,#themes[data-labels] .annot{transition:opacity 180ms var(--ease-out),visibility 0s}}
   @media (max-width:767.98px){[data-panes][data-show="light"]>[data-pane="dark"],[data-panes][data-show="dark"]>[data-pane="light"]{display:none}}
 </style>
 
@@ -180,7 +180,7 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
   new MutationObserver(() => tint(current)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   const labels = document.getElementById('labels-switch') as HTMLInputElement | null;
-  const section = document.getElementById('housings');
+  const section = document.getElementById('themes');
   if (labels && section) labels.addEventListener('change', () => section.toggleAttribute('data-labels', labels.checked));
   document.querySelector('[data-reset-all]')?.addEventListener('click', () => {
     const normal = document.querySelector<HTMLElement>('[data-set-depth="1"]');
