@@ -15,3 +15,8 @@ const groups = [
   </div>
   <iframe class="flex-1 min-h-0 w-full border-0 bg-housing" title="Dashboard" data-screen-frame></iframe>
 </dialog>
+
+<style>
+  [data-screen-frame]{transition:opacity 200ms var(--ease-out)}
+  [data-screen-frame][data-loading]{opacity:0;transition:none}
+</style>
