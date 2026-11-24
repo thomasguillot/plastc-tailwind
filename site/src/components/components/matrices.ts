@@ -34,6 +34,7 @@ export interface MatrixRow {
 export interface Matrix {
   states: State[];
   cellClass?: string;
+  note?: string;
   rows: MatrixRow[];
 }
 
@@ -80,7 +81,7 @@ export const fields: Matrix = {
   states: ['default', 'hover', 'focus', 'on', 'disabled', 'invalid'],
   cellClass: 'max-w-[148px]',
   rows: [
-    row('Text field', '.field', FIELD, (s, attr) => `<input class="field" placeholder="Customer" aria-label="Customer"${fieldValue(s)}${attr}>`),
+    row('Text field', '.field', FIELD, (s, attr) => `<input class="field" placeholder="Name or email" aria-label="Customer"${fieldValue(s)}${attr}>`),
     row('Select', '.field-select', FIELD, (s, attr) => `<select class="field field-select" aria-label="Currency"${attr}><option>USD</option><option>EUR</option></select>`),
     row('Text area', '.field-area', FIELD, (s, attr) => `<textarea class="field field-area !min-h-16" aria-label="Note" placeholder="Add a note"${attr}></textarea>`),
     row('Input group', '.input-group', FIELD, (s, attr) => `<label class="input-group">${icon('search')}<input aria-label="Search invoices" placeholder="Search"${fieldValue(s)}${attr}></label>`),
@@ -107,22 +108,18 @@ export const selection: Matrix = {
 
 export const status: Matrix = {
   states: ['default', 'busy'],
+  note: 'Badges, tags, meters, alerts and empty states take no input, so they look the same in every state. Spinners and skeletons appear only while something loads.',
   rows: [
-    row('Badge', '.badge', ['default'], () => `<span class="badge lamp-ok">Paid</span>`),
-    row('Tag', '.tag', ['default'], () => `<span class="tag">Net 30</span>`),
-    row('Meter', '.meter', ['default'], () => `<div class="meter" role="meter" aria-label="Storage" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6.2" style="min-width:96px"><span style="--v:62%"></span></div>`),
-    row('Alert', '.alert', ['default'], () => `<div class="alert lamp-warn" style="min-width:200px">${icon('alert')}<div class="alert-body"><b>Due this week</b></div></div>`),
     row('Progress', '.progress', ['default', 'busy'], (s) => `<div class="progress" role="progressbar" aria-label="Export"${s === 'busy' ? '' : ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"'} style="min-width:96px"><span${s === 'busy' ? '' : ' style="--v:64%"'}></span></div>`),
     row('Spinner', '.spinner', ['busy'], () => `<span class="spinner" role="status"><span class="sr-only">Loading</span></span>`),
     row('Skeleton', '.skeleton', ['busy'], () => `<span class="grid gap-2" role="status" aria-label="Loading"><span class="skeleton h-3 w-24"></span><span class="skeleton h-3 w-16"></span></span>`),
-    row('Empty state', '.empty', ['default'], () => `<div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit">Customers</span></div>`),
   ],
 };
 
 export const overlays: Matrix = {
   states: ['default', 'hover', 'focus', 'disabled'],
   rows: [
-    row('Menu item', '.menu', ['default', 'hover', 'focus', 'disabled'], (s, attr) => `<div class="menu"><button type="button"${attr}>${icon('copy')}Duplicate</button></div>`),
+    row('Menu item', '.menu', ['default', 'hover', 'focus', 'disabled'], (s, attr) => `<div class="menu !min-w-0 w-full"><button type="button"${attr}>${icon('copy')}Duplicate</button></div>`),
     row('Tooltip', '.tooltip', ['default', 'hover', 'focus'], () => `<span class="tooltip" data-tip="3 unread"><button type="button" class="btn btn-icon" aria-label="Notifications, 3 unread">${icon('bell')}</button></span>`, true),
     row('Toast action', '.lcd-action', ['default', 'hover', 'focus'], () => `<div class="toast"><span>Invoice sent</span><button type="button" class="lcd-action">Undo</button></div>`),
   ],
@@ -152,12 +149,9 @@ export const data: Matrix = {
 
 export const surfaces: Matrix = {
   states: ['default', 'active'],
+  note: 'Plane, raised, recessed and float have no states of their own. Add .pressable to a raised part to give it a pressed state.',
   rows: [
-    row('Plane', '.panel', ['default'], () => `<div class="panel px-4 py-3 text-[13px] font-bold">INV-0193</div>`),
-    row('Raised', '.raised', ['default'], () => `<div class="raised rounded-xl px-4 py-3 text-[13px] font-bold">Raised</div>`),
     row('Raised, pressable', '.pressable', ['default', 'active'], () => `<div class="raised pressable rounded-xl px-4 py-3 text-[13px] font-bold">Press</div>`),
-    row('Recessed', '.recessed', ['default'], () => `<div class="recessed rounded-xl px-4 py-3 text-[13px] font-bold">Recessed</div>`),
-    row('Float', '.float', ['default'], () => `<div class="float rounded-xl px-4 py-3 text-[13px] font-bold">Float</div>`),
   ],
 };
 

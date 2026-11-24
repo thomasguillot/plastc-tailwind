@@ -1,35 +1,114 @@
 ---
 import './state-matrix.css';
+import Icon from '../Icon.astro';
 import { NA_REASON, STATE_LABEL, type Matrix, type State } from './matrices';
 
 interface Props {
   matrix: Matrix;
+  labelledby: string;
 }
-const { matrix } = Astro.props;
+const { matrix, labelledby } = Astro.props;
 const FORCED = new Set<State>(['hover', 'focus', 'active']);
 const ALL = Object.keys(STATE_LABEL) as State[];
 const left = ALL.filter((s) => s !== 'default' && !matrix.states.includes(s));
+const held = matrix.states.filter((s) => FORCED.has(s)).map((s) => STATE_LABEL[s].toLowerCase());
+const heldText = held.length > 1 ? `${held.slice(0, -1).join(', ')} and ${held.at(-1)}` : held[0];
+const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${held.length > 1 ? 'are' : 'is'} held on here so you can compare without a pointer. ` : '';
 ---
-<div class="table-scroll" role="region" aria-label="State matrix" tabindex="0">
-  <table class="sm-table w-full border-collapse text-sm">
-    <thead>
-      <tr>
-        <th scope="col" class="text-left text-[11px] font-bold tracking-[0.09em] uppercase text-ink-2 border-b border-[color:var(--k-seam)]">Part</th>
-        {matrix.states.map((s) => <th scope="col" class="text-left text-[11px] font-bold tracking-[0.09em] uppercase text-ink-2 border-b border-[color:var(--k-seam)]">{STATE_LABEL[s]}</th>)}
-      </tr>
-    </thead>
-    <tbody>
-      {matrix.rows.map((r) => (
-        <tr class="border-b border-[color:var(--k-seam)]">
-          <th scope="row" class="text-left font-bold align-middle min-w-[132px]"><span class="block">{r.name}</span><code class="block font-mono text-[11px] font-normal text-ink-2 mt-0.5">{r.cls}</code></th>
-          {matrix.states.map((s) => r.cells[s] !== undefined ? (
-            <td data-force={FORCED.has(s) ? s : undefined} data-pad={r.pad ? '' : undefined}><div class={`flex items-center min-h-10 ${matrix.cellClass ?? ''}`} set:html={r.cells[s]} /></td>
-          ) : (
-            <td><span class="sm-na" aria-hidden="true">N/A</span><span class="sr-only">Not applicable. {NA_REASON[s]}</span></td>
+<div class="mx" data-matrix>
+  <p class="mx-hint" data-matrix-hint hidden><Icon name="right" />Scroll sideways for more states.</p>
+  <div class="mx-frame" data-matrix-frame>
+    <div class="mx-scroll" role="region" aria-labelledby={labelledby} tabindex="0" data-matrix-scroll>
+      <table class="mx-table" role="table">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">Part</th>
+            {matrix.states.map((s) => <th scope="col" role="columnheader">{STATE_LABEL[s]}</th>)}
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {matrix.rows.map((r) => (
+            <tr role="row">
+              <th scope="row" role="rowheader" class="mx-part"><span class="block">{r.name}</span><code class="block font-mono text-[11px] font-normal text-ink-2 mt-0.5">{r.cls}</code></th>
+              {matrix.states.map((s) => r.cells[s] !== undefined ? (
+                <td role="cell" class="mx-cell" data-force={FORCED.has(s) ? s : undefined}><span class="mx-label" aria-hidden="true">{STATE_LABEL[s]}</span><div class:list={['mx-spec', matrix.cellClass, r.pad && 'mx-spec-pad']} set:html={r.cells[s]} /></td>
+              ) : (
+                <td role="cell" class="mx-cell mx-na"><span aria-hidden="true">N/A</span><span class="sr-only">Not applicable. {NA_REASON[s]}</span></td>
+              ))}
+            </tr>
           ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="mx-note">{matrix.note && `${matrix.note} `}{heldNote}{matrix.states.includes('on') && 'On covers checked, pressed, selected, open and drag-over. '}{matrix.rows.some((r) => matrix.states.some((s) => r.cells[s] === undefined)) && 'N/A means the library gives the part no such style. '}{left.length > 0 && `Nothing on this page has these states: ${left.map((s) => STATE_LABEL[s].toLowerCase()).join(', ')}.`}</p>
 </div>
-<p class="text-[13px] text-ink-2 mt-4 max-w-[68ch]">{matrix.states.some((s) => FORCED.has(s)) && 'Hover, focus and pressed are held on with a site-only attribute that copies the library rules, so you can compare them without a pointer. '}{matrix.states.includes('on') && 'On covers checked, pressed, selected, open and drag-over. '}N/A means the library gives the part no such style.{left.length > 0 && ` Not shown, because nothing on this page has them: ${left.map((s) => STATE_LABEL[s].toLowerCase()).join(', ')}.`}</p>
+
+<script>
+  const sync = (scroll: HTMLElement) => {
+    const frame = scroll.parentElement!;
+    const hint = frame.parentElement!.querySelector<HTMLElement>('[data-matrix-hint]')!;
+    const max = scroll.scrollWidth - scroll.clientWidth;
+    const over = max > 1;
+    frame.toggleAttribute('data-more-start', over && scroll.scrollLeft > 1);
+    frame.toggleAttribute('data-more-end', over && scroll.scrollLeft < max - 1);
+    hint.hidden = !over;
+    if (over) scroll.tabIndex = 0;
+    else scroll.removeAttribute('tabindex');
+  };
+  const observer = new ResizeObserver((entries) => entries.forEach((e) => sync(e.target as HTMLElement)));
+  document.querySelectorAll<HTMLElement>('[data-matrix-scroll]').forEach((scroll) => {
+    scroll.addEventListener('scroll', () => sync(scroll), { passive: true });
+    observer.observe(scroll);
+  });
+</script>
+
+<style>
+  .mx { container-type: inline-size; }
+  .mx-hint { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--k-ink-2); }
+  .mx-hint[hidden] { display: none; }
+  .mx-hint :global(svg) { width: 14px; height: 14px; }
+  .mx-frame { position: relative; }
+  .mx-frame::after {
+    content: ""; position: absolute; inset: 0 0 0 auto; width: 56px; pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--k-housing));
+    opacity: 0;
+  }
+  .mx-frame[data-more-end]::after { opacity: 1; }
+  .mx-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+  .mx-scroll:focus-visible { outline: 2px solid var(--k-focus); outline-offset: 2px; border-radius: 4px; }
+  .mx-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .mx-table th, .mx-table td { vertical-align: middle; text-align: left; }
+  .mx-table thead th {
+    padding: 0 6px 10px; white-space: nowrap;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--k-ink-2);
+    border-bottom: 1px solid var(--k-seam);
+  }
+  .mx-table thead th:first-child { position: sticky; left: 0; z-index: 2; padding-left: 0; background: var(--k-housing); }
+  .mx-table tbody tr { border-bottom: 1px solid var(--k-seam); }
+  .mx-part {
+    position: sticky; left: 0; z-index: 2;
+    min-width: 116px; padding: 12px 12px 12px 0;
+    font-weight: 700; background: var(--k-housing);
+  }
+  .mx-frame[data-more-start] .mx-part, .mx-frame[data-more-start] thead th:first-child { box-shadow: 1px 0 0 var(--k-seam), 6px 0 8px -6px rgb(var(--k-sh) / calc(0.4 * var(--k-sh-a))); }
+  .mx-cell { position: relative; padding: 14px 6px; }
+  .mx-label { display: none; }
+  .mx-spec { display: flex; align-items: center; min-height: 40px; }
+  .mx-spec-pad { padding: 34px 20px 0; }
+  .mx-spec :global(.input-group) { width: 100%; }
+  .mx-spec :global(.input-group > input) { width: 0; }
+  .mx-spec :global(.pager-pages.seg) { display: inline-flex; }
+  .mx-na { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--k-ink-3); }
+  .mx-note { max-width: 58ch; margin-top: 16px; font-size: 13px; line-height: 1.5; color: var(--k-ink-2); }
+
+  @container (max-width: 639px) {
+    .mx-table, .mx-table tbody, .mx-table tr, .mx-table th, .mx-table td { display: block; }
+    .mx-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .mx-table tbody tr { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 16px 12px; padding: 16px 6px 20px; }
+    .mx-part { grid-column: 1 / -1; position: static; min-width: 0; padding: 0; box-shadow: none !important; }
+    .mx-cell { padding: 0; min-width: 0; }
+    .mx-table .mx-na { display: none; }
+    .mx-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--k-ink-2); }
+  }
+</style>
