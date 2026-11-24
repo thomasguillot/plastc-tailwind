@@ -476,6 +476,7 @@
     translate: 0 1px;
     background: var(--btn-latched-bg, var(--k-housing-down)); box-shadow: var(--btn-pressed-shadow, var(--k-pressed)), inset 0 0 0 1px var(--k-edge);
   }
+  &[aria-pressed]:not(.btn-icon) { padding-left: max(calc(var(--btn-h) * 0.46), calc(var(--btn-h) * 0.2 + 10px)); }
   &[aria-pressed="true"]::after {
     content: ""; position: absolute; top: 50%; left: calc(var(--btn-h) * 0.2);
     width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
