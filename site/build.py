@@ -378,7 +378,7 @@ settings = shell("settings", "Settings", "Manage your studio profile, team and b
   {tabpanel("profile", "Profile", f"""
   {row("Studio name", "Shown on every invoice you send.", '<label class="sr-only" for="sn">Studio name</label><input id="sn" class="field" value="Halden Studio">')}
   {row("Billing email", "Where customers reply to invoices.", '<label class="sr-only" for="em">Billing email</label><input id="em" class="field" type="email" value="billing@halden.studio" aria-describedby="em-e"><span id="em-e" class="hint-error" hidden>Add the domain, for example billing@halden.studio.</span>')}
-  {row("Logo", "SVG, PNG or JPG. At least 400 × 400 px.", f'<div class="flex items-center gap-5"><span class="avatar !w-16 !h-16 !text-lg">HS</span><label class="recessed rounded-2xl flex-1 px-5 py-6 text-center text-sm cursor-pointer block">{i("upload","w-5 h-5 mx-auto text-ink-2 mb-2")}<span class="font-bold text-ink underline">Click to upload</span> <span class="text-ink-2">or drag and drop</span><input type="file" class="sr-only" accept="image/*"></label></div>')}
+  {row("Logo", "SVG, PNG or JPG. At least 400 × 400 px.", f'<div class="flex items-center gap-5"><span class="avatar !w-16 !h-16 !text-lg">HS</span><label class="dropzone flex-1" data-dropzone>{i("upload")}<span><strong>Click to upload</strong> or drag and drop</span><input type="file" class="sr-only" accept="image/*"></label></div>')}
   {row("Default terms", "Applied to new invoices. You can change them per invoice.", '<div class="grid sm:grid-cols-2 gap-4"><div><label class="label" for="due">Payment due</label><select id="due" class="field field-select"><option>14 days</option><option selected>30 days</option><option>45 days</option></select></div><div><label class="label" for="cur">Currency</label><select id="cur" class="field field-select"><option>USD — US Dollar</option><option>EUR — Euro</option></select></div></div><label class="label mt-4" for="note">Footer note</label><textarea id="note" class="field field-area" maxlength="240">Thanks for working with us. Bank details are on page two.</textarea><span class="hint">Shown at the bottom of every invoice. 240 characters max.</span>')}
   """)}
   {tabpanel("notifications", "Notifications", row("Email me when", "Choose what lands in your inbox.", notif), True)}
@@ -578,6 +578,20 @@ showcase = f'''<body>
         <button class="btn" data-toast="Invoice INV-0193 sent">Show toast</button>
       </div>
       <dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete">{i("trash")}Delete</button></div></form></dialog>""")}
+    {group("Progress &amp; loading", ".progress  .spinner  .skeleton", f"""
+      <div class="grid gap-6">
+        <div><div class="flex justify-between text-[13px] mb-2"><span class="font-semibold" id="pg1-l">Exporting invoices</span><span class="text-ink-2 tabular-nums">64%</span></div><div class="progress" role="progressbar" aria-labelledby="pg1-l" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"><span style="--v:64%"></span></div></div>
+        <div><p class="text-[13px] font-semibold mb-2" id="pg2-l">Syncing with your bank</p><div class="progress" role="progressbar" aria-labelledby="pg2-l"><span></span></div></div>
+        <div class="flex flex-wrap items-center gap-6"><span class="spinner" role="status"><span class="sr-only">Loading</span></span><span class="spinner spinner-lg" role="status"><span class="sr-only">Loading</span></span><button class="btn btn-sm" aria-busy="true" disabled>Saving</button></div>
+        <div class="flex items-center gap-3.5 p-4 rounded-[18px] seam" role="status" aria-label="Loading customer"><span class="skeleton size-10 !rounded-full"></span><span class="flex-1 grid gap-2"><span class="skeleton h-3 w-2/5"></span><span class="skeleton h-3 w-3/4"></span></span><span class="skeleton h-8 w-20 !rounded-full"></span></div>
+      </div>""")}
+    {group("File upload", ".dropzone  .file-item", f"""
+      <label class="dropzone" data-dropzone>{i("upload")}<span><strong>Click to upload</strong> or drag and drop</span><span class="text-[13px]">PDF, PNG or JPG, up to 10 MB</span><input type="file" multiple accept=".pdf,.png,.jpg,.jpeg" data-file-input></label>
+      <ul class="mt-3" data-file-list>
+        <li class="file-item"><span class="file-icon">{i("file")}</span><div class="min-w-0"><p class="file-name">halden-logo.svg</p><p class="file-meta">240 KB · <span class="badge lamp-ok">Uploaded</span></p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Remove halden-logo.svg" data-file-remove>{i("trash")}</button></li>
+        <li class="file-item"><span class="file-icon">{i("file")}</span><div class="min-w-0"><p class="file-name">invoice-0193.pdf</p><p class="file-meta">1.2 MB · <span data-file-pct>64%</span></p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Cancel invoice-0193.pdf" data-file-remove>{i("x")}</button><div class="progress" role="progressbar" aria-label="Uploading invoice-0193.pdf" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"><span style="--v:64%"></span></div></li>
+        <li class="file-item"><span class="file-icon">{i("file")}</span><div class="min-w-0"><p class="file-name">receipt-scan.jpg</p><p class="file-meta file-error">14.8 MB · Over the 10 MB limit</p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Remove receipt-scan.jpg" data-file-remove>{i("trash")}</button></li>
+      </ul>""")}
     {group("Tabs &amp; pagination", ".tabs  .pager  .pager-pages  .pager-status", f"""
       <nav class="tabs" aria-label="Customer sections"><a href="#components" aria-current="page">Overview</a><a href="#components">Invoices <span class="text-ink-2 font-semibold">12</span></a><a href="#components">Payments</a><a href="#components">Activity</a></nav>
       <p class="text-sm text-ink-2 mt-4 max-w-[52ch]" data-demo-note>Tabs switch the panels of one page. For filters and view modes inside a panel, use <code class="font-mono">.seg</code>.</p>
@@ -587,7 +601,7 @@ showcase = f'''<body>
         <p class="pager-status" aria-live="polite">Page 1 of 8</p>
         <button type="button" class="btn btn-sm" data-page-step="1">Next{i("right")}</button>
       </nav>""")}
-    {group("Breadcrumbs &amp; command menu", ".breadcrumbs  .command  .listbox", f"""
+    {group("Breadcrumbs &amp; command menu", ".breadcrumbs  .command", f"""
       <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="#components">{i("home")}Dashboard</a></li><li><a href="#components">Invoices</a></li><li><a href="#components">Halden Studio</a></li><li><span aria-current="page">INV-0193</span></li></ol></nav>
       <p class="text-sm text-ink-2 mt-6 max-w-[52ch]" data-demo-note>The command menu is a <code class="font-mono">.dialog</code> holding a search field and a <code class="font-mono">.listbox</code>. Open it from anywhere on this page, type to filter, and move with the arrow keys.</p>
       <button type="button" class="btn mt-4" data-open-command>{i("search")}Search or jump to<span class="kbd ml-1" data-kbd-mod>Ctrl K</span></button>""")}

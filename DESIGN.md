@@ -8,7 +8,7 @@ Neumorphism as molded appliance plastic, for Tailwind CSS v4. Source of truth: `
 |---|---|---|---|
 | Plane | The housing and every layout container | `.panel`, `.seam`, `.tabs`, `.empty`, tables, charts, sidebars, page sections | Flush. Moulded seam: 1px parting line + highlight lip. No drop shadow. |
 | Raised | A part you press | `.btn*`, `.key`, switch/range thumbs, selected `.seg` item, `.kbd` | `--k-raised`: specular top edge, lower lip, contact shadow, mid shadow, ambient falloff, faint top-left light bounce. Pressing swaps to `--k-pressed` and moves 1px. |
-| Recessed | A part that holds input or output | `.field`, `.input-group`, `.check`, `.radio`, `.switch` slot, `.seg` channel, `.range` track, `.lcd`, a checked `.choice-card`, the selected `.calendar` day, `.meter`, the current `.nav-item` | `--k-recessed`: inner contact at top, soft inner fill, highlight lip on the lower outside edge. |
+| Recessed | A part that holds input or output | `.field`, `.input-group`, `.check`, `.radio`, `.switch` slot, `.seg` channel, `.range` track, `.lcd`, a checked `.choice-card`, the selected `.calendar` day, `.progress`, `.dropzone`, `.meter`, the current `.nav-item` | `--k-recessed`: inner contact at top, soft inner fill, highlight lip on the lower outside edge. |
 | Float | An overlay | `.menu`, `.popover`, an open `.combobox` list, `.dialog`, `.sheet`, `.toast`, `.tooltip` | `--k-float`: hairline, short + long ambient shadows. The only level with a long shadow. |
 
 Never extrude data (chart bars, table rows, stat cards) or containers. If a thing is neither pressed nor filled, it is plane.
@@ -82,6 +82,9 @@ Combobox `.combobox` wraps an `.input-group` whose `<input>` has `role="combobox
 Date picker: a `.calendar` of day buttons (`aria-pressed="true"` sinks the chosen day into a recess, `aria-current="date"` puts a dot under today, `data-outside` dims the neighbouring months) inside a `.popover` anchored to an input group. The calendar also sits flat on the page on its own.
 Popover `.popover` is the float panel for rich content on `[popover]`; `.menu` stays the panel for a list of actions.
 Command menu `.dialog.command`: a search `.input-group`, a `.listbox` of `role="group"` sections with `.listbox-label` headings, and `.command-hints` along the bottom. The showcase and the app screens open it with Cmd+K or Ctrl+K.
+Progress `.progress` is a recessed channel with an ink fill (`role="progressbar"`, `aria-valuenow`, the fill's `--v`). Without `aria-valuenow` it runs indeterminate. It is for a task in progress; `.meter` stays the LCD readout of a level.
+Spinner `.spinner` (`.spinner-lg`, or set `--spinner-size`) for a wait with no measurable progress; pair it with `role="status"` and hidden text. Skeleton `.skeleton` blocks stand in for content while it loads; size them with utilities and label the region (`role="status"`, `aria-label`).
+File upload: `.dropzone` is a recessed `<label>` around a file input, with `data-dragover` while a file is held over it. Each file is a `.file-item` row: `.file-icon`, `.file-name` and `.file-meta` (`.file-error` for a problem), an action button, and an optional `.progress` under the name.
 Empty states `.empty` centre an LCD `.lcd.readout` (`.readout-value`, `.readout-unit`), a heading, a short reason and `.empty-actions`. Say why it is empty and what to do next; the copy depends on the cause (no data yet, a filter, a search).
 Selection `.check`, `.radio`, `.switch` (`role="switch"`), `.seg` (children use `aria-pressed`, `aria-selected` or `aria-current`), `.range` (`--fill`).
 Overlays `.menu` (on `[popover]`, anchored with CSS anchor positioning), `.dialog` and `.sheet` (on `<dialog>`; add `.dialog-full` for a 90vw × 90vh dialog that holds a full view, nearly edge to edge on phones), `.toast` (on `[popover=manual]`), `.tooltip` (`data-tip`), `.lcd-action`.
@@ -103,6 +106,7 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Toast (`[popover=manual]`) | 360ms in, 240ms out, `ease` | Rises from the bottom (bottom-right on desktop) and leaves the same way. Stays 6s, pauses on hover or focus; Undo also on `Z`. |
 | Keyboard shortcuts | none | Overlays opened by a shortcut get `.no-motion`. |
 | Popover, combobox list | 180ms in; the popover leaves in 120ms, the list closes at once | Opacity + scale 0.96–0.97 from the anchored edge. |
+| Progress, spinner, skeleton | 300ms fill, 700ms spin, 1.5–1.6s loops | Reduced motion: the indeterminate bar and skeletons breathe in place instead of sweeping; the spinner slows. |
 | Tabs | 120ms colour, 160ms indicator | The indicator appears under the new tab; it never slides across. |
 | Tooltip | 125ms, 400ms hover delay | Esc dismisses it at once (`data-tip-off`, WCAG 1.4.13). |
 

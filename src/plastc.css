@@ -745,6 +745,65 @@
   }
 }
 
+@utility progress {
+  height: 10px; border-radius: 999px; overflow: hidden;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  & > span {
+    display: block; height: 100%; width: var(--v, 0%); border-radius: inherit;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--k-ink-2) 78%, var(--k-housing-up)), var(--k-ink-2));
+    transition: width 300ms var(--ease-out);
+  }
+  &:not([aria-valuenow]) > span { width: 38%; animation: plastc-indeterminate 1.5s var(--ease-out) infinite; }
+}
+
+@utility spinner {
+  display: inline-block; flex: none;
+  width: var(--spinner-size, 20px); height: var(--spinner-size, 20px); border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--k-ink-2) 22%, transparent);
+  border-top-color: var(--k-ink);
+  animation: plastc-spin 700ms linear infinite;
+}
+@utility spinner-lg { --spinner-size: 32px; border-width: 3px; }
+
+@utility skeleton {
+  display: block; min-height: 0.75rem; border-radius: 8px;
+  background: var(--k-housing-down);
+  background-image: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--k-housing-up) 75%, transparent) 50%, transparent 100%);
+  background-size: 200% 100%; background-repeat: no-repeat;
+  animation: plastc-shimmer 1.6s ease-in-out infinite;
+}
+
+@utility dropzone {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 26px 20px; border-radius: var(--radius-part);
+  text-align: center; font-size: 14px; color: var(--k-ink-2); cursor: pointer;
+  background: var(--k-housing-down);
+  box-shadow: var(--k-recessed);
+  transition: box-shadow 160ms var(--ease-out), color 120ms ease;
+  & > svg { width: 22px; height: 22px; margin-bottom: 6px; color: var(--k-ink-2); }
+  & strong { font-weight: 700; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+  & input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  &:has(input:focus-visible) { outline: 2px solid var(--k-focus); outline-offset: 2px; }
+  &[data-dragover] { color: var(--k-ink); box-shadow: var(--k-recessed), inset 0 0 0 2px var(--k-ink-2); }
+}
+
+@utility file-item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--k-seam);
+  & .file-icon {
+    display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
+    color: var(--k-ink-2); background: var(--k-housing-down); box-shadow: inset 0 0 0 1px var(--k-seam);
+  }
+  & .file-icon svg { width: 18px; height: 18px; }
+  & .file-name { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  & .file-meta { font-size: 13px; color: var(--k-ink-2); font-variant-numeric: tabular-nums; }
+  & .file-error { color: var(--k-danger); }
+  & > .progress { grid-column: 2 / -1; }
+}
+
 /* Alert: flush. Children: an icon, .alert-body, optional .alert-actions (wraps under on narrow). */
 @utility alert {
   display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-start;
@@ -1040,6 +1099,9 @@
 }
 
 @keyframes plastc-spin { to { rotate: 360deg; } }
+@keyframes plastc-indeterminate { from { translate: -110% 0; } to { translate: 270% 0; } }
+@keyframes plastc-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+@keyframes plastc-breathe { 50% { opacity: 0.55; } }
 
 /* ---------------------------------------------------------------- reduced motion */
 /* Fewer, gentler: keep fades and colour, drop movement. Busy stays visible, slower. */
@@ -1051,7 +1113,9 @@
   .sheet { transition-property: opacity, display, overlay; }
   .sheet:not([open]) { translate: 0 0; opacity: 0; }
   .sheet[open] { opacity: 1; }
-  .btn[aria-busy="true"]::before { animation-duration: 1.6s; }
+  .btn[aria-busy="true"]::before, .spinner { animation-duration: 1.6s; }
+  .progress:not([aria-valuenow]) > span { width: 100%; translate: none; animation: plastc-breathe 1.6s ease-in-out infinite; }
+  .skeleton { background-image: none; animation: plastc-breathe 1.6s ease-in-out infinite; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1061,7 +1125,7 @@
 /* ---------------------------------------------------------------- forced colours */
 /* Windows High Contrast drops every shadow, so parts get real edges. */
 @media (forced-colors: active) {
-  .btn, .key, .seg, .field, .input-group, .popover, .combobox > .listbox, .check, .radio, .switch, .range, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
+  .btn, .key, .seg, .field, .input-group, .dropzone, .progress, .popover, .combobox > .listbox, .check, .radio, .switch, .range, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
   .btn-signal, .btn-go { border: 2px solid ButtonText; }
   .seg > [aria-pressed="true"], .seg > [aria-selected="true"], .seg > [aria-current="page"], .nav-item[aria-current="page"], .key[aria-pressed="true"], .choice-card:has(:checked) { outline: 2px solid Highlight; }
   .tabs > [aria-selected="true"]::after, .tabs > [aria-current="page"]::after { background: Highlight; }

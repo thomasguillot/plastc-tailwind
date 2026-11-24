@@ -355,6 +355,55 @@
     r.addEventListener('input', upd); upd();
   });
 
+  /* ---------- file upload (simulated progress) */
+  const fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>';
+  const xIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>';
+  const fmtSize = b => b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1e3))} KB`;
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function simulate(li) {
+    const bar = $('.progress', li), pct = $('[data-file-pct]', li);
+    let v = Number(bar.getAttribute('aria-valuenow')) || 0;
+    const tick = setInterval(() => {
+      if (!li.isConnected) return clearInterval(tick);
+      v = Math.min(100, v + 6 + Math.random() * 10);
+      bar.setAttribute('aria-valuenow', Math.round(v)); $('span', bar).style.setProperty('--v', v + '%');
+      if (pct) pct.textContent = Math.round(v) + '%';
+      if (v >= 100) {
+        clearInterval(tick); bar.remove();
+        pct.outerHTML = '<span class="badge lamp-ok">Uploaded</span>';
+        const btn = $('[data-file-remove]', li); btn.setAttribute('aria-label', btn.getAttribute('aria-label').replace('Cancel', 'Remove')); btn.innerHTML = trashIcon;
+        live(`${$('.file-name', li).textContent} uploaded`);
+      }
+    }, 280);
+  }
+  function addFiles(list, files) {
+    [...files].forEach(f => {
+      const li = document.createElement('li'); li.className = 'file-item';
+      const name = esc(f.name), big = f.size > 10e6;
+      li.innerHTML = `<span class="file-icon">${fileIcon}</span><div class="min-w-0"><p class="file-name">${name}</p>`
+        + (big ? `<p class="file-meta file-error">${fmtSize(f.size)} · Over the 10 MB limit</p></div>`
+               : `<p class="file-meta">${fmtSize(f.size)} · <span data-file-pct>0%</span></p></div>`)
+        + `<button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="${big ? 'Remove' : 'Cancel'} ${name}" data-file-remove>${big ? trashIcon : xIcon}</button>`
+        + (big ? '' : `<div class="progress" role="progressbar" aria-label="Uploading ${name}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span style="--v:0%"></span></div>`);
+      list.prepend(li);
+      if (!big) simulate(li);
+    });
+  }
+  $$('[data-dropzone]').forEach(z => {
+    const input = $('input[type=file]', z), list = $('[data-file-list]', z.parentElement);
+    const take = files => { if (list) addFiles(list, files); else live(`${files.length} file${files.length === 1 ? '' : 's'} chosen`); };
+    input.addEventListener('change', () => { take(input.files); input.value = ''; });
+    z.addEventListener('dragover', e => { e.preventDefault(); z.setAttribute('data-dragover', ''); });
+    z.addEventListener('dragleave', () => z.removeAttribute('data-dragover'));
+    z.addEventListener('drop', e => { e.preventDefault(); z.removeAttribute('data-dragover'); take(e.dataTransfer.files); });
+  });
+  document.addEventListener('click', e => {
+    const rm = e.target.closest('[data-file-remove]'); if (!rm) return;
+    const li = rm.closest('.file-item'), name = $('.file-name', li).textContent;
+    li.remove(); live(`${name} removed`);
+  });
+
   /* ---------- listbox: combobox and command menu share one controller */
   function listboxFor(input) { return document.getElementById(input.getAttribute('aria-controls')); }
   const visibleOptions = lb => $$('[role=option]', lb).filter(o => !o.hidden && !o.closest('[hidden]'));
