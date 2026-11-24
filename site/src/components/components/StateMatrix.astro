@@ -84,7 +84,12 @@ const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${
     min-width: 116px; padding: 12px 12px 12px 0;
     font-weight: 700; background: var(--k-housing);
   }
-  .mx-frame[data-more-start] .mx-part, .mx-frame[data-more-start] thead th:first-child { box-shadow: 1px 0 0 var(--k-seam), 6px 0 8px -6px rgb(var(--k-sh) / calc(0.4 * var(--k-sh-a))); }
+  .mx-part::after, .mx-table thead th:first-child::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: 32px; pointer-events: none;
+    background: linear-gradient(to right, var(--k-housing), transparent);
+    opacity: 0;
+  }
+  .mx-frame[data-more-start] .mx-part::after, .mx-frame[data-more-start] thead th:first-child::after { opacity: 1; }
   .mx-cell { position: relative; padding: 14px 6px; }
   .mx-label { display: none; }
   .mx-spec { display: flex; align-items: center; min-height: 40px; }
@@ -99,7 +104,8 @@ const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${
     .mx-table, .mx-table tbody, .mx-table tr, .mx-table th, .mx-table td { display: block; }
     .mx-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .mx-table tbody tr { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 16px 12px; padding: 16px 6px 20px; }
-    .mx-part { grid-column: 1 / -1; position: static; min-width: 0; padding: 0; box-shadow: none !important; }
+    .mx-part { grid-column: 1 / -1; position: static; min-width: 0; padding: 0; }
+    .mx-part::after { display: none; }
     .mx-cell { padding: 0; min-width: 0; }
     .mx-table .mx-na { display: none; }
     .mx-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--k-ink-2); }
