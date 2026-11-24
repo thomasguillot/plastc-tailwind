@@ -1,5 +1,5 @@
-[data-force="hover"] .btn:not(:disabled):not([aria-disabled="true"]) { box-shadow: var(--k-raised-hover); }
-[data-force="hover"] .btn-signal:not(:disabled) {
+[data-force="hover"] .btn:where(:not(:disabled, [aria-disabled="true"], [aria-pressed="true"])) { box-shadow: var(--k-raised-hover); }
+[data-force="hover"] .btn-signal:not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]) {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.34),
     inset 0 -1px 0 rgb(0 0 0 / 0.12),
@@ -8,7 +8,7 @@
     calc(2px * var(--d)) calc(8px * var(--d)) calc(18px * var(--d)) calc(-4px * var(--d)) rgb(var(--k-sh) / calc(0.28 * var(--k-sh-a))),
     calc(-3px * var(--d)) calc(-3px * var(--d)) calc(8px * var(--d)) rgb(var(--k-hl) / calc(0.6 * var(--k-hl-a)));
 }
-[data-force="hover"] .btn-quiet:not(:disabled) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
+[data-force="hover"] .btn-quiet:not(:disabled, [aria-disabled="true"], [aria-pressed="true"]) { color: var(--k-ink); background: var(--k-housing-up); border-color: var(--k-seam); box-shadow: var(--k-seam-line); }
 [data-force="hover"] .key:not([aria-pressed="true"]) { box-shadow: var(--k-raised-hover); }
 [data-force="hover"] .choice-card:not(:has(:checked)) { background: var(--k-housing-up); }
 [data-force="hover"] .seg > *, [data-force="hover"] .tabs > *, [data-force="hover"] .nav-item { color: var(--k-ink); }
