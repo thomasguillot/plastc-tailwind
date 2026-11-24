@@ -130,11 +130,15 @@ One curve: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (plus `--ease-drawer` fo
 | Banner dismiss | 220ms | Collapses its height and fades, so the page closes the gap instead of jumping. Reduced motion: a 120ms fade. |
 | Pricing toggle | 180ms | Changed figures fade in from a 2px blur and a 4px drop. Reduced motion: fade only. |
 
-Nothing animates on scroll. Reduced motion keeps fades and colour changes and drops translate/scale; the sheet fades instead of sliding; the busy spinner slows to 1.6s instead of stopping.
+Nothing in the library or the app screens animates on scroll. Reduced motion keeps fades and colour changes and drops translate/scale; the sheet fades instead of sliding; the busy spinner slows to 1.6s instead of stopping.
+
+One sanctioned exception, on the marketing showcase only: scroll-linked motion that explains the kit. The homepage wall drifts each row of screens sideways as the page scrolls (linear, tied to the first 100vh of scroll, `translate` only, through `animation-timeline: scroll()` with a rAF fallback that runs only while the wall is on screen). The anatomy section steps through its six layers as its track scrolls past; a click pins a layer (the row latches and shows a Pinned badge; an Auto key returns to stepping) and pauses the stepping until the track leaves the viewport, hover and focus preview a layer without overriding the pin, and in-page jumps skip the layers they pass. Theme and depth changes suspend all transitions for two frames (`data-retheme`, set by the demo script) so nothing fades behind the switch. The wall's loading placeholders shimmer only while on screen and stop once their screen has loaded. Reduced motion: the wall stays still, and the stepping still runs because it changes state rather than moving anything (its layer changes keep their 180ms fades). Library components and app screens never use either.
 
 ## Showcase
 
 `site/src/pages/index.astro` builds the showcase (`index.html`). The hero's primary action downloads `plastc.css`, which the build copies from `src/plastc.css`, with the version from `package.json` and the file size beside it; Install links the same download and the file on GitHub, and the header and footer link the repository. The Components section opens with a jump list of every group, and each group has a stable id that the Cmd/Ctrl+K menu also lists (searchable by class name). Under each group, View HTML (a native `<details>`) shows clean markup that the build derives from the live demo's rendered HTML (`site/src/lib/clean-html.ts`): demo-only `data-*` hooks and notes are stripped, the `data-*` attributes the library styles are kept, dialog triggers become `commandfor`/`command`, and a script-built calendar is written out as a static month. Copy HTML copies exactly that text, keeps its icon (a check once copied) and holds its width. Where a part needs your own script, one line above the code says what and links `plastc.js`.
+
+The homepage's tuning deck sets the depth (Soft, Normal, Deep) and an LCD tint (green, amber, blue) for the whole page; the theme stays on the header switch. The tint is a showcase control, not a library token: green is the shipped `--k-lcd` set, and the contrast readout recomputes its LCD text figures (WCAG 2 and APCA 0.0.98G) for whichever tint is showing.
 
 ## Screens
 

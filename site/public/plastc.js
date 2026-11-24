@@ -8,13 +8,22 @@
   const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 
   /* ---------- theme + depth */
+  // Hold every transition for two frames so a retheme repaints in one step instead of fading part by part.
+  let rethemeFrame;
+  const quietRetheme = () => {
+    root.setAttribute('data-retheme', '');
+    cancelAnimationFrame(rethemeFrame);
+    rethemeFrame = requestAnimationFrame(() => { rethemeFrame = requestAnimationFrame(() => root.removeAttribute('data-retheme')); });
+  };
   function setTheme(h) {
+    quietRetheme();
     root.dataset.theme = h; save('plastc-theme', h);
     $$('[data-set-theme]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setTheme === h)));
     $$('[data-theme-readout]').forEach(el => el.textContent = h === 'dark' ? 'Dark' : 'Light');
     $$('[data-theme-next]').forEach(el => el.textContent = h === 'dark' ? 'Switch to light' : 'Switch to dark');
   }
   function setDepth(d) {
+    quietRetheme();
     root.style.setProperty('--k-depth', d);
     $$('[data-set-depth]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setDepth === String(d))));
     $$('[data-depth-readout]').forEach(el => el.textContent = (+d).toFixed(1));
@@ -46,6 +55,7 @@
     toastEl.addEventListener('focusout', armToast);
   }
   function runUndo() { const fn = undoFn; hideToast(); if (fn) fn(); }
+  window.plastc = Object.assign(window.plastc || {}, { toast, quietRetheme });
 
   /* ---------- dialogs */
   function openDialog(id, instant) {
@@ -73,14 +83,26 @@
   }
   function showScreen(k) {
     const [name, h] = k.split('#'), hash = h ? `#${h}` : '';
-    const url = `${screensBase}${name}.html${hash}`;
-    if (frame.getAttribute('src') !== url) frame.src = url;
+    const url = `${screensBase}${name}.html${hash}`, was = frame.getAttribute('src');
+    if (was !== url) {
+      // A hash-only change fires no load event, so only a new document hides the frame.
+      if (!was || was.split('#')[0] !== url.split('#')[0]) frame.setAttribute('data-loading', '');
+      frame.src = url;
+    }
     syncViewer(name, hash);
   }
   if (viewer) {
     frame.addEventListener('load', () => {
-      try { const m = frame.contentWindow.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1], frame.contentWindow.location.hash); } catch (e) {}
+      frame.removeAttribute('data-loading');
+      try {
+        const w = frame.contentWindow;
+        w.addEventListener('pagehide', () => frame.setAttribute('data-loading', ''));
+        const m = w.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1], w.location.hash);
+      } catch (e) {}
     });
+    // Start loading the page before the click lands, so the dialog opens onto a ready frame.
+    const warm = e => { if (!viewer.open) showScreen(e.currentTarget.dataset.openScreen); };
+    $$('[data-open-screen]').forEach(el => { el.addEventListener('pointerenter', warm); el.addEventListener('focusin', warm); });
     const sel = $('[data-screen-select]', viewer); if (sel) sel.addEventListener('change', () => showScreen(sel.value));
     viewer.addEventListener('close', () => {
       try { const h = localStorage.getItem('plastc-theme'); if (h === 'light' || h === 'dark') setTheme(h); } catch (e) {}
