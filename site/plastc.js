@@ -12,6 +12,7 @@
     root.dataset.housing = h; save('plastc-housing', h);
     $$('[data-set-housing]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setHousing === h)));
     $$('[data-housing-readout]').forEach(el => el.textContent = h === 'dark' ? 'Dark' : 'Light');
+    $$('[data-housing-next]').forEach(el => el.textContent = h === 'dark' ? 'Switch to light' : 'Switch to dark');
   }
   function setDepth(d) {
     root.style.setProperty('--k-depth', d);
@@ -102,6 +103,13 @@
   /* ---------- clicks */
   document.addEventListener('click', e => {
     const t = e.target;
+    const co = t.closest('#command [role=option]'); if (co) co.closest('dialog').close();
+    if (t.closest('[data-command="housing"]')) return setHousing(root.dataset.housing === 'dark' ? 'light' : 'dark');
+    if (t.closest('[data-open-command]')) return openCommand(false);
+    const ct = t.closest('[data-combobox-toggle]');
+    if (ct) { const inp = $('input[role=combobox]', ct.closest('.combobox')); if (listboxFor(inp).hidden) { openList(inp); filterList(inp, true); } else closeList(inp); inp.focus(); return; }
+    const opt = t.closest('.combobox [role=option]');
+    if (opt) { choose($('input[role=combobox]', opt.closest('.combobox')), opt); return; }
     const h = t.closest('[data-set-housing]'); if (h) return setHousing(h.dataset.setHousing);
     const d = t.closest('[data-set-depth]'); if (d) return setDepth(d.dataset.setDepth);
     if (t.closest('[data-reset]')) { setDepth('1'); setHousing('light'); return; }
@@ -347,9 +355,139 @@
     r.addEventListener('input', upd); upd();
   });
 
+  /* ---------- listbox: combobox and command menu share one controller */
+  function listboxFor(input) { return document.getElementById(input.getAttribute('aria-controls')); }
+  const visibleOptions = lb => $$('[role=option]', lb).filter(o => !o.hidden && !o.closest('[hidden]'));
+  function setActive(input, opt) {
+    $$('[role=option][data-active]', listboxFor(input)).forEach(o => o.removeAttribute('data-active'));
+    if (opt) { opt.setAttribute('data-active', ''); input.setAttribute('aria-activedescendant', opt.id); opt.scrollIntoView({ block: 'nearest' }); }
+    else input.removeAttribute('aria-activedescendant');
+  }
+  function filterList(input, showAll) {
+    const lb = listboxFor(input), q = showAll ? '' : input.value.trim().toLowerCase();
+    $$('[role=option]', lb).forEach(o => { o.hidden = !!q && !o.textContent.toLowerCase().includes(q); });
+    $$('[role=group]', lb).forEach(g => { g.hidden = !$$('[role=option]', g).some(o => !o.hidden); });
+    const vis = visibleOptions(lb), empty = $('.listbox-empty', lb);
+    if (empty) empty.hidden = vis.length > 0;
+    setActive(input, vis.find(o => o.getAttribute('aria-selected') === 'true') || vis[0]);
+  }
+  function openList(input) { const lb = listboxFor(input); if (lb.hidden) { lb.hidden = false; input.setAttribute('aria-expanded', 'true'); } }
+  function closeList(input) {
+    if (input.closest('.combobox')) { listboxFor(input).hidden = true; input.setAttribute('aria-expanded', 'false'); }
+    setActive(input, null);
+  }
+  function choose(input, opt) {
+    if (!input.closest('.combobox')) return opt.click();
+    $$('[role=option]', listboxFor(input)).forEach(o => o.setAttribute('aria-selected', String(o === opt)));
+    input.value = opt.dataset.value || opt.textContent.trim();
+    closeList(input);
+  }
+  document.addEventListener('input', e => {
+    const inp = e.target.closest('input[role=combobox]'); if (!inp) return;
+    openList(inp); filterList(inp);
+  });
+  document.addEventListener('keydown', e => {
+    const inp = e.target.closest && e.target.closest('input[role=combobox]'); if (!inp) return;
+    const lb = listboxFor(inp), vis = visibleOptions(lb), cur = vis.findIndex(o => o.hasAttribute('data-active'));
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (lb.hidden) { openList(inp); filterList(inp, true); return; }
+      const n = cur < 0 ? 0 : e.key === 'ArrowDown' ? Math.min(cur + 1, vis.length - 1) : Math.max(cur - 1, 0);
+      setActive(inp, vis[n]);
+    } else if (e.key === 'Enter' && !lb.hidden && cur >= 0) {
+      e.preventDefault(); choose(inp, vis[cur]);
+    } else if (e.key === 'Escape' && inp.closest('.combobox') && !lb.hidden) {
+      e.preventDefault(); closeList(inp);
+    }
+  });
+  document.addEventListener('pointerdown', e => {
+    $$('.combobox').forEach(c => { if (!c.contains(e.target)) { const i = $('input[role=combobox]', c); if (i && !listboxFor(i).hidden) closeList(i); } });
+  });
+
+  /* ---------- command menu (Cmd/Ctrl+K) */
+  const command = document.getElementById('command');
+  function openCommand(instant) {
+    if (!command) return;
+    if (command.open) return command.close();
+    if (document.querySelector('dialog[open]')) return;
+    const inp = $('input[role=combobox]', command);
+    inp.value = ''; filterList(inp);
+    command.classList.toggle('no-motion', !!instant);
+    command.showModal(); inp.focus();
+  }
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k' && command) { e.preventDefault(); openCommand(true); }
+  });
+  if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $$('[data-kbd-mod]').forEach(k => { k.textContent = '⌘K'; });
+
+  /* ---------- calendar (date picker) */
+  const fmtTitle = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
+  const fmtLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const fmtField = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const chev = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const parseIso = v => { const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
+  function renderCalendar(cal, focusIso) {
+    const sel = cal.dataset.value ? parseIso(cal.dataset.value) : null;
+    const view = parseIso(cal.dataset.view || cal.dataset.value || iso(new Date()));
+    const y = view.getFullYear(), m = view.getMonth(), today = iso(new Date());
+    const start = new Date(y, m, 1 - new Date(y, m, 1).getDay());
+    const anchor = focusIso || (sel && sel.getMonth() === m && sel.getFullYear() === y ? iso(sel) : (today.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`) ? today : iso(new Date(y, m, 1))));
+    let rows = '';
+    for (let w = 0; w < 6; w++) {
+      rows += '<tr>';
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7 + d), k = iso(day);
+        rows += `<td><button type="button" data-day="${k}" tabindex="${k === anchor ? 0 : -1}" aria-label="${fmtLabel.format(day)}"`
+          + `${day.getMonth() !== m ? ' data-outside' : ''}${k === today ? ' aria-current="date"' : ''} aria-pressed="${sel && k === iso(sel)}">${day.getDate()}</button></td>`;
+      }
+      rows += '</tr>';
+    }
+    const heads = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'], full = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    cal.innerHTML = `<div class="calendar-head"><button type="button" class="btn btn-quiet btn-sm btn-icon" data-cal-step="-1" aria-label="Previous month">${chev('m15 6-6 6 6 6')}</button>`
+      + `<p class="calendar-title" aria-live="polite">${fmtTitle.format(view)}</p>`
+      + `<button type="button" class="btn btn-quiet btn-sm btn-icon" data-cal-step="1" aria-label="Next month">${chev('m9 6 6 6-6 6')}</button></div>`
+      + `<table role="grid" aria-label="${fmtTitle.format(view)}"><thead><tr>${heads.map((h, n) => `<th scope="col"><abbr title="${full[n]}">${h}</abbr></th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+    if (focusIso) { const b = $(`[data-day="${focusIso}"]`, cal); if (b) b.focus(); }
+  }
+  function moveCalendar(cal, toIso) {
+    const d = parseIso(toIso);
+    cal.dataset.view = iso(new Date(d.getFullYear(), d.getMonth(), 1));
+    renderCalendar(cal, toIso);
+  }
+  $$('[data-calendar]').forEach(cal => {
+    renderCalendar(cal);
+    const input = cal.dataset.for && document.getElementById(cal.dataset.for);
+    if (input) input.addEventListener('change', () => {
+      const d = new Date(input.value); if (isNaN(d)) return;
+      cal.dataset.value = iso(d); cal.dataset.view = iso(new Date(d.getFullYear(), d.getMonth(), 1)); renderCalendar(cal);
+    });
+    cal.addEventListener('click', e => {
+      const step = e.target.closest('[data-cal-step]');
+      if (step) { const v = parseIso(cal.dataset.view || cal.dataset.value || iso(new Date())); cal.dataset.view = iso(new Date(v.getFullYear(), v.getMonth() + Number(step.dataset.calStep), 1)); renderCalendar(cal); return; }
+      const day = e.target.closest('[data-day]'); if (!day) return;
+      cal.dataset.value = day.dataset.day; moveCalendar(cal, day.dataset.day);
+      if (input) { input.value = fmtField.format(parseIso(day.dataset.day)); input.dispatchEvent(new Event('input', { bubbles: true })); }
+      const pop = cal.closest('[popover]');
+      if (pop) { pop.hidePopover(); if (input) input.focus(); }
+    });
+    cal.addEventListener('keydown', e => {
+      const day = e.target.closest('[data-day]'); if (!day) return;
+      const d = parseIso(day.dataset.day);
+      const delta = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+      let next = null;
+      if (delta) next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + delta);
+      else if (e.key === 'Home') next = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
+      else if (e.key === 'End') next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 6 - d.getDay());
+      else if (e.key === 'PageUp' || e.key === 'PageDown') next = new Date(d.getFullYear(), d.getMonth() + (e.key === 'PageUp' ? -1 : 1), d.getDate());
+      if (!next) return;
+      e.preventDefault(); moveCalendar(cal, iso(next));
+    });
+  });
+
   /* ---------- popover anchoring fallback (browsers without CSS anchor positioning) */
   if (!CSS.supports('position-area: bottom')) {
-    $$('.menu[popover]').forEach(m => m.addEventListener('toggle', e => {
+    $$('.menu[popover], .popover[popover]').forEach(m => m.addEventListener('toggle', e => {
       if (e.newState !== 'open') return;
       const t = document.querySelector(`[popovertarget="${m.id}"]`); if (!t) return;
       const r = t.getBoundingClientRect(), w = m.offsetWidth;

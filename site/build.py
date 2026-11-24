@@ -36,6 +36,8 @@ I = {
     "key": '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l2 2M14.5 8.5l2 2"/>',
     "grid": '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
     "x": '<path d="M6 6l12 12M18 6 6 18"/>',
+    "chevron": '<path d="m6 9 6 6 6-6"/>',
+    "hash": '<path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/>',
     "external": '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
 }
 def i(name, cls="", sw="1.8"):
@@ -208,6 +210,24 @@ def nav_block(active):
       </div>
     </div>'''
 
+def command_dialog(groups, placeholder="Search or jump to…"):
+    body, n = "", 0
+    for gi, (label, items) in enumerate(groups):
+        opts = ""
+        for icon, text, attrs, kbd in items:
+            n += 1
+            tag = "a" if "href=" in attrs else "div"
+            key = f'<span class="kbd">{kbd}</span>' if kbd else ""
+            opts += f'<{tag} role="option" id="cmd-o{n}" tabindex="-1" {attrs}>{i(icon)}<span>{text}</span>{key}</{tag}>'
+        body += f'<div role="group" aria-labelledby="cmd-l{gi}"><p class="listbox-label" id="cmd-l{gi}">{label}</p>{opts}</div>'
+    return f'''<dialog class="dialog command" id="command" aria-label="Command menu">
+  <label class="input-group">{i("search")}<span class="sr-only">Search commands</span><input role="combobox" aria-expanded="true" aria-controls="command-list" aria-autocomplete="list" autocomplete="off" placeholder="{placeholder}"><span class="kbd" aria-hidden="true">esc</span></label>
+  <div class="listbox" role="listbox" id="command-list" aria-label="Commands">{body}<p class="listbox-empty" hidden>No results. Try a page name or an action.</p></div>
+  <div class="command-hints" aria-hidden="true"><span><span class="kbd">↑</span><span class="kbd">↓</span>to move</span><span><span class="kbd">↵</span>to open</span><span><span class="kbd">esc</span>to close</span></div>
+</dialog>'''
+
+HOUSING_CMD = ("moon", '<span data-housing-next>Switch to dark</span>', 'data-command="housing"', "")
+
 def search():
     return f'''<label class="input-group">{i("search")}<span class="sr-only">Search</span><input placeholder="Search" data-search><span class="kbd" aria-hidden="true">/</span></label>'''
 
@@ -240,6 +260,10 @@ def shell(active, title, sub, actions, content):
   </main>
 </div>
 {NEW_INVOICE}
+{command_dialog([
+    ("Go to", [(ic, label, f'href="{k}.html"', "") for k, label, ic in NAV] + [("cog", "Settings", 'href="settings.html"', "")]),
+    ("Actions", [("plus", "New invoice", 'data-open-dialog="new-invoice"', "N"), HOUSING_CMD, ("logout", "Sign out", 'href="sign-in.html"', ""), ("left", "Back to Plastc", 'href="../index.html" target="_top"', "")]),
+])}
 '''
 
 NEW_BTN = f'<span class="tooltip" data-tip="Shortcut: N"><button class="btn btn-signal" data-open-dialog="new-invoice" aria-keyshortcuts="N">{i("plus","", "2.2")}New invoice</button></span>'
@@ -417,6 +441,9 @@ def group(title, classes, body, wide=False):
   <div id="{gid}">{body}</div>
 </section>'''
 
+CB_SEEN = {}
+for row_ in CUSTOMERS: CB_SEEN.setdefault(row_[1], row_[2])
+CB_OPTS = "".join(f'<div role="option" id="cb1-o{n}" aria-selected="false" data-value="{name}"><span class="avatar !w-6 !h-6 !text-[10px]">{ini}</span>{name}</div>' for n, (name, ini) in enumerate(CB_SEEN.items()))
 screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("settings", "Settings"), ("sign-in", "Sign in")]
 viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in screens)
 VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference screens">
@@ -509,6 +536,16 @@ showcase = f'''<body>
         <div><label class="label" for="ig3">Late fee</label><div class="input-group"><input id="ig3" inputmode="decimal" value="4"><span class="input-affix">% a month</span></div></div>
         <div><label class="label" for="ig4">API key</label><div class="input-group"><input id="ig4" class="!font-mono !text-[14px]" value="plc_live_4f2a…9c1e" readonly><button type="button" class="btn btn-sm" data-copy="plc_live_4f2a9c1e">{i("copy")}Copy</button></div></div>
       </div>""")}
+    {group("Combobox &amp; date picker", ".combobox  .calendar  .popover", f"""
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="label" id="cb1-l" for="cb1">Customer</label>
+          <div class="combobox"><div class="input-group"><input id="cb1" role="combobox" aria-expanded="false" aria-controls="cb1-list" aria-autocomplete="list" autocomplete="off" placeholder="Search customers"><button type="button" class="btn btn-quiet btn-sm btn-icon" tabindex="-1" aria-label="Show customers" data-combobox-toggle>{i("chevron")}</button></div>
+          <div class="listbox" role="listbox" id="cb1-list" aria-labelledby="cb1-l" hidden>{CB_OPTS}<p class="listbox-empty" hidden>No customers match.</p></div></div></div>
+        <div><label class="label" for="dp1">Due date</label>
+          <div class="input-group" style="anchor-name:--dp1"><input id="dp1" value="Nov 28, 2026"><button type="button" class="btn btn-quiet btn-sm btn-icon" popovertarget="dp1-cal" aria-label="Choose due date">{i("cal")}</button></div>
+          <div class="popover" popover id="dp1-cal" style="position-anchor:--dp1"><div class="calendar" data-calendar data-for="dp1" data-value="2026-11-28"></div></div></div>
+      </div>
+      <div class="mt-6 w-fit max-w-full overflow-x-auto rounded-[20px] seam p-4"><div class="calendar" data-calendar data-value="2026-11-24"></div></div>""")}
     {group("Selection", ".check  .radio  .switch  .choice-card  .seg  .range", """
       <div class="flex flex-wrap gap-x-8 gap-y-4">
         <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" class="check" checked>Send copy</label>
@@ -550,6 +587,10 @@ showcase = f'''<body>
         <p class="pager-status" aria-live="polite">Page 1 of 8</p>
         <button type="button" class="btn btn-sm" data-page-step="1">Next{i("right")}</button>
       </nav>""")}
+    {group("Breadcrumbs &amp; command menu", ".breadcrumbs  .command  .listbox", f"""
+      <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="#components">{i("home")}Dashboard</a></li><li><a href="#components">Invoices</a></li><li><a href="#components">Halden Studio</a></li><li><span aria-current="page">INV-0193</span></li></ol></nav>
+      <p class="text-sm text-ink-2 mt-6 max-w-[52ch]" data-demo-note>The command menu is a <code class="font-mono">.dialog</code> holding a search field and a <code class="font-mono">.listbox</code>. Open it from anywhere on this page, type to filter, and move with the arrow keys.</p>
+      <button type="button" class="btn mt-4" data-open-command>{i("search")}Search or jump to<span class="kbd ml-1" data-kbd-mod>Ctrl K</span></button>""")}
     {group("Navigation &amp; data", ".nav-item  .seg  .ktable  .kbd  .lcd", f"""
       <div class="grid sm:grid-cols-[180px_1fr] gap-6 items-start">
         <nav class="flex flex-col gap-1" aria-label="Example"><a class="nav-item" href="#components" aria-current="page">{i("home")}Dashboard</a><a class="nav-item" href="#components">{i("file")}Invoices</a><a class="nav-item" href="#components">{i("users")}Customers</a></nav>
@@ -610,6 +651,11 @@ showcase = f'''<body>
 </section>
 </main>
 {VIEWER}
+{command_dialog([
+    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', "")]),
+    ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("tokens", "Tokens"), ("install", "Install"))]),
+    ("Actions", [HOUSING_CMD, ("copy", "Copy the import line", f"data-copy='{IMPORT}'", "")]),
+])}
 
 <footer class="max-w-[1240px] mx-auto px-4 md:px-8 py-10 border-t border-[color:var(--k-seam)] flex flex-wrap gap-4 justify-between items-center text-sm text-ink-2">
   <span>Plastc, a neumorphic UI library for Tailwind CSS v4.</span><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>

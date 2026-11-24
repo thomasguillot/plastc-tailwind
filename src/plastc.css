@@ -666,6 +666,19 @@
   @media (width >= 40rem) { .pager:has(> .pager-pages) > & { display: none; } }
 }
 
+@utility breadcrumbs {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
+  margin: 0; padding: 0; list-style: none;
+  font-size: 14px; font-weight: 600; color: var(--k-ink-2);
+  & > li { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+  & > li + li::before { content: "/"; font-weight: 400; color: var(--k-ink-3); }
+  & a { display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; border-radius: 4px; }
+  & a:focus-visible { outline: 2px solid var(--k-focus); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) { & a:hover { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; } }
+  & [aria-current="page"] { color: var(--k-ink); font-weight: 700; }
+  & svg { width: 16px; height: 16px; flex: none; }
+}
+
 /* Range: recessed slot, signal fill, raised thumb. Set --fill to the value %. */
 @utility range {
   appearance: none; width: 100%; height: 10px; border-radius: 999px; cursor: pointer;
@@ -812,6 +825,106 @@
 }
 @starting-style { .menu[popover]:popover-open { opacity: 0; scale: 0.96; } }
 
+@utility popover {
+  padding: 16px; border: 0; border-radius: 16px;
+  color: var(--k-ink);
+  background: var(--k-housing-up);
+  box-shadow: var(--k-float);
+  &[popover] {
+    position: fixed; inset: auto; margin: 8px 0;
+    position-area: bottom span-right;
+    position-try-fallbacks: flip-block, flip-inline;
+    transform-origin: top left;
+    opacity: 1; scale: 1;
+    transition-property: opacity, scale, display, overlay;
+    transition-duration: var(--dur-overlay-out);
+    transition-timing-function: var(--ease-out);
+    transition-behavior: allow-discrete;
+  }
+  &[popover]:not(:popover-open) { opacity: 0; scale: 0.96; }
+  &[popover]:popover-open { transition-duration: var(--dur-overlay-in); }
+}
+@starting-style { .popover[popover]:popover-open { opacity: 0; scale: 0.96; } }
+
+@utility listbox {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px; max-height: 280px;
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  & [role="option"] {
+    display: flex; align-items: center; gap: 10px;
+    min-height: 36px; padding: 6px 10px; border-radius: 9px;
+    font-size: 14px; color: var(--k-ink); text-decoration: none; cursor: pointer;
+  }
+  & [role="option"] svg { width: 16px; height: 16px; flex: none; color: var(--k-ink-2); }
+  & [role="option"] .kbd { margin-left: auto; }
+  @media (hover: hover) and (pointer: fine) { & [role="option"]:hover { background: var(--k-housing); } }
+  & [role="option"][data-active] { background: var(--k-housing); box-shadow: inset 0 0 0 1px var(--k-seam); }
+  & [role="option"][aria-selected="true"] { font-weight: 700; }
+  & [role="option"][aria-selected="true"]::after {
+    content: ""; flex: none; width: 16px; height: 16px; margin-left: auto;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  & [role="option"][aria-disabled="true"] { color: var(--k-ink-off); cursor: not-allowed; }
+  & [role="group"] + [role="group"] { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--k-seam); }
+  & .listbox-label { padding: 8px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--k-ink-2); }
+  & .listbox-empty { padding: 18px 10px; text-align: center; font-size: 14px; color: var(--k-ink-2); }
+}
+
+@utility combobox {
+  position: relative;
+  & > .listbox {
+    position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; right: 0;
+    border-radius: 14px;
+    background: var(--k-housing-up);
+    box-shadow: var(--k-float);
+    transform-origin: top center;
+    transition: opacity var(--dur-overlay-in) var(--ease-out), scale var(--dur-overlay-in) var(--ease-out);
+  }
+}
+@starting-style { .combobox > .listbox { opacity: 0; scale: 0.97; } }
+
+@utility calendar {
+  display: grid; gap: 8px; width: max-content;
+  & .calendar-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  & .calendar-title { font-size: 15px; font-weight: 700; }
+  & table { border-collapse: collapse; }
+  & abbr { text-decoration: none; }
+  & th { width: 40px; height: 28px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-ink-2); }
+  & td { padding: 2px; text-align: center; }
+  & td button {
+    position: relative; width: 36px; height: 36px;
+    border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--k-ink);
+    transition: background-color 120ms ease, box-shadow 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { & td button:hover:not(:disabled):not([aria-pressed="true"]) { background: color-mix(in oklab, var(--k-ink) 7%, transparent); } }
+  & td button:focus-visible { outline: 2px solid var(--k-focus); outline-offset: 1px; }
+  & td button[data-outside] { color: var(--k-ink-3); }
+  & td button[aria-current="date"]::after {
+    content: ""; position: absolute; left: 50%; bottom: 5px;
+    width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor;
+  }
+  & td button[aria-pressed="true"] {
+    font-weight: 800; color: var(--k-ink);
+    background: var(--k-housing-down);
+    box-shadow: var(--k-recessed), inset 0 0 0 1px var(--k-edge);
+  }
+  & td button:disabled { color: var(--k-ink-off); cursor: not-allowed; }
+}
+
+@utility command {
+  &.dialog { width: min(560px, calc(100vw - 24px)); margin: 12vh auto auto; padding: 0; overflow: hidden; }
+  & > .input-group { margin: 12px 12px 6px; }
+  & > .listbox { max-height: min(50vh, 380px); padding: 4px 8px 8px; }
+  & > .command-hints {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px;
+    border-top: 1px solid var(--k-seam);
+    font-size: 12px; color: var(--k-ink-2);
+  }
+  & > .command-hints span { display: inline-flex; align-items: center; gap: 6px; }
+}
+
 /* Dialog: on a native <dialog>, opened with showModal(). Centered, so it scales from the middle. */
 @utility dialog {
   width: min(440px, calc(100vw - 32px));
@@ -932,7 +1045,7 @@
 /* Fewer, gentler: keep fades and colour, drop movement. Busy stays visible, slower. */
 @media (prefers-reduced-motion: reduce) {
   .btn, .key, .pressable { translate: none !important; scale: none !important; }
-  .menu[popover], .dialog, .toast[popover], .tooltip::after { scale: 1 !important; translate: none !important; }
+  .menu[popover], .popover[popover], .combobox > .listbox, .dialog, .toast[popover], .tooltip::after { scale: 1 !important; translate: none !important; }
   .tooltip::after { translate: -50% 0 !important; }
   .switch::before { transition-duration: 0ms; }
   .sheet { transition-property: opacity, display, overlay; }
@@ -948,10 +1061,11 @@
 /* ---------------------------------------------------------------- forced colours */
 /* Windows High Contrast drops every shadow, so parts get real edges. */
 @media (forced-colors: active) {
-  .btn, .key, .seg, .field, .input-group, .check, .radio, .switch, .range, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
+  .btn, .key, .seg, .field, .input-group, .popover, .combobox > .listbox, .check, .radio, .switch, .range, .panel, .choice-card, .menu, .dialog, .sheet, .toast, .tag, .lcd, .code, .meter, .alert { border: 1px solid CanvasText; }
   .btn-signal, .btn-go { border: 2px solid ButtonText; }
   .seg > [aria-pressed="true"], .seg > [aria-selected="true"], .seg > [aria-current="page"], .nav-item[aria-current="page"], .key[aria-pressed="true"], .choice-card:has(:checked) { outline: 2px solid Highlight; }
   .tabs > [aria-selected="true"]::after, .tabs > [aria-current="page"]::after { background: Highlight; }
+  .listbox [role="option"][data-active], .calendar td button[aria-pressed="true"] { outline: 2px solid Highlight; }
   .check:checked, .radio:checked, .switch:checked { background: Highlight; }
   .switch::before { border: 1px solid CanvasText; }
   .badge::before { forced-color-adjust: none; }
