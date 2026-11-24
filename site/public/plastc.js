@@ -65,14 +65,15 @@
   /* ---------- screen viewer (showcase) */
   const viewer = document.getElementById('screen-viewer');
   const frame = viewer && $('[data-screen-frame]', viewer);
+  const screensBase = (viewer && viewer.dataset.screensBase) || 'screens/';
   function syncViewer(k, hash = '') {
-    const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html${hash}`;
+    const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `${screensBase}${k}.html${hash}`;
     const sel = $('[data-screen-select]', viewer);
     if (sel) { sel.value = k; const o = sel.selectedOptions[0]; if (o) frame.title = o.textContent; }
   }
   function showScreen(k) {
     const [name, h] = k.split('#'), hash = h ? `#${h}` : '';
-    const url = `screens/${name}.html${hash}`;
+    const url = `${screensBase}${name}.html${hash}`;
     if (frame.getAttribute('src') !== url) frame.src = url;
     syncViewer(name, hash);
   }
