@@ -167,6 +167,22 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
     });
   const themed = $$('[data-theme]');
   let current: TintName = 'green';
+  const frames = $$<HTMLIFrameElement>('.tile-view iframe');
+  const frameCss = () => {
+    const depth = document.documentElement.style.getPropertyValue('--k-depth').trim();
+    const lcd = current === 'green' ? '' : (['light', 'dark'] as const).map((th) => `[data-theme="${th}"]{${LCD_VARS.map((v, i) => `${v}:${tints[current][th][i]}`).join(';')}}`).join('');
+    return (depth ? `:root{--k-depth:${depth}}` : '') + lcd;
+  };
+  const syncFrame = (f: HTMLIFrameElement) => {
+    try {
+      const d = f.contentDocument;
+      if (!d?.head) return;
+      let st = d.getElementById('plastc-sync');
+      if (!st) { st = d.createElement('style'); st.id = 'plastc-sync'; d.head.append(st); }
+      st.textContent = frameCss();
+    } catch {}
+  };
+  const syncFrames = () => frames.forEach(syncFrame);
   const tint = (name: TintName) => {
     current = name;
     PL.quietRetheme?.();
@@ -182,6 +198,7 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
       } else b.setAttribute('aria-pressed', String(on));
     });
     lcdFigures(name);
+    syncFrames();
   };
   $$('[data-tint-set]').forEach((b) => b.addEventListener('click', () => tint(b.dataset.tintSet as TintName)));
   $$('[data-radios]').forEach((group) =>
@@ -196,6 +213,8 @@ const keyClass = 'key text-[13px] !aspect-auto h-12 !rounded-2xl';
     }),
   );
   new MutationObserver(() => tint(current)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  frames.forEach((f) => f.addEventListener('load', () => syncFrame(f)));
+  new MutationObserver(syncFrames).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
 
   const labels = document.getElementById('labels-switch') as HTMLInputElement | null;
   const section = document.getElementById('themes');
