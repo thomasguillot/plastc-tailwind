@@ -330,6 +330,7 @@
   /* ---------- shortcuts: no animation, ever */
   document.addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('label[data-open-command]')) { e.preventDefault(); return openCommand(false); }
     const typing = e.target.closest('input, textarea, select, [contenteditable]');
     if (typing || document.querySelector('dialog[open]')) return;
     if ((e.key === 'z' || e.key === 'Z') && undoFn) { e.preventDefault(); return runUndo(); }
