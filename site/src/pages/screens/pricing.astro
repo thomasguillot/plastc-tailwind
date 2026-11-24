@@ -1,0 +1,37 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import PageHeader from '../../components/marketing/PageHeader.astro';
+import PlanCard from '../../components/marketing/PlanCard.astro';
+import BillingToggle from '../../components/marketing/BillingToggle.astro';
+import FaqAccordion from '../../components/marketing/FaqAccordion.astro';
+import CtaPanel from '../../components/marketing/CtaPanel.astro';
+import { PLANS, PRICING_COMPARE, PRICING_FAQS } from '../../data/marketing';
+
+const featured = PLANS.map((p) => (p.featured ? '' : undefined));
+---
+<Marketing title="Pricing · Plastc" active="pricing">
+<PageHeader title="Pay for the invoices you send" lede="Every plan has pay links, reminders and the dashboard. Start free, and move up when your team or your client list grows."><BillingToggle /></PageHeader>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pb-16 md:pb-24" aria-labelledby="plans-h">
+  <h2 id="plans-h" class="sr-only">Plans</h2>
+  <div class="grid gap-5 md:grid-cols-3 items-stretch">{PLANS.map((plan) => <PlanCard plan={plan} />)}</div>
+  <p class="mt-6 text-sm text-ink-2">Prices are in US dollars, per workspace. Sales tax is added at checkout where it applies.</p>
+</section>
+
+<section id="compare" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-20" aria-labelledby="compare-h">
+  <h2 id="compare-h" class="display text-[40px] md:text-[56px] text-balance">Compare plans</h2>
+  <p class="text-ink-2 text-lg mt-4 max-w-[48ch] text-pretty">Every feature, side by side. Studio is the plan most small teams pick.</p>
+  <div class="table-scroll mt-10"><table class="ktable compare">
+    <caption class="sr-only">Features included in the Solo, Studio and Practice plans</caption>
+    <thead><tr><th scope="col"><span class="sr-only">Feature</span></th>{PLANS.map((p) => <th scope="col" data-featured={p.featured ? '' : undefined}>{p.featured && <span class="badge lamp-ok">Recommended</span>}<span class="compare-plan">{p.name}</span><span class="compare-price"><span data-price data-monthly={`$${p.monthly}`} data-yearly={`$${p.yearly}`}>${p.monthly}</span> <span data-price-unit>/ month</span></span></th>)}</tr></thead>
+    {PRICING_COMPARE.map(({ group, rows }) => <tbody><tr class="compare-group"><th scope="rowgroup">{group}</th>{featured.map((f) => <td data-featured={f}></td>)}</tr>{rows.map(([label, ...values]) => <tr><th scope="row">{label}</th>{values.map((v, k) => <td data-featured={featured[k]}>{v === true ? <span class="compare-yes"><span class="sr-only">Included</span></span> : v === false ? <span class="compare-no"><span class="sr-only">Not included</span></span> : <span class="font-semibold">{v}</span>}</td>)}</tr>)}</tbody>)}
+  </table></div>
+</section>
+
+<section id="faq" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24 grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+  <div><h2 class="display text-[40px] md:text-[56px]">Questions</h2><p class="text-ink-2 text-lg mt-4 max-w-[36ch]">About billing, limits and changing plans. Something else? Write to the team from inside the app.</p></div>
+  <FaqAccordion faqs={PRICING_FAQS} />
+</section>
+
+<CtaPanel title="Start with five free invoices a month." text="No card needed. Move up when you outgrow it." secondary={{ label: 'See the dashboard', href: 'dashboard.html' }} />
+</Marketing>

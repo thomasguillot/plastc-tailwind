@@ -1,0 +1,8 @@
+---
+interface Props {
+  n: number | string;
+  unit: string;
+}
+const { n, unit } = Astro.props;
+---
+<div class="lcd readout"><span class="readout-value">{n}</span><span class="readout-unit">{unit}</span></div>

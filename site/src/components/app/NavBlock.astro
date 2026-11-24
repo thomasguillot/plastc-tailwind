@@ -1,0 +1,22 @@
+---
+import Icon from '../Icon.astro';
+import HousingSeg from '../HousingSeg.astro';
+import { NAV } from '../../data/app';
+
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+const cur = (k: string) => (k === active ? 'page' : undefined);
+---
+<nav class="flex flex-col gap-1" aria-label="Main">{NAV.map(({ key, label, icon }) => <a class="nav-item" href={`${key}.html`} aria-current={cur(key)}><Icon name={icon} />{label}{key === 'invoices' && <span class="ml-auto text-[12px] font-semibold text-danger"><span data-nav-count="overdue">2</span> overdue</span>}</a>)}</nav>
+    <div class="mt-auto flex flex-col gap-1 pt-6">
+      <a class="nav-item" href="settings.html" aria-current={cur('settings')}><Icon name="cog" />Settings</a>
+      <a class="nav-item" href="../index.html#install" target="_top"><Icon name="help" />Docs</a>
+      <div class="flex items-center justify-between gap-3 px-3 py-3 mt-2"><span class="text-sm font-semibold text-ink-2">Appearance</span><HousingSeg /></div>
+      <div class="flex items-center gap-3 px-2 pt-4 border-t border-[color:var(--k-seam)]">
+        <span class="avatar">MO</span>
+        <div class="min-w-0 text-sm leading-tight"><p class="font-bold truncate">Mira Okafor</p><p class="text-ink-2 truncate">mira@halden.studio</p></div>
+        <a href="sign-in.html" class="btn btn-quiet btn-sm btn-icon ml-auto" aria-label="Sign out"><Icon name="logout" /></a>
+      </div>
+    </div>

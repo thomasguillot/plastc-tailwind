@@ -1,0 +1,14 @@
+---
+import type { Plan } from '../../data/marketing';
+
+interface Props {
+  plan: Plan;
+}
+const { name, monthly, yearly, blurb, features, featured, cta } = Astro.props.plan;
+---
+<article class="plan" data-featured={featured ? '' : undefined}>
+  <div><div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold">{name}</h3>{featured && <span class="badge lamp-ok">Recommended</span>}</div><p class="text-sm text-ink-2 mt-1">{blurb}</p></div>
+  <p class="plan-price"><span data-price data-monthly={`$${monthly}`} data-yearly={`$${yearly}`}>${monthly}</span><small data-price-unit>/ month</small></p>
+  <ul class="check-list">{features.map((f) => <li>{f}</li>)}</ul>
+  <a class={featured ? 'btn btn-signal w-full' : 'btn w-full'} href="sign-in.html">{cta}</a>
+</article>

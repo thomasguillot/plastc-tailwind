@@ -1,0 +1,9 @@
+---
+import { categoryLabel, displayDate, isoDate, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { category, date, readTime } = Astro.props.post.data;
+---
+<p class="post-meta"><span>{categoryLabel(category)}</span><time datetime={isoDate(date)}>{displayDate(date)}</time><span>{readTime} min read</span></p>

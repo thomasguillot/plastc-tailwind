@@ -1,0 +1,19 @@
+---
+import Icon from '../../Icon.astro';
+import { CUSTOMERS } from '../../../data/app';
+
+const seen = new Map<string, string>();
+for (const c of CUSTOMERS) if (!seen.has(c.name)) seen.set(c.name, c.initials);
+const options = [...seen];
+---
+<div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_auto] items-start">
+  <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-1">
+    <div><label class="label" id="cb1-l" for="cb1">Customer</label>
+      <div class="combobox"><div class="input-group"><input id="cb1" role="combobox" aria-expanded="false" aria-controls="cb1-list" aria-autocomplete="list" autocomplete="off" placeholder="Search customers"><button type="button" class="btn btn-quiet btn-sm btn-icon" tabindex="-1" aria-label="Show customers" data-combobox-toggle><Icon name="chevron" /></button></div>
+      <div class="listbox" role="listbox" id="cb1-list" aria-labelledby="cb1-l" hidden>{options.map(([name, initials], n) => <div role="option" id={`cb1-o${n}`} aria-selected="false" data-value={name}><span class="avatar !w-7 !h-7 !text-[11px]">{initials}</span>{name}</div>)}<p class="listbox-empty" hidden>No customers match.</p></div></div></div>
+    <div><label class="label" for="dp1">Due date</label>
+      <div class="input-group" style="anchor-name:--dp1"><input id="dp1" value="Nov 28, 2026"><button type="button" class="btn btn-quiet btn-sm btn-icon" popovertarget="dp1-cal" aria-label="Choose due date"><Icon name="cal" /></button></div>
+      <div class="popover" popover id="dp1-cal" style="position-anchor:--dp1;position-area:bottom span-left;transform-origin:top right"><div class="calendar" data-calendar data-for="dp1" data-value="2026-11-28"></div></div></div>
+  </div>
+  <div class="min-w-0"><p class="text-[13px] font-bold mb-2" id="cal-solo-l">Calendar, on its own</p><div class="w-fit max-w-full overflow-x-auto rounded-[20px] seam p-4" role="group" aria-labelledby="cal-solo-l"><div class="calendar" data-calendar data-value="2026-11-24"></div></div></div>
+</div>

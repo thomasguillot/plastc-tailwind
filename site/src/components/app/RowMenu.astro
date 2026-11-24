@@ -1,0 +1,17 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const mid = `m-${id.toLowerCase()}`;
+---
+<button class="btn btn-quiet btn-sm btn-icon" popovertarget={mid} style={`anchor-name:--${mid}`} aria-label={`Actions for ${id}`}><Icon name="dots" /></button>
+<div class="menu" popover id={mid} style={`position-anchor:--${mid}`} aria-label={`${id} actions`}>
+  <a href="#"><Icon name="file" />View invoice</a>
+  <button type="button" data-toast={`Reminder sent for ${id}`}><Icon name="send" />Send reminder</button>
+  <button type="button" data-toast={`${id} duplicated as a draft`}><Icon name="copy" />Duplicate</button>
+  <hr>
+  <button type="button" class="!text-danger" data-void={id}><Icon name="trash" />Void invoice</button>
+</div>

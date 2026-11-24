@@ -1,0 +1,8 @@
+---
+interface Props {
+  root?: string;
+  size?: string;
+}
+const { root = '', size = 'w-10 h-10 -m-1.5' } = Astro.props;
+---
+<img src={`${root}mark-light.svg`} alt="" class={`${size} shrink-0 [[data-housing=dark]_&]:hidden`}><img src={`${root}mark-dark.svg`} alt="" class={`${size} shrink-0 hidden [[data-housing=dark]_&]:block`}>

@@ -1,0 +1,7 @@
+---
+import Article from '../../layouts/Article.astro';
+import { getPosts } from '../../data/blog';
+
+const [featured] = await getPosts();
+---
+<Article post={featured} />

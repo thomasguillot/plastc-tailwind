@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+export interface CommandItem {
+  icon: IconName;
+  text: string;
+  attrs: Record<string, string | boolean>;
+  kbd?: string;
+}
+export interface CommandGroup {
+  label: string;
+  items: CommandItem[];
+}
+interface Props {
+  groups: CommandGroup[];
+  placeholder?: string;
+}
+const { groups, placeholder = 'Search or jump to…' } = Astro.props;
+let n = 0;
+const numbered = groups.map((g) => ({ ...g, items: g.items.map((item) => ({ ...item, n: ++n, Tag: 'href' in item.attrs ? 'a' : 'div' })) }));
+---
+<dialog class="dialog command" id="command" aria-label="Command menu">
+  <label class="input-group"><Icon name="search" /><span class="sr-only">Search commands</span><input role="combobox" aria-expanded="true" aria-controls="command-list" aria-autocomplete="list" autocomplete="off" placeholder={placeholder}><span class="kbd" aria-hidden="true">esc</span></label>
+  <div class="listbox" role="listbox" id="command-list" aria-label="Commands">{numbered.map((g, gi) => <div role="group" aria-labelledby={`cmd-l${gi}`}><p class="listbox-label" id={`cmd-l${gi}`}>{g.label}</p>{g.items.map(({ Tag, n, icon, text, attrs, kbd }) => <Tag role="option" id={`cmd-o${n}`} tabindex="-1" {...attrs}><Icon name={icon} /><span set:html={text} />{kbd && <span class="kbd">{kbd}</span>}</Tag>)}</div>)}<p class="listbox-empty" hidden>No results. Try a page name or an action.</p></div>
+  <div class="command-hints" aria-hidden="true"><span><span class="kbd">↑</span><span class="kbd">↓</span>to move</span><span><span class="kbd">↵</span>to open</span><span><span class="kbd">esc</span>to close</span></div>
+</dialog>

@@ -1,0 +1,16 @@
+---
+import Icon from '../Icon.astro';
+import LcdEmpty from './LcdEmpty.astro';
+
+interface Props {
+  table: string;
+  unit: string;
+}
+const { table, unit } = Astro.props;
+---
+<div class="empty" data-empty-for={table} hidden>
+    <LcdEmpty n={0} unit={unit} />
+    <h2>Nothing matches</h2>
+    <p>Check the spelling, or try another filter.</p>
+    <button class="btn btn-sm" data-clear-filter={table}><Icon name="x" />Clear search</button>
+  </div>

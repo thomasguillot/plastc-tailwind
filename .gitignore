@@ -3,8 +3,6 @@
 !.well-known/
 .DS_Store
 node_modules/
-site/dist.css
-site/index.html
-site/screens/
+site/dist/
+site/.astro/
 direction-contract.md
-site/plastc.css

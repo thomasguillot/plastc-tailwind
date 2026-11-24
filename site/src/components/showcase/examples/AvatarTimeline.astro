@@ -1,0 +1,20 @@
+---
+import Timeline from '../../Timeline.astro';
+
+const more = [
+  { initials: 'AB', name: 'Ade Bello', role: 'Member' },
+  { initials: 'SM', name: 'Sofia Marin', role: 'Member' },
+  { initials: 'KI', name: 'Kenji Ito', role: 'Viewer' },
+];
+---
+<div class="flex flex-wrap items-center gap-4">
+  <div class="avatar-group"><span class="avatar">MO</span><span class="avatar">DS</span><span class="avatar">LW</span><button type="button" class="avatar" popovertarget="team-more" style="anchor-name:--team-more" aria-label="3 more people">+3</button></div>
+  <p class="text-sm text-ink-2">6 people can send invoices</p>
+  <div class="popover" popover id="team-more" style="position-anchor:--team-more"><p class="engraved mb-3">Also on the team</p><ul class="grid gap-3">{more.map(({ initials, name, role }) => <li class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{initials}</span><span><span class="block text-sm font-semibold">{name}</span><span class="block text-[13px] text-ink-2">{role}</span></span></li>)}</ul></div>
+</div>
+<Timeline class="timeline mt-7" items={[
+  { lamp: 'lamp-ok', title: 'Paid in full', text: 'by card', datetime: '2026-10-28T09:14', time: 'Oct 28 · 9:14 AM' },
+  { lamp: 'lamp-warn', title: 'Reminder sent', text: 'to billing@halden.studio', datetime: '2026-10-24T08:00', time: 'Oct 24 · 8:00 AM' },
+  { title: 'Viewed', text: 'by Halden Studio', datetime: '2026-10-03T14:31', time: 'Oct 3 · 2:31 PM' },
+  { title: 'Sent', text: 'by Mira Okafor', datetime: '2026-10-01T10:02', time: 'Oct 1 · 10:02 AM' },
+]} />

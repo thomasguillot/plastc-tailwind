@@ -1,0 +1,11 @@
+<div class="flex flex-wrap gap-x-8 gap-y-4">
+  <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" class="check" checked>Send copy</label>
+  <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" class="check">Attach PDF</label>
+  <label class="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" role="switch" class="switch" checked>Reminders</label>
+</div>
+<div class="grid sm:grid-cols-2 gap-3 mt-5" role="radiogroup" aria-label="Billing period">
+  <label class="choice-card"><input type="radio" name="bp" class="radio mt-0.5" checked><span><span class="block text-sm font-bold">Monthly</span><span class="block text-sm text-ink-2">$12 / mo</span></span></label>
+  <label class="choice-card"><input type="radio" name="bp" class="radio mt-0.5"><span><span class="block text-sm font-bold">Yearly</span><span class="block text-sm text-ink-2">$120 / yr, 2 months free</span></span></label>
+</div>
+<div class="flex flex-wrap items-end gap-5 mt-6"><div class="seg" role="group" aria-label="View"><button aria-pressed="true">Grid</button><button aria-pressed="false">List</button></div>
+<div class="flex-1 min-w-[200px]"><label class="label" for="rg">Late fee · <span data-range-out>4</span>%</label><input id="rg" type="range" min="0" max="10" value="4" class="range" style="--fill:40%"></div></div>

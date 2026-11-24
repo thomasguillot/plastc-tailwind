@@ -1,0 +1,61 @@
+---
+import Base from './Base.astro';
+import SkipLink from '../components/SkipLink.astro';
+import Icon from '../components/Icon.astro';
+import Wordmark from '../components/Wordmark.astro';
+import NavBlock from '../components/app/NavBlock.astro';
+import InvoiceDialogs from '../components/app/InvoiceDialogs.astro';
+import CommandMenu, { type CommandGroup } from '../components/CommandMenu.astro';
+import { NAV } from '../data/app';
+import { HOUSING_COMMAND } from '../data/commands';
+
+interface Props {
+  title: string;
+  active: string;
+  heading: string;
+  sub: string;
+}
+const { title, active, heading, sub } = Astro.props;
+const commands: CommandGroup[] = [
+  { label: 'Go to', items: [...NAV.map(({ key, label, icon }) => ({ icon, text: label, attrs: { href: `${key}.html` } })), { icon: 'cog', text: 'Settings', attrs: { href: 'settings.html' } }] },
+  {
+    label: 'Actions',
+    items: [
+      { icon: 'plus', text: 'New invoice', attrs: { 'data-open-dialog': 'new-invoice' }, kbd: 'N' },
+      HOUSING_COMMAND,
+      { icon: 'logout', text: 'Sign out', attrs: { href: 'sign-in.html' } },
+      { icon: 'left', text: 'Back to Plastc', attrs: { href: '../index.html', target: '_top' } },
+    ],
+  },
+];
+---
+<Base title={title} root="../" bodyClass="min-h-screen">
+<SkipLink />
+<header class="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-housing border-b border-[color:var(--k-seam)]">
+  <button class="btn btn-sm btn-icon" data-open-dialog="nav-sheet" aria-label="Open navigation"><Icon name="menu" /></button>
+  <Wordmark href="dashboard.html" />
+</header>
+<dialog class="sheet" id="nav-sheet" aria-label="Navigation">
+  <div class="flex flex-col h-full gap-6">
+    <div class="flex items-center justify-between"><Wordmark href="dashboard.html" /><button class="btn btn-quiet btn-sm btn-icon" data-close-dialog aria-label="Close navigation"><Icon name="x" /></button></div>
+    <NavBlock active={active} />
+  </div>
+</dialog>
+<div class="flex min-h-screen">
+  <aside class="hidden lg:flex sticky top-0 h-screen overflow-y-auto w-[272px] shrink-0 flex-col gap-6 px-4 py-6 border-r border-[color:var(--k-seam)] shadow-[1px_0_0_rgb(var(--k-hl)/calc(.6*var(--k-hl-a)))]">
+    <div class="px-2"><Wordmark href="dashboard.html" /></div>
+    <label class="input-group"><Icon name="search" /><span class="sr-only">Search</span><input placeholder="Search" data-search><span class="kbd" aria-hidden="true">/</span></label>
+    <NavBlock active={active} />
+  </aside>
+  <main id="main" class="flex-1 min-w-0 px-4 pt-6 pb-24 sm:px-6 md:px-10 md:pt-9 md:pb-28">
+    <header class="flex flex-wrap items-end gap-4 justify-between pb-7">
+      <div><h1 class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em] leading-tight">{heading}</h1><p class="text-ink-2 mt-1">{sub}</p></div>
+      <div class="flex flex-wrap gap-3"><slot name="actions" /></div>
+    </header>
+    <slot />
+    <p class="text-xs text-ink-2 mt-10">Sample data for demonstration. Plastc reference screen.</p>
+  </main>
+</div>
+<InvoiceDialogs />
+<CommandMenu groups={commands} />
+</Base>

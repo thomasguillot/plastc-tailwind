@@ -1,0 +1,11 @@
+---
+import Icon from '../../Icon.astro';
+---
+<nav class="tabs" aria-label="Customer sections"><a href="#components" aria-current="page">Overview</a><a href="#components">Invoices <span class="text-ink-2 font-semibold">12</span></a><a href="#components">Payments</a><a href="#components">Activity</a></nav>
+<p class="text-sm text-ink-2 mt-4 max-w-[52ch]" data-demo-note>Tabs switch the panels of one page. For filters and view modes inside a panel, use <code class="font-mono">.seg</code>.</p>
+<nav class="pager mt-7" aria-label="Pagination">
+  <button type="button" class="btn btn-sm" data-page-step="-1" disabled><Icon name="left" />Previous</button>
+  <div class="seg pager-pages" role="group" aria-label="Pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><span aria-hidden="true">…</span><button type="button">8</button></div>
+  <p class="pager-status" aria-live="polite">Page 1 of 8</p>
+  <button type="button" class="btn btn-sm" data-page-step="1">Next<Icon name="right" /></button>
+</nav>

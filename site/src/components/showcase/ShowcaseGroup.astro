@@ -1,0 +1,34 @@
+---
+import Icon from '../Icon.astro';
+import { cleanHtml } from '../../lib/clean-html';
+import { REPO } from '../../data/site';
+import type { ShowcaseGroupInfo } from '../../data/showcase';
+
+type Props = ShowcaseGroupInfo;
+const { id, title, classes, wide = false } = Astro.props;
+const body = await Astro.slots.render('default');
+const extra = Astro.slots.has('extra') ? await Astro.slots.render('extra') : '';
+const markup = cleanHtml(body + extra);
+const needs = (
+  [
+    [body.includes('role="combobox"'), 'combobox filtering and keys'],
+    [body.includes('data-calendar'), 'the calendar’s month grid'],
+    [body.includes('data-page-step'), 'moving the page numbers'],
+    [body.includes('data-file-input'), 'listing files and their upload progress'],
+    [extra.includes('class="toast"'), 'showing toasts and hiding them on a timer'],
+    [body.includes('data-open-command'), 'the Cmd+K shortcut, filtering and arrow keys'],
+  ] as const
+)
+  .filter(([hit]) => hit)
+  .map(([, label]) => label);
+const last = needs.some((n) => n.includes(' and ')) ? ', and ' : ' and ';
+const said = needs.length === 1 ? needs[0] : needs.slice(0, -1).join(', ') + last + needs.at(-1);
+---
+<section id={id} class={`py-7 ${wide ? 'lg:col-span-2 ' : ''}border-t border-[color:var(--k-seam)] shadow-[inset_0_1px_0_rgb(var(--k-hl)/calc(.55*var(--k-hl-a)))] min-w-0 scroll-mt-4`}>
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-5"><h3 class="engraved">{title}</h3><code class="order-last basis-full sm:order-none sm:basis-0 sm:flex-1 sm:text-right font-mono text-[11px] text-ink-2 break-words min-w-0">{classes}</code><button type="button" class="btn btn-quiet btn-sm ml-auto sm:ml-0 -mr-3.5" data-copy-from={`${id}-html`}><Icon name="copy" />Copy HTML</button></div>
+  <div><Fragment set:html={body} /></div>
+  <details class="group/code mt-5">
+    <summary class="btn btn-quiet btn-sm -ml-3.5 [&::-webkit-details-marker]:hidden"><Icon name="code" />View HTML<Icon name="chevron" class="transition-transform duration-200 ease-out motion-reduce:transition-none group-open/code:rotate-180" /></summary>
+    <div class="grid gap-3 mt-3">{needs.length > 0 && <p class="text-[13px] text-ink-2">Your own script handles {said}. <a class="text-ink underline" href={`${REPO}/blob/main/site/public/plastc.js`}>plastc.js</a> shows one way.</p>}<pre class="code min-w-0 max-h-[28rem] overflow-y-auto" id={`${id}-html`} tabindex="0" aria-label={`HTML for ${title}`}>{markup}</pre></div>
+  </details>
+</section>

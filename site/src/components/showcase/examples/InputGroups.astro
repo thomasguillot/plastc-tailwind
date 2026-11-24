@@ -1,0 +1,9 @@
+---
+import Icon from '../../Icon.astro';
+---
+<div class="grid sm:grid-cols-2 gap-4">
+  <div><label class="label" for="ig1">Search</label><label class="input-group"><Icon name="search" /><input id="ig1" placeholder="Search invoices"><span class="kbd" aria-hidden="true">/</span></label></div>
+  <div><label class="label" for="ig2">Website</label><div class="input-group"><span class="input-affix">https://</span><input id="ig2" value="halden.studio"></div></div>
+  <div><label class="label" for="ig3">Late fee</label><div class="input-group"><input id="ig3" inputmode="decimal" value="4"><span class="input-affix">% a month</span></div></div>
+  <div><label class="label" for="ig4">API key</label><div class="input-group"><input id="ig4" class="!font-mono !text-[14px]" value="plc_live_4f2a…9c1e" readonly><button type="button" class="btn btn-sm" data-copy="plc_live_4f2a9c1e"><Icon name="copy" />Copy</button></div></div>
+</div>

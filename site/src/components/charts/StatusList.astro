@@ -1,0 +1,9 @@
+---
+import { STATUS_SHARE } from '../../data/app';
+
+interface Props {
+  class: string;
+}
+const { class: cls } = Astro.props;
+---
+<ul class={cls}>{STATUS_SHARE.map(({ name, value, lamp }) => <li class="flex items-center justify-between gap-4"><span class={`badge ${lamp}`}>{name}</span><span class="tabular-nums text-ink-2">{value}%</span></li>)}</ul>

@@ -1,0 +1,14 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  table: string;
+  placeholder: string;
+  segments: { key: string; label: string; count: number }[];
+}
+const { table, placeholder, segments } = Astro.props;
+---
+<div class="flex flex-wrap items-center gap-3 justify-between mb-5">
+  <div class="seg" role="group" aria-label="Filter" data-filter-for={table}>{segments.map(({ key, label, count }, n) => <button type="button" aria-pressed={n === 0 ? 'true' : 'false'} data-row-filter={key}>{label}<span class="hidden sm:inline text-ink-2 font-semibold">{count}</span></button>)}</div>
+  <label class="input-group flex-1 sm:flex-none sm:w-72 min-w-0"><Icon name="search" /><span class="sr-only">Search</span><input placeholder={placeholder} data-filter-for={table}></label>
+</div>

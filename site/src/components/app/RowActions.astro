@@ -1,0 +1,10 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  id: string;
+  label: string;
+}
+const { id, label } = Astro.props;
+---
+<button class="btn btn-quiet btn-sm btn-icon" popovertarget={id} style={`anchor-name:--${id}`} aria-label={`Actions for ${label}`}><Icon name="dots" /></button><div class="menu" popover id={id} style={`position-anchor:--${id}`}><slot /></div>

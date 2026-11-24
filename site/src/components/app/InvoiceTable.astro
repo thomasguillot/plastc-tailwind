@@ -1,0 +1,23 @@
+---
+import RowMenu from './RowMenu.astro';
+import { money, type Invoice } from '../../data/app';
+
+interface Props {
+  rows: Invoice[];
+  select?: boolean;
+  actions?: boolean;
+  dates?: boolean;
+}
+const { rows, select = true, actions = true, dates = true } = Astro.props;
+---
+<table class="ktable">
+<thead><tr>{select && <th class="w-10"><label class="grid place-items-center size-9 -m-2 cursor-pointer"><input type="checkbox" class="check" data-select-all aria-label="Select all invoices"></label></th>}<th class="hidden sm:table-cell">Invoice</th><th>Customer</th>{dates && <th class="hidden md:table-cell">Issued</th>}<th>Status</th><th class="num hidden sm:table-cell">Amount</th>{actions && <th class="w-12"><span class="sr-only">Actions</span></th>}</tr></thead>
+<tbody>{rows.map((r) => <tr data-status={r.status.toLowerCase()}>
+  {select && <td><label class="grid place-items-center size-9 -m-2 cursor-pointer"><input type="checkbox" class="check" data-row-select aria-label={`Select ${r.id}`}></label></td>}
+  <td class="hidden sm:table-cell font-semibold">{r.id}</td>
+  <td><div class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px] !hidden sm:!inline-grid">{r.initials}</span><span><span class="block">{r.name}</span><span class="block sm:hidden text-[13px] text-ink-2 tabular-nums">{money(r.amount)}</span></span></div></td>
+  {dates && <td class="hidden md:table-cell text-ink-2">{r.date}</td>}
+  <td><span class={`badge lamp-${r.lamp}`}>{r.status}</span></td>
+  <td class="num font-semibold hidden sm:table-cell">{money(r.amount)}</td>
+  {actions && <td><RowMenu id={r.id} /></td>}
+</tr>)}</tbody></table>

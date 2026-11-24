@@ -1,0 +1,44 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import Icon from '../../components/Icon.astro';
+import SettingsRow from '../../components/app/SettingsRow.astro';
+import LcdEmpty from '../../components/app/LcdEmpty.astro';
+
+const notifications = [
+  { title: 'Invoice paid', text: 'When a customer pays in full.', on: true },
+  { title: 'Invoice overdue', text: 'The morning after a due date passes.', on: true },
+  { title: 'Weekly summary', text: 'Mondays at 9:00, your local time.', on: false },
+];
+const plans = [
+  { title: 'Studio', price: '$12 / mo', text: 'Up to 3 people and 200 invoices a month.', selected: true },
+  { title: 'Practice', price: '$29 / mo', text: 'Unlimited invoices, reminders and exports.', selected: false },
+];
+const team = [
+  { initials: 'MO', name: 'Mira Okafor', email: 'mira@halden.studio', role: 'Owner' },
+  { initials: 'DS', name: 'Dev Sharma', email: 'dev@halden.studio', role: 'Admin' },
+  { initials: 'LW', name: 'Lena Wolff', email: 'lena@halden.studio', role: 'Member' },
+];
+const tabs = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'notifications', label: 'Notifications' },
+  { key: 'billing', label: 'Billing' },
+  { key: 'team', label: 'Team' },
+  { key: 'api', label: 'API' },
+];
+---
+<AppShell title="Settings · Plastc" active="settings" heading="Settings" sub="Manage your studio profile, team and billing.">
+<div class="tabs mb-6" role="tablist" aria-label="Settings sections">{tabs.map(({ key, label }, n) => <button role="tab" id={`tab-${key}`} aria-controls={`tp-${key}`} aria-selected={n === 0 ? 'true' : 'false'} tabindex={n ? '-1' : undefined}>{label}</button>)}</div>
+<section class="panel !px-5 !py-2 md:!px-8">
+  <div role="tabpanel" id="tp-profile" aria-labelledby="tab-profile">
+  <SettingsRow label="Studio name" help="Shown on every invoice you send."><label class="sr-only" for="sn">Studio name</label><input id="sn" class="field" value="Halden Studio"></SettingsRow>
+  <SettingsRow label="Billing email" help="Where customers reply to invoices."><label class="sr-only" for="em">Billing email</label><input id="em" class="field" type="email" value="billing@halden.studio" aria-describedby="em-e"><span id="em-e" class="hint-error" hidden>Add the domain, for example billing@halden.studio.</span></SettingsRow>
+  <SettingsRow label="Logo" help="SVG, PNG or JPG. At least 400 × 400 px."><div class="flex items-center gap-5"><span class="avatar !w-16 !h-16 !text-lg">HS</span><label class="dropzone flex-1" data-dropzone><Icon name="upload" /><span><strong>Click to upload</strong> or drag and drop</span><input type="file" class="sr-only" accept="image/*"></label></div></SettingsRow>
+  <SettingsRow label="Default terms" help="Applied to new invoices. You can change them per invoice."><div class="grid sm:grid-cols-2 gap-4"><div><label class="label" for="due">Payment due</label><select id="due" class="field field-select"><option>14 days</option><option selected>30 days</option><option>45 days</option></select></div><div><label class="label" for="cur">Currency</label><select id="cur" class="field field-select"><option>USD — US Dollar</option><option>EUR — Euro</option></select></div></div><label class="label mt-4" for="note">Footer note</label><textarea id="note" class="field field-area" maxlength="240">Thanks for working with us. Bank details are on page two.</textarea><span class="hint">Shown at the bottom of every invoice. 240 characters max.</span></SettingsRow>
+  </div>
+  <div role="tabpanel" id="tp-notifications" aria-labelledby="tab-notifications" hidden><SettingsRow label="Email me when" help="Choose what lands in your inbox.">{notifications.map(({ title, text, on }) => <label class="flex items-start gap-3.5 py-2.5"><input type="checkbox" role="switch" class="switch mt-0.5" checked={on}><span><span class="block text-sm font-semibold">{title}</span><span class="block text-sm text-ink-2">{text}</span></span></label>)}</SettingsRow></div>
+  <div role="tabpanel" id="tp-billing" aria-labelledby="tab-billing" hidden><SettingsRow label="Plan" help="Billed monthly. Change any time."><div class="grid gap-3" role="radiogroup" aria-label="Plan">{plans.map(({ title, price, text, selected }) => <label class="choice-card"><input type="radio" name="plan" class="radio mt-0.5" checked={selected}><span class="flex-1"><span class="flex justify-between gap-3 text-sm font-bold"><span>{title}</span><span class="tabular-nums">{price}</span></span><span class="block text-sm text-ink-2 mt-0.5">{text}</span></span></label>)}</div></SettingsRow><SettingsRow label="Card" help="Charged on the 1st of each month."><p class="text-sm"><span class="font-semibold">Visa ending 4242</span> <span class="text-ink-2">· expires 08/28</span></p><button class="btn btn-sm mt-3">Update card</button></SettingsRow></div>
+  <div role="tabpanel" id="tp-team" aria-labelledby="tab-team" hidden><SettingsRow label="Members" help="People who can create and send invoices."><div class="table-scroll"><table class="ktable"><thead><tr><th>Name</th><th>Role</th></tr></thead><tbody>{team.map(({ initials, name, email, role }) => <tr><td><div class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{initials}</span><div><p class="font-semibold">{name}</p><p class="text-ink-2 text-[13px]">{email}</p></div></div></td><td><span class="tag">{role}</span></td></tr>)}</tbody></table></div><button class="btn btn-sm mt-4" data-toast="Invite link copied"><Icon name="plus" sw="2.2" />Invite someone</button></SettingsRow></div>
+  <div role="tabpanel" id="tp-api" aria-labelledby="tab-api" hidden><SettingsRow label="API keys" help="For connecting your own tools to Plastc."><div class="flex flex-col items-start gap-4"><LcdEmpty n={0} unit="Keys" /><p class="text-sm text-ink-2">You haven’t created a key yet. Keys can read and create invoices.</p><button class="btn btn-sm" data-toast="Key created. Copy it now: it won’t be shown again."><Icon name="key" />Create key</button></div></SettingsRow></div>
+  <div class="flex justify-end gap-3 py-6 border-t border-[color:var(--k-seam)]"><button class="btn" data-settings-cancel>Cancel</button><button class="btn btn-signal" data-settings-save>Save changes</button></div>
+</section>
+</AppShell>

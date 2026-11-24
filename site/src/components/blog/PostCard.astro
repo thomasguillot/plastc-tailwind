@@ -1,0 +1,20 @@
+---
+import PostVisual from './PostVisual.astro';
+import PostMeta from './PostMeta.astro';
+import { BLOG_AUTHORS, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+  href: string;
+}
+const { post, href } = Astro.props;
+const { title, excerpt, category, author, visual } = post.data;
+const by = BLOG_AUTHORS[author];
+---
+<article class="post-card" data-category={category}>
+  <PostVisual visual={visual} />
+  <PostMeta post={post} />
+  <h3><a href={href}>{title}</a></h3>
+  <p class="text-[15px] leading-normal text-ink-2 -mt-1">{excerpt}</p>
+  <div class="byline"><span class="avatar !w-8 !h-8 !text-[11px]">{by.initials}</span><div><strong>{by.name}</strong>{by.role}</div></div>
+</article>

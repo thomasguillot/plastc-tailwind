@@ -1,0 +1,9 @@
+---
+import Icon from '../../Icon.astro';
+---
+<label class="dropzone" data-dropzone><Icon name="upload" /><span><strong>Click to upload</strong> or drag and drop</span><span class="text-[13px]">PDF, PNG or JPG, up to 10 MB</span><input type="file" multiple accept=".pdf,.png,.jpg,.jpeg" data-file-input></label>
+<ul class="mt-3" data-file-list>
+  <li class="file-item"><span class="file-icon"><Icon name="file" /></span><div class="min-w-0"><p class="file-name">halden-logo.svg</p><p class="file-meta">240 KB · <span class="badge lamp-ok">Uploaded</span></p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Remove halden-logo.svg" data-file-remove><Icon name="trash" /></button></li>
+  <li class="file-item"><span class="file-icon"><Icon name="file" /></span><div class="min-w-0"><p class="file-name">invoice-0193.pdf</p><p class="file-meta">1.2 MB · <span data-file-pct>64%</span></p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Cancel invoice-0193.pdf" data-file-remove><Icon name="x" /></button><div class="progress" role="progressbar" aria-label="Uploading invoice-0193.pdf" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"><span style="--v:64%"></span></div></li>
+  <li class="file-item"><span class="file-icon"><Icon name="file" /></span><div class="min-w-0"><p class="file-name">receipt-scan.jpg</p><p class="file-meta file-error">14.8 MB · Over the 10 MB limit</p></div><button type="button" class="btn btn-quiet btn-sm btn-icon" aria-label="Remove receipt-scan.jpg" data-file-remove><Icon name="trash" /></button></li>
+</ul>

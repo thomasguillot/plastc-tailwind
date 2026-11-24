@@ -1,0 +1,44 @@
+---
+import Base from './Base.astro';
+import SkipLink from '../components/SkipLink.astro';
+import Icon from '../components/Icon.astro';
+import Wordmark from '../components/Wordmark.astro';
+import HousingSeg from '../components/HousingSeg.astro';
+import { FOOTER_NAV, MKT_NAV } from '../data/marketing';
+
+interface Props {
+  title: string;
+  active?: string;
+  banner?: boolean;
+}
+const { title, active = '', banner = true } = Astro.props;
+---
+<Base title={title} root="../">
+<SkipLink />
+{banner && <div class="banner" role="region" aria-label="Announcement" data-banner>
+  <p class="badge lamp-ok">New: reminders now pause automatically when a customer replies. <a href="article.html">Read the update</a></p>
+  <button type="button" class="btn btn-quiet btn-sm btn-icon" data-banner-dismiss aria-label="Dismiss announcement"><Icon name="x" /></button>
+</div>}
+<header class="max-w-[1200px] mx-auto px-4 md:px-8 pt-6 pb-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+  <Wordmark href="landing.html" />
+  <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Main">{MKT_NAV.map(({ key, label, href }) => <a class="btn btn-quiet btn-sm" href={href} aria-current={key === active ? 'page' : undefined}>{label}</a>)}</nav>
+  <div class="ml-auto flex items-center gap-2"><a class="btn btn-quiet btn-sm" href="sign-in.html">Sign in</a><a class="btn btn-sm" href="dashboard.html">Open the app</a></div>
+</header>
+
+<main id="main">
+<slot />
+</main>
+
+<footer class="max-w-[1200px] mx-auto px-4 md:px-8 mt-6">
+ <div class="pt-12 pb-10 border-t border-[color:var(--k-seam)]">
+  <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+    <div><Wordmark href="landing.html" /><p class="text-sm text-ink-2 mt-4 max-w-[32ch]">Invoicing for studios and small practices.</p></div>
+    {FOOTER_NAV.map(({ heading, links }) => <nav aria-label={heading}><p class="engraved mb-3">{heading}</p><ul class="grid gap-2 text-sm">{links.map(({ label, href, top }) => <li><a class="text-ink-2 hover:text-ink hover:underline underline-offset-3" href={href} target={top ? '_top' : undefined}>{label}</a></li>)}</ul></nav>)}
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t border-[color:var(--k-seam)] text-sm text-ink-2">
+    <p>Sample page built with Plastc. The product, prices and copy are made up.</p>
+    <HousingSeg />
+  </div>
+ </div>
+</footer>
+</Base>

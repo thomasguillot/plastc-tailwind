@@ -1,0 +1,13 @@
+---
+interface Props {
+  title: string;
+  lede?: string;
+}
+const { title, lede } = Astro.props;
+const hasExtra = Astro.slots.has('default');
+---
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-8 md:pb-10">
+  <h1 class="display text-[40px] sm:text-[52px] md:text-[64px] max-w-[18ch] text-balance">{title}</h1>
+  {lede && <p class="text-lg text-ink-2 max-w-[52ch] mt-5 leading-relaxed text-pretty">{lede}</p>}
+  {hasExtra && <div class="mt-8"><slot /></div>}
+</section>

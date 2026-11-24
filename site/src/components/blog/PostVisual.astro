@@ -1,0 +1,30 @@
+---
+import LcdCell from './LcdCell.astro';
+import ReplyFragment from './ReplyFragment.astro';
+import BarChart from '../charts/BarChart.astro';
+import Sparkline from '../charts/Sparkline.astro';
+import type { Post } from '../../data/blog';
+
+interface Props {
+  visual: Post['data']['visual'];
+}
+const { visual } = Astro.props;
+const transfers = [
+  { invoice: 'INV-0189', amount: '$2,275.00', status: 'Matched', lamp: 'ok' },
+  { invoice: 'INV-0184', amount: '$1,980.00', status: 'Waiting', lamp: 'warn' },
+];
+const shortcuts = [
+  { keys: ['N'], what: 'New invoice' },
+  { keys: ['/'], what: 'Search' },
+  { keys: ['⌘', 'K'], what: 'Everything else' },
+];
+---
+<div class="h-[168px] grid items-center overflow-hidden" aria-hidden="true"><div class="min-w-0 w-full grid justify-items-center"><div class="w-full max-w-[300px]">{
+  visual === 'reply' ? <ReplyFragment compact /> :
+  visual === 'terms' ? <div class="grid justify-items-center"><div class="lcd readout"><span class="readout-value">Net 30</span><span class="readout-unit">Due Dec 24</span></div></div> :
+  visual === 'marlow' ? <BarChart values={[18, 22, 21, 26, 29]} labels={['Jun', 'Jul', 'Aug', 'Sep', 'Oct']} label="Invoices sent by Marlow Print Co., June to October: 18, 22, 21, 26 and 29." h={130} /> :
+  visual === 'transfers' ? transfers.map(({ invoice, amount, status, lamp }, n) => <div class={`flex items-center justify-between gap-3 py-2.5${n ? ' border-t border-[color:var(--k-seam)]' : ''}`}><span><span class="block text-sm font-semibold">{invoice}</span><span class="block text-[13px] text-ink-2 tabular-nums">Transfer {amount}</span></span><span class={`badge lamp-${lamp}`}>{status}</span></div>) :
+  visual === 'followup' ? <div class="lcd px-4 py-3 grid grid-cols-3 gap-3"><LcdCell label="Day 1" value="Note" /><LcdCell label="Day 7" value="Remind" /><LcdCell label="Day 30" value="Call" /></div> :
+  visual === 'varga' ? <div class="lcd px-4 py-3"><div class="flex items-end justify-between gap-3"><LcdCell label="Sent on Fridays" value="15 clients" /><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Jan–Oct</p></div><div class="mt-3"><Sparkline values={[4, 5, 4, 6, 7, 6, 8, 7, 9, 9]} /></div></div> :
+  shortcuts.map(({ keys, what }, n) => <p class={`flex items-center gap-3 text-sm${n ? ' mt-2.5' : ''}`}><span class="flex gap-1 w-16">{keys.map((k) => <kbd class="kbd">{k}</kbd>)}</span><span class="text-ink-2">{what}</span></p>)
+}</div></div></div>

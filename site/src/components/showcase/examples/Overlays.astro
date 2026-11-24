@@ -1,0 +1,11 @@
+---
+import Icon from '../../Icon.astro';
+---
+<p class="text-sm text-ink-2 mb-4 max-w-[52ch]" data-demo-note>The only parts that float. Menus grow from their button, the dialog settles in from the centre, and toasts rise from the bottom. Each leaves faster than it arrives. All native: popover and &lt;dialog&gt;, so Esc and outside-click work without a script.</p>
+<div class="flex flex-wrap gap-3">
+  <button class="btn" popovertarget="demo-menu" style="anchor-name:--demo-menu"><Icon name="dots" />Open menu</button>
+  <div class="menu" popover id="demo-menu" style="position-anchor:--demo-menu;position-area:bottom span-right;transform-origin:top left"><a href="#components"><Icon name="file" />View</a><button type="button" data-toast="Duplicated"><Icon name="copy" />Duplicate</button><hr><button type="button" class="!text-danger" data-open-dialog="demo-dialog"><Icon name="trash" />Delete…</button></div>
+  <button class="btn" data-open-dialog="demo-dialog">Open dialog</button>
+  <button class="btn" data-toast="Invoice INV-0193 sent">Show toast</button>
+</div>
+<dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete"><Icon name="trash" />Delete</button></div></form></dialog>

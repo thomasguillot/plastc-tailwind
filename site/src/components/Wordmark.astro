@@ -1,0 +1,10 @@
+---
+import Mark from './Mark.astro';
+
+interface Props {
+  href: string;
+  root?: string;
+}
+const { href, root = '../' } = Astro.props;
+---
+<a href={href} class="flex items-center gap-2.5 no-underline text-ink font-extrabold tracking-[-0.02em] text-[17px]"><Mark root={root} />Plastc</a>

@@ -1,0 +1,50 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/marketing/PageHeader.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import PostMeta from '../../components/blog/PostMeta.astro';
+import ReplyFragment from '../../components/blog/ReplyFragment.astro';
+import BlogSubscribe from '../../components/blog/BlogSubscribe.astro';
+import { BLOG_AUTHORS, BLOG_CATEGORIES, getPosts, postHref } from '../../data/blog';
+
+const posts = await getPosts();
+const [featured, ...rest] = posts;
+const by = BLOG_AUTHORS[featured.data.author];
+---
+<Marketing title="Blog · Plastc" active="blog">
+<PageHeader title="Blog" lede="Product updates, guides to getting paid on time, and stories from the studios that send their invoices with us."><div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="seg max-sm:[&>button]:!px-2.5" role="group" aria-label="Category" data-post-filter="posts">
+    <button type="button" aria-pressed="true" data-category-filter="all">All</button>
+    {BLOG_CATEGORIES.map(({ key, label }) => <button type="button" aria-pressed="false" data-category-filter={key}>{label}</button>)}
+  </div>
+  <label class="input-group w-full sm:w-72 min-w-0"><Icon name="search" /><span class="sr-only">Search posts</span><input placeholder="Search posts" data-post-filter="posts"></label>
+</div></PageHeader>
+
+<div id="posts" class="max-w-[1200px] mx-auto px-4 md:px-8 pb-4">
+  <article class="post-card" data-featured data-category={featured.data.category}>
+    <div class="grid gap-4 content-center">
+      <p class="badge lamp-ok">Latest update</p>
+      <h2><a href="article.html">{featured.data.title}</a></h2>
+      <p class="text-lg text-ink-2 leading-relaxed max-w-[44ch] text-pretty">{featured.data.excerpt}</p>
+      <PostMeta post={featured} />
+      <div class="byline mt-2"><span class="avatar">{by.initials}</span><div><strong>{by.name}</strong>{by.role}</div></div>
+    </div>
+    <div class="max-md:mt-2" aria-hidden="true"><ReplyFragment compact /></div>
+  </article>
+
+  <section class="mt-14 md:mt-16" aria-labelledby="latest-h" data-post-group>
+    <h2 id="latest-h" class="engraved">More posts</h2>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-5">{rest.map((p) => <PostCard post={p} href={postHref(p, featured)} />)}</div>
+  </section>
+
+  <div class="empty" data-post-empty hidden>
+    <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit">posts</span></div>
+    <h2>No posts match</h2>
+    <p>Check the spelling, or look in another category.</p>
+    <button type="button" class="btn btn-sm" data-post-clear="posts"><Icon name="x" />Show all posts</button>
+  </div>
+</div>
+
+<BlogSubscribe id="blog-sub" />
+</Marketing>

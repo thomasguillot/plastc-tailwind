@@ -1,0 +1,50 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import Icon from '../../components/Icon.astro';
+import LineChart from '../../components/charts/LineChart.astro';
+import BarChart from '../../components/charts/BarChart.astro';
+import StatusDonut from '../../components/charts/StatusDonut.astro';
+import StatusList from '../../components/charts/StatusList.astro';
+import { CLIENTS, INVOICES_SENT, MONTHS, REV, money } from '../../data/app';
+
+const top = [...CLIENTS].sort((a, b) => b.billed - a.billed).slice(0, 5);
+const total = CLIENTS.reduce((s, c) => s + c.billed, 0);
+const share = (billed: number) => (billed / total) * 100;
+const figures = [
+  { label: 'Revenue', value: money(total, false), note: '▲ 31% on the year before' },
+  { label: 'Invoices sent', value: String(INVOICES_SENT.reduce((s, v) => s + v, 0)), note: '18 in October' },
+  { label: 'Avg. days to pay', value: '18.2', note: '▼ 2.1 days faster' },
+  { label: 'Paid on time', value: '86%', note: 'of invoices due' },
+];
+---
+<AppShell title="Reports · Plastc" active="reports" heading="Reports" sub="How invoicing has gone over the last twelve months.">
+<Fragment slot="actions"><button class="btn" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Last 12 months" data-range-btn><Icon name="cal" /><span data-range-label>Last 12 months</span></button>
+    <div class="menu" popover id="range-menu" style="position-anchor:--range-menu" aria-label="Date range"><button type="button" data-range="Last 30 days">Last 30 days</button><button type="button" data-range="This quarter">This quarter</button><button type="button" data-range="Last 12 months">Last 12 months</button><button type="button" data-range="All time">All time</button></div>
+    <button class="btn" data-toast="Export started. We’ll email the CSV."><Icon name="down" />Export</button></Fragment>
+<section class="lcd px-6 py-5 grid gap-5 grid-cols-2 lg:grid-cols-4" aria-label="Key figures, last twelve months">
+  {figures.map(({ label, value, note }) => <div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{label}</p><p class="text-[28px] font-semibold leading-none mt-2 tracking-[-0.02em]">{value}</p><p class="text-xs mt-2">{note}</p></div>)}
+</section>
+
+<section class="panel !p-5 sm:!p-6 mt-8" aria-labelledby="rr-h">
+  <div class="flex flex-wrap items-center gap-3 justify-between mb-5"><div><h2 id="rr-h" class="font-bold">Revenue</h2><p class="text-sm text-ink-2">Paid invoices by month</p></div><p class="text-sm text-ink-2 tabular-nums">Nov 2025 – Oct 2026</p></div>
+  <LineChart values={REV} labels={MONTHS} highlight={11} />
+</section>
+
+<div class="grid gap-6 lg:grid-cols-[1.5fr_1fr] mt-6 [&>*]:min-w-0">
+  <section class="panel !p-5 sm:!p-6" aria-labelledby="rs-h">
+    <h2 id="rs-h" class="font-bold">Invoices sent</h2><p class="text-sm text-ink-2">By month</p>
+    <div class="mt-5 hidden sm:block"><BarChart values={INVOICES_SENT} labels={MONTHS} label="Invoices sent per month, November 2025 to October 2026. October: 18, the most in the year." h={290} /></div>
+    <div class="mt-5 sm:hidden"><BarChart values={INVOICES_SENT.slice(6)} labels={MONTHS.slice(6)} label="Invoices sent per month, May to October 2026. October: 18." /></div>
+  </section>
+  <section class="panel !p-5 sm:!p-6" aria-labelledby="rd-h">
+    <h2 id="rd-h" class="font-bold">By status</h2><p class="text-sm text-ink-2">Share of invoiced value this quarter</p>
+    <div class="mt-5 flex flex-wrap items-center gap-6"><div class="w-[140px] shrink-0"><StatusDonut /></div>
+    <StatusList class="grid gap-2 text-sm min-w-[150px] flex-1" /></div>
+  </section>
+</div>
+
+<section class="panel !p-0 mt-6" aria-labelledby="rt-h">
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 pt-5 pb-3"><h2 id="rt-h" class="font-bold">Top customers</h2><a class="btn btn-sm" href="customers.html">All customers<Icon name="right" /></a></div>
+  <div class="table-scroll px-2 pb-2"><table class="ktable"><thead><tr><th>Customer</th><th class="hidden md:table-cell num">Invoices</th><th class="num">Billed</th><th class="hidden sm:table-cell">Share of revenue</th></tr></thead><tbody>{top.map((c) => <tr><td><div class="flex items-center gap-3"><span class="avatar !w-8 !h-8 !text-[11px]">{c.initials}</span><span class="font-semibold">{c.name}</span></div></td><td class="hidden md:table-cell num">{c.count}</td><td class="num">{money(c.billed)}</td><td class="hidden sm:table-cell w-[28%] min-w-[120px]"><div class="flex items-center gap-3"><div class="meter flex-1" role="meter" aria-label={`Share of revenue for ${c.name}`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={share(c.billed).toFixed(1)}><span style={`--v:${(share(c.billed) * 2.5).toFixed(1)}%`}></span></div><span class="text-ink-2 tabular-nums text-[13px] w-12 text-right">{share(c.billed).toFixed(1)}%</span></div></td></tr>)}</tbody></table></div>
+</section>
+</AppShell>

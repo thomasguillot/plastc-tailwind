@@ -1,0 +1,13 @@
+---
+import Icon from '../../Icon.astro';
+import InvoiceTable from '../../app/InvoiceTable.astro';
+import { CUSTOMERS } from '../../../data/app';
+---
+<div class="grid sm:grid-cols-[180px_1fr] gap-6 items-start">
+  <nav class="flex flex-col gap-1" aria-label="Example"><a class="nav-item" href="#components" aria-current="page"><Icon name="home" />Dashboard</a><a class="nav-item" href="#components"><Icon name="file" />Invoices</a><a class="nav-item" href="#components"><Icon name="users" />Customers</a></nav>
+  <div class="flex flex-col gap-4 min-w-0">
+    <div class="lcd px-5 py-3 flex gap-8"><div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Paid</p><p class="text-xl font-semibold">$48,210</p></div><div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Open</p><p class="text-xl font-semibold">$15,447</p></div></div>
+    <p class="text-sm text-ink-2">Shortcut hints use <code class="font-mono">.kbd</code>. For example <span class="kbd">N</span> for a new invoice.</p>
+  </div>
+</div>
+<div class="table-scroll mt-5"><InvoiceTable rows={CUSTOMERS.slice(0, 3)} select={false} actions={false} dates={false} /></div>

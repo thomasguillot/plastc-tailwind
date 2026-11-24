@@ -1,0 +1,15 @@
+---
+interface Props {
+  id: string;
+  step: number;
+  title: string;
+  body: string;
+  points: string[];
+  hidden?: boolean;
+}
+const { id, step, title, body, points, hidden = true } = Astro.props;
+---
+<div role="tabpanel" id={`hw-${id}`} aria-labelledby={`hw-tab-${id}`} class="grid gap-8 md:gap-14 md:grid-cols-[1fr_1.15fr] items-center pt-10" hidden={hidden}>
+    <div><p class="engraved">Step {step} of 3</p><h3 class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em] text-balance mt-3">{title}</h3><p class="text-ink-2 text-lg mt-3 max-w-[44ch] text-pretty">{body}</p><ul class="check-list mt-6">{points.map((p) => <li>{p}</li>)}</ul></div>
+    <div class="rounded-[22px] seam p-5 md:p-8 min-w-0"><slot /></div>
+  </div>

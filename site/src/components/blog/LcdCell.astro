@@ -1,0 +1,8 @@
+---
+interface Props {
+  label: string;
+  value: string;
+}
+const { label, value } = Astro.props;
+---
+<div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{label}</p><p class="text-[15px] sm:text-base font-semibold mt-1 whitespace-nowrap">{value}</p></div>

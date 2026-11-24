@@ -1,0 +1,35 @@
+---
+import cssHref from '../app.css?url';
+import { SCREEN_DESCRIPTION } from '../data/site';
+
+interface Props {
+  title: string;
+  root?: string;
+  description?: string;
+  bodyClass?: string;
+}
+const { title, root = '', description = SCREEN_DESCRIPTION, bodyClass } = Astro.props;
+const css = root + cssHref.replace(/^\//, '');
+---
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<slot name="head" /><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href={css}>
+<link rel="icon" href={`${root}favicon.ico`} sizes="32x32">
+<link rel="icon" href={`${root}favicon.svg`} type="image/svg+xml">
+<link rel="apple-touch-icon" href={`${root}apple-touch-icon.png`}>
+<script is:inline>(function(){var r=document.documentElement,h=null;try{h=localStorage.getItem('plastc-housing')}catch(e){}if(h!=='light'&&h!=='dark'){var t=r.getAttribute('data-theme');h=(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light'}r.dataset.housing=h})();</script>
+</head>
+<body class={bodyClass}>
+<slot />
+<div id="live" class="sr-only" aria-live="polite"></div>
+<div id="toast" class="toast" popover="manual" role="status"><span data-toast-text></span><span class="sr-only" data-toast-hint></span><button type="button" class="lcd-action" data-toast-undo>Undo</button></div>
+<script is:inline src={`${root}plastc.js`}></script>
+</body>
+</html>

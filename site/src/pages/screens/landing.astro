@@ -1,0 +1,148 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import Icon from '../../components/Icon.astro';
+import Timeline from '../../components/Timeline.astro';
+import InvoiceTable from '../../components/app/InvoiceTable.astro';
+import StatusDonut from '../../components/charts/StatusDonut.astro';
+import StatusList from '../../components/charts/StatusList.astro';
+import Feature from '../../components/marketing/Feature.astro';
+import HowItWorksStep from '../../components/marketing/HowItWorksStep.astro';
+import PlanCard from '../../components/marketing/PlanCard.astro';
+import BillingToggle from '../../components/marketing/BillingToggle.astro';
+import FaqAccordion from '../../components/marketing/FaqAccordion.astro';
+import CtaPanel from '../../components/marketing/CtaPanel.astro';
+import { CUSTOMERS } from '../../data/app';
+import { FAQS, LP_LOGOS, LP_QUOTES, LP_STATS, PLANS } from '../../data/marketing';
+import type { IconName } from '../../lib/icons';
+
+const heroFigures = [
+  ['Paid', '$48,210'],
+  ['Open', '$15,447'],
+  ['Overdue', '$9,300'],
+];
+const steps: { key: string; label: string; icon: IconName }[] = [
+  { key: 'send', label: 'Send', icon: 'send' },
+  { key: 'remind', label: 'Remind', icon: 'bell' },
+  { key: 'paid', label: 'Get paid', icon: 'check' },
+];
+const reminderSwitches = [
+  { title: 'The morning after the due date', text: 'A short note with the pay link.' },
+  { title: 'Every 7 days until it is paid', text: 'The same note, with the days overdue.' },
+  { title: 'Pause when they reply', text: 'Reminders wait while you talk it through.' },
+];
+---
+<Marketing title="Landing page · Plastc">
+<section id="top" class="max-w-[1200px] mx-auto px-4 md:px-8 pt-14 md:pt-24 pb-16 md:pb-20 grid gap-12 lg:grid-cols-[1.05fr_1fr] items-center">
+  <div>
+    <h1 class="display text-[48px] sm:text-[64px] md:text-[80px] text-balance">Invoices that chase themselves.</h1>
+    <p class="text-lg text-ink-2 max-w-[44ch] mt-7 leading-relaxed text-pretty">Send an invoice in a minute. Reminders follow up on their own, and one readout shows what is paid, open and overdue.</p>
+    <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="sign-in.html">Start free</a><a class="btn btn-xl" href="dashboard.html">See the dashboard</a></div>
+  </div>
+  <div class="panel !p-4 sm:!p-5 min-w-0">
+    <div class="lcd px-5 py-4 grid grid-cols-3 gap-4">{heroFigures.map(([k, v]) => <div><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">{k}</p><p class="text-lg sm:text-xl font-semibold mt-1">{v}</p></div>)}</div>
+    <div class="table-scroll mt-3"><InvoiceTable rows={CUSTOMERS.slice(0, 4)} select={false} actions={false} dates={false} /></div>
+  </div>
+</section>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pb-8" aria-labelledby="customers-h">
+  <div class="py-10 border-y border-[color:var(--k-seam)]">
+    <h2 id="customers-h" class="engraved text-center">Studios and small firms that invoice with Plastc</h2>
+    <ul class="logo-strip mt-7">{LP_LOGOS.map((l) => <li class={l.class} set:html={l.html} />)}</ul>
+    <p class="text-center text-[13px] text-ink-2 mt-7">Sample customers. These businesses are made up.</p>
+  </div>
+</section>
+
+<section id="features" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24">
+  <h2 class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">Built for the part after you hit send</h2>
+  <div class="mt-12">
+  <Feature title="Reminders that go out on their own" body="The morning after a due date passes, then every week until the invoice is paid. Pause them for one customer whenever you need to."><Timeline items={[
+    { lamp: 'lamp-ok', title: 'Paid in full', text: 'by card', time: 'Oct 28 · 9:14 AM' },
+    { lamp: 'lamp-warn', title: 'Reminder sent', text: 'to billing@halden.studio', time: 'Oct 24 · 8:00 AM' },
+    { title: 'Viewed', text: 'by Halden Studio', time: 'Oct 3 · 2:31 PM' },
+    { title: 'Sent', text: 'by Mira Okafor', time: 'Oct 1 · 10:02 AM' },
+  ]} /></Feature>
+  <Feature title="Paid the way your customers prefer" body="Every invoice carries a pay link for card and bank transfer. Payments mark the invoice paid as they land." flip><div class="grid gap-3" role="radiogroup" aria-label="Payment method"><label class="choice-card"><input type="radio" name="lpm" class="radio mt-0.5" checked><span><span class="block text-sm font-bold">Card</span><span class="block text-sm text-ink-2">Visa, Mastercard and Amex. Paid in seconds.</span></span></label><label class="choice-card"><input type="radio" name="lpm" class="radio mt-0.5"><span><span class="block text-sm font-bold">Bank transfer</span><span class="block text-sm text-ink-2">Details on the invoice. Matched when it arrives.</span></span></label></div></Feature>
+  <Feature title="Know where you stand" body="Paid, open and overdue in one readout, updated as payments arrive. No spreadsheet to keep in step."><div class="flex flex-wrap items-center gap-6"><div class="w-[140px] shrink-0"><StatusDonut /></div><StatusList class="grid gap-2 text-sm min-w-[150px]" /></div></Feature>
+  </div>
+</section>
+
+<section id="how-it-works" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="how-h">
+  <h2 id="how-h" class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">One invoice, from draft to paid</h2>
+  <p class="text-ink-2 text-lg mt-4 max-w-[48ch] text-pretty">Each step shows the part of the app that does the work. The controls are real, so try them.</p>
+  <div class="tabs mt-10" role="tablist" aria-label="How it works">{steps.map(({ key, label, icon }, n) => <button role="tab" id={`hw-tab-${key}`} aria-controls={`hw-${key}`} aria-selected={n === 0 ? 'true' : 'false'} tabindex={n ? '-1' : undefined}><Icon name={icon} class="w-4 h-4" />{label}</button>)}</div>
+  <div class="md:grid md:min-h-[560px] md:items-start md:[&>*]:col-start-1 md:[&>*]:row-start-1 md:[&>[hidden]]:!grid md:[&>[hidden]]:invisible">
+  <HowItWorksStep id="send" step={1} title="Send it in a minute" body="Pick the customer and the work, choose the terms, and send. The invoice arrives by email with a pay link." points={['Line items from your saved products', 'Terms remembered for each customer', 'A PDF copy for their records']} hidden={false}><div class="grid gap-4">
+  <div class="flex items-center justify-between gap-3"><p class="font-bold">New invoice</p><span class="tag">INV-0194</span></div>
+  <div><label class="label" for="hw-c">Customer</label><select id="hw-c" class="field field-select"><option>Halden Studio</option><option>Northwind Co-op</option><option>Kettle Hill Bakery</option></select></div>
+  <div><label class="label" for="hw-i">Item</label><select id="hw-i" class="field field-select"><option>Brand identity</option><option>Website design</option><option>Design day</option></select></div>
+  <div class="grid grid-cols-2 gap-4"><div class="min-w-0"><label class="label" for="hw-a">Amount</label><div class="input-group"><span class="input-affix">$</span><input id="hw-a" inputmode="decimal" value="4,820.00"></div></div><div class="min-w-0"><label class="label" for="hw-d">Due in</label><select id="hw-d" class="field field-select"><option>14 days</option><option selected>30 days</option></select></div></div>
+  <div class="flex flex-wrap items-center justify-between gap-3 pt-1"><p class="text-sm text-ink-2">Goes to billing@halden.studio</p><button type="button" class="btn" data-toast="INV-0194 sent to Halden Studio"><Icon name="send" />Send invoice</button></div>
+</div></HowItWorksStep>
+  <HowItWorksStep id="remind" step={2} title="Let the reminders follow up" body="Once the due date passes, reminders go out on a schedule you set. They stop the moment the invoice is paid." points={['Set the schedule once, or per customer', 'Pause for one customer at any time', 'See every reminder on the invoice']}><div>
+  <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="font-bold">Reminders for Northwind Co-op</p><p class="text-sm text-ink-2 mt-0.5 tabular-nums">INV-0191 · $9,300.00 · due Oct 26</p></div><span class="badge lamp-danger">Overdue</span></div>
+  <div class="mt-3">{reminderSwitches.map(({ title, text }) => <label class="flex items-start gap-3.5 py-2.5"><input type="checkbox" role="switch" class="switch mt-0.5" checked><span><span class="block text-sm font-semibold">{title}</span><span class="block text-sm text-ink-2">{text}</span></span></label>)}</div>
+  <Timeline class="timeline mt-5 pt-5 border-t border-[color:var(--k-seam)]" items={[
+    { lamp: 'lamp-off', title: 'Next reminder', text: 'to finance@northwind.coop', time: 'Nov 3 · 8:00 AM' },
+    { lamp: 'lamp-warn', title: 'Reminder sent', text: 'the morning after the due date', time: 'Oct 27 · 8:00 AM' },
+    { title: 'Sent', text: 'by Mira Okafor', time: 'Oct 12 · 4:18 PM' },
+  ]} />
+</div></HowItWorksStep>
+  <HowItWorksStep id="paid" step={3} title="Get paid and see it land" body="Card payments mark the invoice paid in seconds. Bank transfers are matched when they arrive." points={['Card and bank transfer on every invoice', 'Payouts on a set schedule', 'An alert for every payment']}><div class="grid gap-5">
+  <dl class="lcd px-5 py-4 grid gap-4 sm:grid-cols-2"><div class="stat"><dt>Paid in full</dt><dd class="stat-value !text-[28px]">$4,820.00</dd></div><div class="stat"><dt>In your bank</dt><dd class="stat-value !text-[28px]">Oct 30</dd></div></dl>
+  <dl class="desc-list"><div><dt>Invoice</dt><dd>INV-0193 · Halden Studio</dd></div><div><dt>Status</dt><dd><span class="badge lamp-ok">Paid</span></dd></div><div><dt>Method</dt><dd>Visa ending 4242</dd></div><div><dt>Paid on</dt><dd>Oct 28 · 9:14 AM</dd></div></dl>
+  <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-sm text-ink-2">You hear about it the moment it lands.</p><button type="button" class="btn" data-toast="INV-0193 paid in full: $4,820.00"><Icon name="bell" />Show the alert</button></div>
+</div></HowItWorksStep>
+  </div>
+</section>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-4 md:pb-8" aria-labelledby="numbers-h">
+  <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+    <h2 id="numbers-h" class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">Paid sooner, with less chasing</h2>
+    <p class="text-sm text-ink-2">Sample figures. The product and its numbers are made up.</p>
+  </div>
+  <dl class="lcd mt-10 px-6 py-6 md:px-8 md:py-7 grid gap-x-6 gap-y-8 grid-cols-2 lg:grid-cols-4">{LP_STATS.map(({ label, value, note }) => <div class="stat"><dt>{label}</dt><dd class="stat-value">{value}</dd><dd>{note}</dd></div>)}</dl>
+</section>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24" aria-labelledby="quotes-h">
+  <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+    <h2 id="quotes-h" class="display text-[40px] md:text-[56px] max-w-[16ch] text-balance">What studios tell us</h2>
+    <p class="text-sm text-ink-2">Sample quotes. The people and businesses are made up.</p>
+  </div>
+  <div class="quotes mt-10">{LP_QUOTES.map(({ initials, name, role, quote }) => <figure class="quote"><blockquote><p>“{quote}”</p></blockquote><figcaption><span class="avatar">{initials}</span><span><strong>{name}</strong>{role}</span></figcaption></figure>)}</div>
+</section>
+
+<section id="pricing" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24">
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <div><h2 class="display text-[40px] md:text-[56px]">Pricing</h2><p class="text-ink-2 text-lg mt-4 max-w-[44ch]">Start free. Move up when your team or your client list grows.</p></div>
+    <BillingToggle />
+  </div>
+  <div class="grid gap-5 md:grid-cols-3 mt-10 items-stretch">{PLANS.map((plan) => <PlanCard plan={plan} />)}</div>
+  <p class="mt-8 text-sm text-ink-2">Need the detail? <a class="font-bold text-ink underline" href="pricing.html">Compare every feature</a></p>
+</section>
+
+<section id="faq" class="max-w-[1200px] mx-auto px-4 md:px-8 py-16 md:py-24 grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+  <div><h2 class="display text-[40px] md:text-[56px]">Questions</h2><p class="text-ink-2 text-lg mt-4 max-w-[36ch]">Something else? Write to the team from inside the app.</p></div>
+  <FaqAccordion faqs={FAQS} />
+</section>
+
+<CtaPanel title="Send your next invoice in a minute." text="Free for your first five invoices every month." secondary={{ label: 'Compare plans', href: 'pricing.html' }} />
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pt-4 pb-12 md:pb-16" aria-labelledby="news-h">
+  <div class="grid gap-6 md:gap-12 md:grid-cols-2 md:items-center">
+    <div><h2 id="news-h" class="text-[24px] md:text-[28px] font-bold tracking-[-0.015em] text-balance">Product notes, once a month</h2><p class="text-ink-2 mt-2 max-w-[44ch] text-pretty">What changed in the app, and one tip on getting paid sooner. Nothing else.</p></div>
+    <div class="min-w-0">
+      <form novalidate data-newsletter="news-done">
+        <label class="label" for="news-email">Email</label>
+        <div class="input-group"><Icon name="mail" /><input id="news-email" type="email" autocomplete="email" placeholder="you@studio.com" aria-describedby="news-err news-hint"><button type="submit" class="btn">Subscribe</button></div>
+        <span id="news-err" class="hint-error" data-newsletter-error hidden></span>
+        <span id="news-hint" class="hint">One email a month. Every issue has a one-click unsubscribe.</span>
+      </form>
+      <div id="news-done" tabindex="-1" class="rounded-[16px] seam px-5 py-4 focus-visible:outline-none" hidden>
+        <p class="badge lamp-ok !text-sm">You are subscribed</p>
+        <p class="text-sm text-ink-2 mt-2">The first issue goes to <span class="font-semibold text-ink break-all" data-newsletter-email></span> on the first Monday of the month.</p>
+        <button type="button" class="btn btn-quiet btn-sm mt-3 -ml-3" data-newsletter-reset>Use a different email</button>
+      </div>
+    </div>
+  </div>
+</section>
+</Marketing>

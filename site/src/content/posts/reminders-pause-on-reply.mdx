@@ -1,0 +1,87 @@
+---
+title: Reminders now pause when a customer replies
+excerpt: When a customer answers a reminder, the next one waits until you have had a chance to read the reply.
+ledeNote: You do not need to change anything to get it.
+author: ines
+category: product
+date: 2026-11-18
+readTime: 3
+slug: reminders-pause-on-reply
+visual: reply
+---
+import ReplyFragment from '../../components/blog/ReplyFragment.astro';
+
+Until now, reminders kept to their schedule no matter what happened in between. They went out the morning after the due date, then every week until the invoice was paid. If a customer wrote back to say the payment was on its way, or to ask about a line item, the next reminder still arrived a few days later.
+
+Now a reply to any invoice or reminder email **pauses reminders for that invoice**. The reply shows up on the invoice timeline, the invoice gets a *Reminders paused* label, and nothing else goes out until you have had a chance to answer.
+
+<figure>
+  <div class="rounded-[18px] seam p-5 sm:p-6"><ReplyFragment /></div>
+  <figcaption>An overdue invoice after the customer replied on Nov 3. The reminder due on Nov 10 was skipped. The next one waits until Nov 17, unless the invoice is paid first.</figcaption>
+</figure>
+
+## Why we changed it
+
+A customer who replies is usually already dealing with the invoice. Sending them another reminder after they have written “paying on Friday” reads as if nobody opened their message, and it puts you in the position of apologizing for your own software.
+
+It was also the most common thing people asked support about this year: how to stop the next reminder for one invoice, right after a customer had answered. You could already pause reminders by hand, but you had to remember to do it.
+
+## How it works
+
+1. Every invoice email has its own reply-to address, so a reply is tied to one invoice, not to the whole customer.
+2. When a reply arrives, we forward it to you as before and pause reminders for that invoice only. Other invoices for the same customer keep their schedule.
+3. Reminders stay paused for 14 days, or until you resume them. If the invoice is still unpaid after that, the schedule picks up where it stopped.
+
+A typical reply that pauses reminders looks like this:
+
+<blockquote>
+  <p>Thanks for the reminder. This one is approved and goes out with our Friday payment run.</p>
+  <footer>Finance team, Northwind Co-op</footer>
+</blockquote>
+
+### What counts as a reply
+
+Only messages written by a person. Automatic replies, such as out-of-office notices and delivery failures, are ignored. Here is what happens to reminders in each case:
+
+<div class="table-scroll">
+  <table>
+    <thead><tr><th>When this happens</th><th>Reminders</th></tr></thead>
+    <tbody>
+      <tr><td>The customer replies to a reminder</td><td>Paused for 14 days</td></tr>
+      <tr><td>The customer replies to the original invoice</td><td>Paused for 14 days</td></tr>
+      <tr><td>An out-of-office or bounce comes back</td><td>Keep their schedule</td></tr>
+      <tr><td>The invoice is paid</td><td>Stop for good</td></tr>
+      <tr><td>14 days pass without payment</td><td>Resume</td></tr>
+    </tbody>
+  </table>
+</div>
+
+### Resuming early
+
+Open the invoice and choose **Resume reminders**. The next reminder goes out on its usual morning, not straight away, so a customer never gets two emails in an hour.
+
+## How to turn it off
+
+Pausing on reply is on for every account. If you would rather keep reminders on a fixed schedule, go to [Settings](settings.html), open **Notifications**, and switch off *Pause reminders when a customer replies*. You can also change how long a pause lasts: 7, 14 or 30 days.
+
+If you manage reminders through the API, the same two settings live on the account:
+
+```
+PATCH /v1/settings/reminders
+
+{
+  "pause_on_reply": true,
+  "pause_days": 14
+}
+```
+
+Invoices also have a new `reminders_paused_until` field. It is `null` unless a reply paused them, and it is cleared when you resume reminders or the invoice is paid.
+
+## What it does not cover yet
+
+- Replies by phone, or to a personal address instead of the invoice email, cannot pause anything. Use **Pause reminders** on the invoice for those.
+- Customers who reply to a monthly statement pause reminders on every invoice in that statement. We are looking at making this per invoice.
+
+---
+
+Questions, or a case we did not think of? [Write to us](contact.html). We read every message, and a few of them shaped this change.

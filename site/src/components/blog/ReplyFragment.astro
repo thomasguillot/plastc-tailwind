@@ -1,0 +1,25 @@
+---
+import LcdCell from './LcdCell.astro';
+import Timeline, { type TimelineItem } from '../Timeline.astro';
+
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+const full: TimelineItem[] = [
+  { title: 'Sent', text: 'by Mira Okafor', datetime: '2026-10-12T10:02', time: 'Oct 12 · 10:02 AM' },
+  { lamp: 'lamp-warn', title: 'Reminder sent', text: 'to finance@northwind.coop', datetime: '2026-10-27T08:00', time: 'Oct 27 · 8:00 AM' },
+  { lamp: 'lamp-warn', title: 'Reminder sent', text: 'to finance@northwind.coop', datetime: '2026-11-03T08:00', time: 'Nov 3 · 8:00 AM' },
+  { lamp: 'lamp-ok', title: 'Reply received, reminders paused', text: 'until Nov 17', datetime: '2026-11-03T11:26', time: 'Nov 3 · 11:26 AM' },
+  { lamp: 'lamp-off', title: 'Reminder skipped', text: 'while paused', datetime: '2026-11-10T08:00', time: 'Nov 10 · 8:00 AM' },
+];
+const short: TimelineItem[] = [
+  { lamp: 'lamp-warn', title: 'Reminder sent', text: 'to finance@northwind.coop', datetime: '2026-11-03T08:00', time: 'Nov 3 · 8:00 AM' },
+  { lamp: 'lamp-ok', title: 'Reply received, reminders paused', text: '', datetime: '2026-11-03T11:26', time: 'Nov 3 · 11:26 AM' },
+  { lamp: 'lamp-off', title: 'Reminder skipped', text: 'while paused', datetime: '2026-11-10T08:00', time: 'Nov 10 · 8:00 AM' },
+];
+---
+<div class="grid gap-5">
+  <div class="lcd px-4 py-3 grid grid-cols-3 gap-3"><LcdCell label="Invoice" value="INV-0191" /><LcdCell label="Due" value="$9,300" /><LcdCell label="Reminders" value="Paused" /></div>
+  <Timeline items={compact ? short : full} />
+</div>

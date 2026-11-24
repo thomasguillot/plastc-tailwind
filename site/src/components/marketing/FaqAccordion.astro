@@ -1,0 +1,9 @@
+---
+import type { Faq } from '../../data/marketing';
+
+interface Props {
+  faqs: Faq[];
+}
+const { faqs } = Astro.props;
+---
+<div class="accordion">{faqs.map(([q, a], n) => <details open={n === 0}><summary>{q}</summary><p>{a}</p></details>)}</div>

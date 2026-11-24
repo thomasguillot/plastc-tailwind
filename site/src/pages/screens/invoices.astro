@@ -1,0 +1,42 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import Icon from '../../components/Icon.astro';
+import InvoiceTable from '../../components/app/InvoiceTable.astro';
+import NewInvoiceButton from '../../components/app/NewInvoiceButton.astro';
+import { CUSTOMERS } from '../../data/app';
+
+const tab = 'max-sm:!flex-1 max-sm:!px-2';
+---
+<AppShell title="Invoices · Plastc" active="invoices" heading="Invoices" sub="Create, send and track every invoice in one place.">
+<Fragment slot="actions"><button class="btn" data-toast="Import is not part of this demo"><Icon name="down" />Import</button><NewInvoiceButton /></Fragment>
+<div class="flex flex-wrap items-center gap-3 justify-between mb-5">
+  <div class="seg max-sm:w-full" role="tablist" aria-label="Filter by status" data-filter-tabs>
+    <button role="tab" class={tab} aria-selected="true" data-filter="all">All <span class="text-ink-2 font-semibold" data-count="all">{CUSTOMERS.length}</span></button>
+    <button role="tab" class={tab} aria-selected="false" data-filter="paid">Paid</button><button role="tab" class={tab} aria-selected="false" data-filter="open">Open</button>
+    <button role="tab" class={tab} aria-selected="false" data-filter="overdue">Overdue <span class="text-danger" data-count="overdue">2</span></button><button role="tab" class={tab} aria-selected="false" data-filter="draft">Draft</button>
+  </div>
+  <div class="flex gap-3 flex-1 sm:flex-none min-w-0">
+    <label class="input-group flex-1 sm:w-72 min-w-0"><Icon name="search" /><span class="sr-only">Search invoices</span><input placeholder="Customer or number" data-search data-table-search></label>
+    <button class="btn shrink-0" popovertarget="range-menu" style="anchor-name:--range-menu" aria-label="Date range: Sep 1 to Oct 31" data-range-btn><Icon name="cal" /><span data-range-label>Sep 1 – Oct 31</span></button>
+    <div class="menu" popover id="range-menu" style="position-anchor:--range-menu" aria-label="Date range"><button type="button" data-range="Last 30 days">Last 30 days</button><button type="button" data-range="Sep 1 – Oct 31">Sep 1 – Oct 31</button><button type="button" data-range="This quarter">This quarter</button><button type="button" data-range="This year">This year</button></div>
+  </div>
+</div>
+
+<div class="alert mb-5" role="status" data-bulk-bar hidden><Icon name="info" /><div class="alert-body"><b data-bulk-count>0 invoices selected.</b> <span class="text-ink-2">Send reminders or export them together.</span></div><div class="alert-actions"><button class="btn btn-sm btn-quiet" data-clear-selection>Clear</button><button class="btn btn-sm" data-toast="Export started">Export</button><button class="btn btn-sm btn-go" data-bulk-remind><Icon name="send" />Send reminders</button></div></div>
+
+<section class="panel !p-0">
+  <div class="table-scroll px-2 pt-1" data-table-wrap><InvoiceTable rows={CUSTOMERS} /></div>
+  <div class="empty" data-empty hidden>
+    <div class="lcd readout"><span class="readout-value">0</span><span class="readout-unit" data-empty-unit>Drafts</span></div>
+    <h2 data-empty-title>Nothing waiting to send</h2>
+    <p data-empty-text>Invoices you start but don’t send wait here. Everything you’ve started has gone out.</p>
+    <button class="btn btn-sm" data-open-dialog="new-invoice" data-empty-new><Icon name="plus" sw="2.2" />Start a draft</button>
+    <button class="btn btn-sm" data-clear-search hidden><Icon name="x" />Clear search</button>
+  </div>
+  <nav class="pager px-5 sm:px-6 py-4 border-t border-[color:var(--k-seam)]" aria-label="Pagination" data-pager>
+    <button class="btn btn-sm" disabled><Icon name="left" />Previous</button>
+    <p class="pager-status" data-showing>Showing all 10 invoices</p>
+    <button class="btn btn-sm" disabled>Next<Icon name="right" /></button>
+  </nav>
+</section>
+</AppShell>

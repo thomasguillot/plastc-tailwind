@@ -1,0 +1,50 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import Icon from '../../components/Icon.astro';
+import LineChart from '../../components/charts/LineChart.astro';
+import InvoiceTable from '../../components/app/InvoiceTable.astro';
+import NewInvoiceButton from '../../components/app/NewInvoiceButton.astro';
+import { CUSTOMERS, MONTHS, REV } from '../../data/app';
+
+const attention = [
+  { initials: 'NC', name: 'Northwind Co-op', status: '22 days overdue', lamp: 'lamp-danger', amount: '$9,300.00', action: { label: 'Remind', quiet: false, toast: 'Reminder sent to Northwind Co-op' } },
+  { initials: 'FD', name: 'Fenwick & Daughters', status: '34 days overdue', lamp: 'lamp-danger', amount: '$3,140.00', action: { label: 'Remind', quiet: false, toast: 'Reminder sent to Fenwick & Daughters' } },
+  { initials: 'JP', name: 'Juno Park', status: 'Due in 3 days', lamp: 'lamp-warn', amount: '$1,980.00', action: { label: 'Snooze', quiet: true, toast: 'Snoozed until Friday' } },
+];
+---
+<AppShell title="Dashboard · Plastc" active="dashboard" heading="Welcome back, Mira" sub="Here’s how invoicing is tracking this month.">
+<Fragment slot="actions"><button class="btn" data-toast="Export started. We’ll email the CSV."><Icon name="down" />Export</button><NewInvoiceButton /></Fragment>
+<section class="lcd px-6 py-5 grid gap-5 sm:grid-cols-3 sm:gap-0 sm:divide-x divide-[color:rgb(0_0_0/0.14)]" aria-label="Key figures for October">
+  <div class="sm:pr-6"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Revenue · Oct</p><p class="text-[32px] font-semibold leading-none mt-2 tracking-[-0.02em]">$44,900</p><p class="text-xs mt-2">▲ 7.4% vs Sep</p></div>
+  <div class="sm:px-6"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Outstanding</p><p class="text-[32px] font-semibold leading-none mt-2 tracking-[-0.02em]">$15,447</p><p class="text-xs mt-2">2 of 5 overdue</p></div>
+  <div class="sm:pl-6"><p class="text-[11px] tracking-[0.12em] uppercase text-lcd-dim">Avg. days to pay</p><p class="text-[32px] font-semibold leading-none mt-2 tracking-[-0.02em]">18.2</p><p class="text-xs mt-2">▼ 2.1 days faster</p></div>
+</section>
+
+<div class="grid gap-6 xl:grid-cols-[1.6fr_1fr] mt-8 [&>*]:min-w-0">
+  <section class="panel !p-5 sm:!p-6 flex flex-col" aria-labelledby="rev-h">
+    <div class="flex flex-wrap items-center gap-3 justify-between mb-5">
+      <div><h2 id="rev-h" class="font-bold">Revenue</h2><p class="text-sm text-ink-2">Paid invoices by month</p></div>
+      <p class="text-sm text-ink-2 tabular-nums">Nov 2025 – Oct 2026</p>
+    </div>
+    <LineChart values={REV} labels={MONTHS} highlight={11} class="h-[220px] sm:h-[260px] xl:h-auto xl:flex-1 xl:min-h-[220px]" />
+  </section>
+  <section class="panel !p-5 sm:!p-6" aria-labelledby="att-h">
+    <div class="flex items-center justify-between mb-2"><h2 id="att-h" class="font-bold">Needs attention</h2><a href="invoices.html" class="btn btn-quiet btn-sm">View all</a></div>
+    <ul class="divide-y divide-[color:var(--k-seam)]">
+      {attention.map((a) => <li class="flex items-center gap-3 py-3.5"><span class="avatar !w-9 !h-9 !text-xs shrink-0">{a.initials}</span><div class="min-w-0 flex-1"><p class="font-semibold text-sm truncate">{a.name}</p><p class="mt-1"><span class={`badge ${a.lamp} !font-semibold !text-[13px] !text-ink-2 whitespace-nowrap`}>{a.status}</span></p></div><div class="flex flex-col items-end gap-1.5 shrink-0"><p class="font-semibold text-sm tabular-nums">{a.amount}</p><button class={a.action.quiet ? 'btn btn-sm btn-quiet' : 'btn btn-sm'} data-toast={a.action.toast}>{a.action.label}</button></div></li>)}
+    </ul>
+    <div class="mt-4">
+      <div class="flex justify-between gap-3 text-[13px] mb-2"><span class="font-semibold">Collected this quarter</span><span class="text-ink-2 tabular-nums">$112,400 of $140,000</span></div>
+      <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="140000" aria-valuenow="112400" aria-label="Collected this quarter"><span style="--v:80%"></span></div>
+    </div>
+  </section>
+</div>
+
+<section class="panel !p-0 mt-8" aria-labelledby="recent-h">
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 pt-5 pb-3">
+    <h2 id="recent-h" class="font-bold">Recent invoices</h2>
+    <a class="btn btn-sm" href="invoices.html">All invoices<Icon name="right" /></a>
+  </div>
+  <div class="table-scroll px-2 pb-2"><InvoiceTable rows={CUSTOMERS.slice(0, 6)} select={false} /></div>
+</section>
+</AppShell>

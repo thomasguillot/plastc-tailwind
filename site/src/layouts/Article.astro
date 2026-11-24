@@ -1,0 +1,47 @@
+---
+import { render } from 'astro:content';
+import Marketing from './Marketing.astro';
+import Icon from '../components/Icon.astro';
+import PostCard from '../components/blog/PostCard.astro';
+import BlogSubscribe from '../components/blog/BlogSubscribe.astro';
+import { BLOG_AUTHORS, categoryLabel, displayDate, getPosts, isoDate, postHref, type Post } from '../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const posts = await getPosts();
+const [featured] = posts;
+const index = posts.findIndex((p) => p.id === post.id);
+const related = index === 0 ? [posts[3], posts[4], posts[1]] : [1, 2, 3].map((k) => posts[(index + k) % posts.length]);
+const { title, excerpt, ledeNote, category, author, date, readTime } = post.data;
+const by = BLOG_AUTHORS[author];
+const { Content } = await render(post);
+---
+<Marketing title={`${title} · Plastc`} active="blog">
+<article>
+  <header class="max-w-[1200px] mx-auto px-4 md:px-8 pt-10 md:pt-16">
+    <div class="max-w-[648px] mx-auto">
+      <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="blog.html">Blog</a></li><li><a href={`blog.html?category=${category}`}>{categoryLabel(category)}</a></li><li><span aria-current="page">{title}</span></li></ol></nav>
+      <h1 class="display text-[38px] sm:text-[48px] md:text-[56px] mt-6 text-balance">{title}</h1>
+      <p class="text-lg md:text-xl text-ink-2 mt-5 leading-relaxed text-pretty">{excerpt}{ledeNote && ` ${ledeNote}`}</p>
+      <div class="byline mt-8 pb-8 border-b border-[color:var(--k-seam)]"><span class="avatar">{by.initials}</span><div><strong>{by.name}</strong><p class="post-meta"><span>{by.role}</span><time datetime={isoDate(date)}>{displayDate(date)}</time><span>{readTime} min read</span></p></div></div>
+    </div>
+  </header>
+  <div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-10 md:pt-12 pb-6">
+    <div class="prose mx-auto">
+<Content />
+    </div>
+  </div>
+</article>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 pt-14 md:pt-20" aria-labelledby="more-h">
+  <div class="flex flex-wrap items-end justify-between gap-4 pt-10 border-t border-[color:var(--k-seam)]">
+    <h2 id="more-h" class="text-[26px] md:text-[30px] font-bold tracking-[-0.015em]">More from the blog</h2>
+    <a class="btn btn-sm" href="blog.html">All posts<Icon name="right" class="w-4 h-4" /></a>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">{related.map((p) => <PostCard post={p} href={postHref(p, featured)} />)}</div>
+</section>
+
+<BlogSubscribe id="article-sub" />
+</Marketing>

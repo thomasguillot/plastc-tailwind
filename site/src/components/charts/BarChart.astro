@@ -1,0 +1,15 @@
+---
+interface Props {
+  values: number[];
+  labels: string[];
+  label: string;
+  current?: number;
+  h?: number;
+}
+const { values, labels, label, current = -1, h = 190 } = Astro.props;
+const n = values.length;
+const hi = Math.max(...values);
+const cur = ((current % n) + n) % n;
+const flag = (k: number) => (k === cur ? '' : undefined);
+---
+<div class="bar-chart" style={`--chart-h:${h - 40}px`} role="img" aria-label={label}>{values.map((v, k) => <div class="bar" style={`--v:${((v / hi) * 100).toFixed(1)}%`} data-current={flag(k)}><span>{v}</span></div>)}</div><div class="bar-chart-axis" aria-hidden="true">{labels.map((l, k) => <span data-current={flag(k)}>{l}</span>)}</div>

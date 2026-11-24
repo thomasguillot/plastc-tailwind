@@ -1,0 +1,15 @@
+---
+export interface TimelineItem {
+  lamp?: string;
+  title: string;
+  text: string;
+  time: string;
+  datetime?: string;
+}
+interface Props {
+  items: TimelineItem[];
+  class?: string;
+}
+const { items, class: cls = 'timeline' } = Astro.props;
+---
+<ol class={cls}>{items.map(({ lamp, title, text, time, datetime }) => <li class={lamp}><b>{title}</b>{text && ` ${text}`}<time datetime={datetime}>{time}</time></li>)}</ol>

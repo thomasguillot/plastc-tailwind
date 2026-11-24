@@ -1,0 +1,23 @@
+---
+interface Props {
+  segments: { name: string; value: number; lamp: string }[];
+  total: string;
+  caption: string;
+  label: string;
+  r?: number;
+  sw?: number;
+}
+const { segments, total, caption, label, r = 54, sw = 14 } = Astro.props;
+const c = 2 * Math.PI * r;
+const sum = segments.reduce((a, s) => a + s.value, 0);
+const gap = 3;
+let off = 0;
+let arcs = '';
+for (const { value, lamp } of segments) {
+  const ln = (c * value) / sum;
+  arcs += `<circle class="chart-seg ${lamp}" cx="70" cy="70" r="${r}" stroke-width="${sw}" stroke-dasharray="${Math.max(ln - gap, 0.1).toFixed(2)} ${c.toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
+  off += ln;
+}
+const inner = `<circle class="chart-track" cx="70" cy="70" r="${r}" stroke-width="${sw}"/>${arcs}<text class="chart-total" x="70" y="70" text-anchor="middle">${total}</text><text class="chart-caption" x="70" y="89" text-anchor="middle">${caption}</text>`;
+---
+<svg class="chart" viewBox="0 0 140 140" role="img" aria-label={label} set:html={inner}></svg>

@@ -1,0 +1,12 @@
+---
+interface Props {
+  values: number[];
+  w?: number;
+  h?: number;
+}
+const { values, w = 120, h = 32 } = Astro.props;
+const lo = Math.min(...values);
+const hi = Math.max(...values);
+const pts = values.map((v, k) => `${((k * w) / (values.length - 1)).toFixed(1)},${(h - 3 - ((v - lo) / (hi - lo)) * (h - 6)).toFixed(1)}`).join(' ');
+---
+<svg class="sparkline" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true" set:html={`<polyline points="${pts}"/>`}></svg>
