@@ -1,11 +1,13 @@
 ---
 import Icon from '../../Icon.astro';
 ---
-<p class="text-sm text-ink-2 mb-4 max-w-[52ch]" data-demo-note>The only parts that float. Menus grow from their button, the dialog settles in from the centre, and toasts rise from the bottom. Each leaves faster than it arrives. All native: popover and &lt;dialog&gt;, so Esc and outside-click work without a script.</p>
+<p class="text-sm text-ink-2 mb-4 max-w-[52ch]" data-demo-note>Menus grow from their button, the dialog settles in from the center, the sheet slides in from the left and toasts rise from the bottom. Each leaves faster than it arrives.</p>
 <div class="flex flex-wrap gap-3">
   <button class="btn" popovertarget="demo-menu" style="anchor-name:--demo-menu"><Icon name="dots" />Open menu</button>
-  <div class="menu" popover id="demo-menu" style="position-anchor:--demo-menu;position-area:bottom span-right;transform-origin:top left"><a href="#components"><Icon name="file" />View</a><button type="button" data-toast="Duplicated"><Icon name="copy" />Duplicate</button><hr><button type="button" class="!text-danger" data-open-dialog="demo-dialog"><Icon name="trash" />Delete…</button></div>
+  <div class="menu" popover id="demo-menu" style="position-anchor:--demo-menu;position-area:bottom span-right;transform-origin:top left"><a href="/screens/invoices.html"><Icon name="file" />View</a><button type="button" data-toast="Duplicated"><Icon name="copy" />Duplicate</button><hr><button type="button" class="!text-danger" data-open-dialog="demo-dialog"><Icon name="trash" />Delete…</button></div>
   <button class="btn" data-open-dialog="demo-dialog">Open dialog</button>
+  <button class="btn" data-open-dialog="demo-sheet">Open sheet</button>
   <button class="btn" data-toast="Invoice INV-0193 sent">Show toast</button>
 </div>
 <dialog class="dialog" id="demo-dialog" aria-labelledby="dd-h"><form method="dialog" class="grid gap-4"><h4 id="dd-h" class="text-lg font-bold">Delete this draft?</h4><p class="text-sm text-ink-2">It hasn’t been sent, so no one else has seen it. This can’t be undone.</p><div class="flex justify-end gap-3 pt-2"><button class="btn" value="cancel" autofocus>Keep draft</button><button class="btn btn-danger" value="delete"><Icon name="trash" />Delete</button></div></form></dialog>
+<dialog class="sheet" id="demo-sheet" aria-labelledby="ds-h"><div class="grid gap-4"><div class="flex items-center justify-between"><h4 id="ds-h" class="font-bold">Plastc Invoicing</h4><button type="button" class="btn btn-quiet btn-sm btn-icon" data-close-dialog aria-label="Close navigation"><Icon name="x" /></button></div><nav class="flex flex-col gap-1" aria-label="Invoicing"><a class="nav-item" href="/screens/dashboard.html"><Icon name="home" />Dashboard</a><a class="nav-item" href="/screens/invoices.html"><Icon name="file" />Invoices</a><a class="nav-item" href="/screens/customers.html"><Icon name="users" />Customers</a><a class="nav-item" href="/screens/reports.html"><Icon name="chart" />Reports</a></nav></div></dialog>
