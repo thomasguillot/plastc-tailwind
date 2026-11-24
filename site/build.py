@@ -78,7 +78,8 @@ HEAD = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="description" content="{description}">
+{extra}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{root}dist.css">
@@ -95,9 +96,13 @@ FOOT = """<div id="live" class="sr-only" aria-live="polite"></div>
 </html>
 """
 
-def page(path, title, body, root=""):
+SITE = "https://plastc.space.fast"
+DESCRIPTION = "Plastc is a neumorphic UI library for Tailwind CSS v4: components, app screens and tokens in one CSS file, with light and dark themes and contrast checked against WCAG 2 and APCA."
+SCREEN_DESCRIPTION = "A reference screen built with Plastc, a neumorphic UI library for Tailwind CSS v4. Sample data only."
+
+def page(path, title, body, root="", description=SCREEN_DESCRIPTION, extra=""):
     (HERE / path).parent.mkdir(parents=True, exist_ok=True)
-    (HERE / path).write_text(HEAD.format(title=title, root=root) + body + FOOT.format(root=root))
+    (HERE / path).write_text(HEAD.format(title=title, root=root, description=description, extra=extra) + body + FOOT.format(root=root))
 
 def housing_seg(light="Light", dark="Dark", extra=""):
     return f'''<div class="seg {extra}" role="group" aria-label="Appearance">
@@ -596,5 +601,12 @@ showcase = f'''<body>
   <span>Plastc, a neumorphic UI library for Tailwind CSS v4.</span><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
 </footer>
 '''
-page("index.html", "Plastc UI", showcase)
+HOME_TITLE = "Neumorphic UI library for Tailwind CSS v4 · Plastc"
+page("index.html", HOME_TITLE, showcase, description=DESCRIPTION, extra=f"""<link rel="canonical" href="{SITE}/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plastc">
+<meta property="og:title" content="{HOME_TITLE}">
+<meta property="og:description" content="{DESCRIPTION}">
+<meta property="og:url" content="{SITE}/">
+""")
 print("built")

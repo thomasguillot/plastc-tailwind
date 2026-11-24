@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "title": "Plastc",
+    "description": "A neumorphic UI library for Tailwind CSS v4: components, app screens and tokens in one CSS file.",
+    "favicon": "/favicon.svg"
+  },
+  "headers": [
+    {
+      "source": "/screens/*",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    }
+  ]
+}
