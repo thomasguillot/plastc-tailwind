@@ -102,6 +102,21 @@
     setTimeout(() => target && target.focus(), 50);
   });
 
+  const lockCopyWidth = c => {
+    if (c.dataset.copyLocked || !c.offsetWidth) return;
+    const was = c.innerHTML, svg = (was.match(/<svg[\s\S]*?<\/svg>/) || [''])[0];
+    c.style.minWidth = '';
+    const w0 = c.getBoundingClientRect().width;
+    c.innerHTML = svg + 'Copied';
+    const w1 = c.getBoundingClientRect().width;
+    c.innerHTML = was;
+    c.style.minWidth = Math.ceil(Math.max(w0, w1)) + 'px';
+    c.dataset.copyLocked = '1';
+  };
+  const lockCopyWidths = () => document.querySelectorAll('[data-copy], [data-copy-from]').forEach(lockCopyWidth);
+  lockCopyWidths();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { document.querySelectorAll('[data-copy-locked]').forEach(c => delete c.dataset.copyLocked); lockCopyWidths(); });
+
   /* ---------- clicks */
   document.addEventListener('click', e => {
     const t = e.target;
@@ -137,13 +152,13 @@
       if (!copyLabels.has(c)) copyLabels.set(c, c.innerHTML);
       const label = copyLabels.get(c);
       const done = ok => {
-        if (!c.style.minWidth) c.style.minWidth = getComputedStyle(c).width;
+        lockCopyWidth(c);
         const svg = (label.match(/<svg[\s\S]*?<\/svg>/) || [''])[0];
         const icon = ok ? svg.replace(/(<svg[^>]*>)[\s\S]*<\/svg>/, '$1<path d="m5 12.5 4.5 4.5L19 7.5"/></svg>') : svg;
         c.innerHTML = icon + (ok ? 'Copied' : 'Copy failed');
         live(ok ? 'Copied to clipboard' : 'Copy failed. Select the text and copy it.');
         clearTimeout(c._copyTimer);
-        c._copyTimer = setTimeout(() => { c.innerHTML = label; c.style.minWidth = ''; }, 1400);
+        c._copyTimer = setTimeout(() => { c.innerHTML = label; }, 1400);
       };
       (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => done(true), () => done(false));
       return;
