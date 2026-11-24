@@ -577,23 +577,16 @@
   transition-property: box-shadow, translate, scale, background-color;
   transition-duration: var(--dur-press-up);
   transition-timing-function: var(--ease-out);
-  @media (hover: hover) and (pointer: fine) { &:hover:not(:active, [aria-pressed="true"], :disabled, [aria-disabled="true"]) { box-shadow: var(--k-raised-hover); } }
+  @media (hover: hover) and (pointer: fine) { &:hover:not(:active, [aria-pressed="true"], [aria-checked="true"], :disabled, [aria-disabled="true"]) { box-shadow: var(--k-raised-hover); } }
   &:active:not(:disabled, [aria-disabled="true"]) { transition-duration: var(--dur-press-down); translate: 0 1px; scale: 0.985; background: var(--k-housing); box-shadow: var(--k-pressed); }
-  &[aria-pressed="true"]:not(:disabled, [aria-disabled="true"]) { translate: 0 1px; background: var(--k-well); box-shadow: var(--k-latched); }
-  &[aria-checked="true"]:not(:active, :disabled, [aria-disabled="true"]) { background: radial-gradient(circle at 50% 30%, var(--k-chosen-top), var(--k-chosen) 70%); }
-  &[aria-checked="true"]::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: 15%;
-    width: min(16px, 34%); height: 3px; margin-inline: auto; border-radius: 3px;
-    background: var(--k-ink);
-  }
+  &:is([aria-pressed="true"], [aria-checked="true"]):not(:disabled, [aria-disabled="true"]) { translate: 0 1px; background: var(--k-well); box-shadow: var(--k-latched); }
   &:is(:disabled, [aria-disabled="true"]) {
     cursor: not-allowed; color: var(--k-ink-off);
     background: transparent; box-shadow: none;
     border: 1px dashed color-mix(in oklab, var(--k-ink-off) 60%, transparent);
     translate: none; scale: none;
   }
-  &[aria-pressed="true"]:is(:disabled, [aria-disabled="true"]) { background: color-mix(in oklab, var(--k-ink-off) 18%, transparent); }
-  &[aria-checked="true"]:is(:disabled, [aria-disabled="true"])::after { background: var(--k-ink-off); }
+  &:is([aria-pressed="true"], [aria-checked="true"]):is(:disabled, [aria-disabled="true"]) { background: color-mix(in oklab, var(--k-ink-off) 18%, transparent); }
 }
 
 /* ---------------------------------------------------------------- fields */
@@ -1579,8 +1572,6 @@
   .check:checked, .radio:checked, .switch:checked { background: Highlight; }
   .switch::before { border: 1px solid CanvasText; }
   .badge::before { forced-color-adjust: none; }
-  .key[aria-checked="true"]::after { forced-color-adjust: none; background: Highlight; }
-  .key[aria-checked="true"]:is(:disabled, [aria-disabled="true"])::after { background: GrayText; box-shadow: none; }
   .ktable tbody tr:has(input[type="checkbox"]:checked) { outline: 2px solid Highlight; outline-offset: -2px; }
 }
 
