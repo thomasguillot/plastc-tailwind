@@ -1,35 +1,33 @@
+import libraryCss from '../../../src/plastc.css?raw';
+
 export interface ShowcaseGroupInfo {
   id: string;
   title: string;
   classes: string;
-  wide?: boolean;
 }
 
 const slug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const group = (title: string, classes: string, wide = false): ShowcaseGroupInfo => ({ id: slug(title), title, classes, wide });
+const group = (title: string, classes: string): ShowcaseGroupInfo => ({ id: slug(title), title, classes });
 
 export const GROUPS = {
-  buttons: group('Buttons', '.btn  .btn-signal  .btn-go  .btn-quiet  .btn-sm…2xl'),
+  depth: group('Depth levels', '.panel  .raised  .recessed  .float'),
+  panels: group('Panels and seams', '.panel  .seam  .depth-deep'),
+  buttons: group('Buttons', '.btn  .btn-signal  .btn-go  .btn-quiet  .btn-danger  .btn-sm…2xl  .key'),
   inputs: group('Inputs', '.field  .field-select  .field-area  .label  .hint'),
   inputGroups: group('Input groups', '.input-group  .input-affix'),
   status: group('Status & feedback', '.badge  .lamp-*  .tag  .meter  .alert'),
   combobox: group('Combobox & date picker', '.combobox  .calendar  .popover'),
   selection: group('Selection', '.check  .radio  .switch  .choice-card  .seg  .range'),
   empty: group('Empty states', '.empty  .readout  .empty-actions'),
-  overlays: group('Overlays', '.menu  .dialog  .toast  .tooltip'),
+  overlays: group('Overlays', '.menu  .dialog  .sheet  .toast  .tooltip'),
   progress: group('Progress & loading', '.progress  .spinner  .skeleton'),
   upload: group('File upload', '.dropzone  .file-item'),
   tabs: group('Tabs & pagination', '.tabs  .pager  .pager-pages  .pager-status'),
   command: group('Breadcrumbs & command menu', '.breadcrumbs  .command'),
   accordion: group('Accordion & description list', '.accordion  .desc-list'),
   timeline: group('Avatar group & timeline', '.avatar-group  .timeline'),
-  charts: group('Charts', '.bar-chart  .chart  .sparkline', true),
-  navigation: group('Navigation & data', '.nav-item  .seg  .ktable  .kbd  .lcd', true),
-} satisfies Record<string, ShowcaseGroupInfo>;
-
-export const SURFACE_GROUPS = {
-  depth: group('Depth levels', '.panel  .raised  .recessed  .float'),
-  panels: group('Panels and seams', '.panel  .seam  .depth-deep'),
+  charts: group('Charts', '.bar-chart  .chart  .sparkline'),
+  navigation: group('Navigation & data', '.nav-item  .seg  .ktable  .kbd  .lcd'),
 } satisfies Record<string, ShowcaseGroupInfo>;
 
 export const SCREENS = [
@@ -61,3 +59,5 @@ export const DEPTH_TOKENS = [
 ];
 
 export const SCALE = [25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+export const SWATCH_HEX: Record<string, string> = Object.fromEntries([...libraryCss.matchAll(/--color-([a-z]+-\d+):\s*(#[0-9a-f]{3,8})/gi)].map((m) => [m[1], m[2]]));

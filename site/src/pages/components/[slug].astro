@@ -24,7 +24,7 @@ import Surfaces from '../../components/showcase/examples/Surfaces.astro';
 import Panels from '../../components/showcase/examples/Panels.astro';
 import { PAGES } from '../../components/components/pages';
 import { MATRICES } from '../../components/components/matrices';
-import { DEPTH_TOKENS, GROUPS, SCALE, SURFACE_GROUPS } from '../../data/showcase';
+import { DEPTH_TOKENS, GROUPS, SCALE, SWATCH_HEX } from '../../data/showcase';
 
 export function getStaticPaths() {
   return PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
@@ -38,45 +38,47 @@ const commandExample: CommandGroup[] = [
   { label: 'Go to', items: [{ icon: 'home', text: 'Dashboard', attrs: { href: 'dashboard.html' } }, { icon: 'file', text: 'Invoices', attrs: { href: 'invoices.html' } }] },
   { label: 'Actions', items: [{ icon: 'plus', text: 'New invoice', attrs: { 'data-command': 'new-invoice' }, kbd: 'N' }] },
 ];
-const description = `${page.summary} Live examples, a table of classes and a grid of every state.`;
+const EXAMPLES = {
+  depth: Surfaces,
+  panels: Panels,
+  buttons: Buttons,
+  inputs: Inputs,
+  inputGroups: InputGroups,
+  combobox: Combobox,
+  upload: FileUpload,
+  selection: Selection,
+  status: Status,
+  progress: Progress,
+  empty: EmptyStates,
+  overlays: Overlays,
+  tabs: Tabs,
+  command: Breadcrumbs,
+  accordion: Accordion,
+  navigation: NavigationData,
+  timeline: AvatarTimeline,
+  charts: Charts,
+} satisfies Record<keyof typeof GROUPS, unknown>;
+const examples = page.examples.map((key) => ({ key, info: GROUPS[key], Example: EXAMPLES[key] }));
+const swatches = (names: string[]) => names.map((name) => ({ name, hex: SWATCH_HEX[name] }));
+const gray = swatches(SCALE.map((n) => `gray-${n}`));
+const brand = swatches(SCALE.map((n) => `brand-${n}`));
+const signals = swatches(colors.map(({ c, n }) => `${c}-${n}`));
 ---
-<Components title={`${page.title} · Components · Plastc`} description={description} current={slug}>
+<Components title={`${page.title} · Components · Plastc`} description={page.summary} current={slug}>
   <p class="engraved"><a class="no-underline" href="/components/">Components</a></p>
   <h1 class="display text-[44px] sm:text-[56px] md:text-[64px] mt-3">{page.title}</h1>
   <p class="text-lg text-ink-2 max-w-[56ch] mt-5 leading-relaxed">{page.lead}</p>
 
   <section aria-labelledby="examples" class="mt-12">
     <h2 id="examples" class="text-[28px] font-bold tracking-[-0.015em]">Examples</h2>
-    <p class="text-ink-2 max-w-[56ch] mt-2">Every part is live. Press, type and toggle, then view or copy the markup.</p>
-    <div class="mt-4 grid gap-x-14 [&>*]:min-w-0">
-      {slug === 'surfaces' && <>
-        <ShowcaseGroup {...SURFACE_GROUPS.depth}><Surfaces /></ShowcaseGroup>
-        <ShowcaseGroup {...SURFACE_GROUPS.panels}><Panels /></ShowcaseGroup>
-      </>}
-      {slug === 'buttons' && <ShowcaseGroup {...GROUPS.buttons}><Buttons /></ShowcaseGroup>}
-      {slug === 'fields' && <>
-        <ShowcaseGroup {...GROUPS.inputs}><Inputs /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.inputGroups}><InputGroups /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.combobox}><Combobox /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.upload}><FileUpload /></ShowcaseGroup>
-      </>}
-      {slug === 'selection' && <ShowcaseGroup {...GROUPS.selection}><Selection /></ShowcaseGroup>}
-      {slug === 'status' && <>
-        <ShowcaseGroup {...GROUPS.status}><Status /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.progress}><Progress /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.empty}><EmptyStates /></ShowcaseGroup>
-      </>}
-      {slug === 'overlays' && <ShowcaseGroup {...GROUPS.overlays}><Overlays /><Fragment slot="extra"><div class="toast" popover="manual" role="status" id="toast"><span>Invoice INV-0193 sent</span><button type="button" class="lcd-action">Undo</button></div></Fragment></ShowcaseGroup>}
-      {slug === 'navigation' && <>
-        <ShowcaseGroup {...GROUPS.tabs}><Tabs /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.command}><Breadcrumbs /><CommandMenu slot="extra" groups={commandExample} /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.accordion}><Accordion /></ShowcaseGroup>
-      </>}
-      {slug === 'data' && <>
-        <ShowcaseGroup {...GROUPS.navigation}><NavigationData /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.timeline}><AvatarTimeline /></ShowcaseGroup>
-        <ShowcaseGroup {...GROUPS.charts}><Charts /></ShowcaseGroup>
-      </>}
+    <div class="mt-4 grid [&>*]:min-w-0">
+      {examples.map(({ key, info, Example }) => (
+        <ShowcaseGroup {...info}>
+          <Example />
+          {key === 'overlays' && <Fragment slot="extra"><div class="toast" popover="manual" role="status" id="toast"><span>Invoice INV-0193 sent</span><button type="button" class="lcd-action">Undo</button></div></Fragment>}
+          {key === 'command' && <CommandMenu slot="extra" groups={commandExample} />}
+        </ShowcaseGroup>
+      ))}
     </div>
   </section>
 
@@ -87,27 +89,47 @@ const description = `${page.summary} Live examples, a table of classes and a gri
       <div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-8">{DEPTH_TOKENS.map(({ name, token, style, note, decl }) => <div class="min-w-0"><div class="rounded-[18px] seam p-5"><div class="h-20 rounded-[14px] grid place-items-center text-[13px] font-bold" style={style}>{name}</div></div><p class="font-mono text-[13px] font-bold mt-3">{token}</p><p class="text-sm text-ink-2 mt-1">{note}</p><button class="btn btn-quiet btn-sm mt-2" data-copy={decl} aria-label={`Copy ${decl}`}><Icon name="copy" />Copy</button></div>)}</div>
       <p class="text-sm text-ink-2 max-w-[64ch] mt-6"><code class="font-mono">--k-depth</code> scales every offset and blur. <code class="font-mono">.depth-soft</code> sets it to 0.5 and <code class="font-mono">.depth-deep</code> to 1.7, on any region.</p>
       <h3 class="engraved mt-10 mb-4">Gray, warm and tuned to the light theme</h3>
-      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{SCALE.map((n) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-gray-${n}`} title={`gray-${n}`}></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>)}</div>
+      <div class="grid grid-cols-3 min-[480px]:grid-cols-4 md:grid-cols-6 xl:grid-cols-12 gap-x-1.5 gap-y-4">{gray.map(({ name, hex }) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-${name}`}></div><p class="font-mono text-[11px] text-ink mt-1.5">{name}</p><p class="font-mono text-[11px] text-ink-2">{hex}</p></div>)}</div>
       <h3 class="engraved mt-7 mb-4">Brand, signal orange</h3>
-      <div class="grid grid-cols-6 sm:grid-cols-12 gap-1.5">{SCALE.map((n) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-brand-${n}`} title={`brand-${n}`}></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>)}</div>
+      <div class="grid grid-cols-3 min-[480px]:grid-cols-4 md:grid-cols-6 xl:grid-cols-12 gap-x-1.5 gap-y-4">{brand.map(({ name, hex }) => <div class="min-w-0"><div class={`h-12 rounded-md seam bg-${name}`}></div><p class="font-mono text-[11px] text-ink mt-1.5">{name}</p><p class="font-mono text-[11px] text-ink-2">{hex}</p></div>)}</div>
       <h3 class="engraved mt-7 mb-4">Success, warning and error</h3>
-      <div class="grid grid-cols-6 gap-1.5 max-w-[480px]">{colors.map(({ c, n }) => <div class="min-w-0"><div class={`h-10 rounded-md seam bg-${c}-${n}`} title={`${c}-${n}`}></div><p class="font-mono text-[11px] text-ink-2 mt-1.5 text-center">{n}</p></div>)}</div>
+      <div class="grid grid-cols-3 xl:grid-cols-9 gap-x-1.5 gap-y-4">{signals.map(({ name, hex }) => <div class="min-w-0"><div class={`h-10 rounded-md seam bg-${name}`}></div><p class="font-mono text-[11px] text-ink mt-1.5">{name}</p><p class="font-mono text-[11px] text-ink-2">{hex}</p></div>)}</div>
     </section>
   )}
 
   <section aria-labelledby="states" class="mt-14">
     <h2 id="states" class="text-[28px] font-bold tracking-[-0.015em] scroll-mt-4">States</h2>
     <p class="text-ink-2 max-w-[56ch] mt-2 mb-5">Each part in the states it has, set side by side.</p>
-    <StateMatrix matrix={matrix} />
+    <StateMatrix matrix={matrix} labelledby="states" />
   </section>
 
   <section aria-labelledby="classes" class="mt-14">
     <h2 id="classes" class="text-[28px] font-bold tracking-[-0.015em]">Classes</h2>
-    <div class="table-scroll mt-5">
-      <table class="ktable">
-        <thead><tr><th scope="col">Class</th><th scope="col">Use it for</th><th scope="col">Notes</th></tr></thead>
-        <tbody>{page.rows.map((r) => <tr><th scope="row" class="!normal-case !tracking-normal !text-[13px] !text-ink font-mono whitespace-nowrap border-b border-[color:var(--k-seam)]"><code>{r.cls}</code></th><td class="!whitespace-normal min-w-[200px]">{r.use}</td><td class="!whitespace-normal min-w-[240px] text-ink-2">{r.notes}</td></tr>)}</tbody>
+    <div class="table-scroll cls-scroll mt-5">
+      <table class="ktable cls-table" role="table">
+        <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Class</th><th scope="col" role="columnheader">Use it for</th><th scope="col" role="columnheader">Notes</th></tr></thead>
+        <tbody role="rowgroup">{page.rows.map((r) => <tr role="row"><th scope="row" role="rowheader" class="cls-name !normal-case !tracking-normal !text-[13px] !text-ink font-mono whitespace-nowrap border-b border-[color:var(--k-seam)]"><code>{r.cls}</code></th><td role="cell" class="cls-use !whitespace-normal min-w-[200px]">{r.use}</td><td role="cell" class="cls-notes !whitespace-normal min-w-[240px] text-ink-2">{r.notes}</td></tr>)}</tbody>
       </table>
     </div>
   </section>
 </Components>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const key = (e.target as Element).closest('[data-latch]');
+    if (key) key.setAttribute('aria-pressed', String(key.getAttribute('aria-pressed') !== 'true'));
+  });
+</script>
+
+<style>
+  @media (max-width: 639px) {
+    .cls-scroll { overflow: visible; mask-image: none; }
+    .cls-table, .cls-table tbody, .cls-table tr, .cls-table th, .cls-table td { display: block; }
+    .cls-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .cls-table tbody tr { padding: 14px 0; border-bottom: 1px solid var(--k-seam); box-shadow: 0 1px 0 rgb(var(--k-hl) / calc(0.5 * var(--k-hl-a))); }
+    .cls-table tbody tr:last-child { border-bottom: 0; box-shadow: none; }
+    .cls-table .cls-name, .cls-table .cls-use, .cls-table .cls-notes { min-width: 0; padding: 0; border: 0; box-shadow: none; white-space: normal; }
+    .cls-table .cls-use { margin-top: 6px; }
+    .cls-table .cls-notes { margin-top: 4px; font-size: 14px; }
+  }
+</style>

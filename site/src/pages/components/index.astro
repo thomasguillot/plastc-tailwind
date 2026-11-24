@@ -2,11 +2,12 @@
 import Components from '../../layouts/Components.astro';
 import { PAGES } from '../../components/components/pages';
 
-const description = 'Every Plastc part, grouped by what it does. Each page has live examples to copy, a table of classes and a grid of how each part looks in every state.';
+const titles = PAGES.map((p) => p.title.toLowerCase());
+const description = `Plastc components for Tailwind CSS v4, in ${PAGES.length} groups: ${titles.slice(0, -1).join(', ')} and ${titles.at(-1)}.`;
 ---
 <Components title="Components · Plastc" description={description}>
   <h1 class="display text-[44px] sm:text-[56px] md:text-[64px]">Components</h1>
-  <p class="text-lg text-ink-2 max-w-[56ch] mt-5 leading-relaxed">One page per group. Each has live examples you can copy as HTML, a table of its classes, and a grid of how each part looks in every state.</p>
+  <p class="text-lg text-ink-2 max-w-[56ch] mt-5 leading-relaxed">Pick a group to try its parts, copy their HTML and compare the states each one supports.</p>
   <ul class="grid gap-4 sm:grid-cols-2 mt-10 list-none p-0">
     {PAGES.map((p) => (
       <li class="contents">

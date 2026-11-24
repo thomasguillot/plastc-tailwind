@@ -21,9 +21,9 @@ export const PAGES: ComponentsPage[] = [
     slug: 'surfaces',
     title: 'Surfaces',
     summary: 'The four depths and the tokens behind them, plus panels, seams and the color scales.',
-    lead: 'Every part sits at one of four depths, and the depth tells you what the part does. Build your own parts at the right level with these classes.',
+    lead: 'Every part sits at one of four depths, and the depth tells you what the part does. The six layers on the homepage use these same four: the base and its planes both sit at plane depth, and the LCD is glass set at the recessed depth.',
     classes: '.panel  .seam  .raised  .recessed  .float  .pressable',
-    examples: [],
+    examples: ['depth', 'panels'],
     rows: [
       { cls: '.panel', use: 'A layout container on the plane.', notes: 'Flush, with a seam and no drop shadow.' },
       { cls: '.seam', use: 'A parting line on any element.', notes: 'A 1px line with a highlight lip. Add a radius yourself.' },
@@ -37,7 +37,7 @@ export const PAGES: ComponentsPage[] = [
   {
     slug: 'buttons',
     title: 'Buttons',
-    summary: 'Four colors, five sizes, the icon button and the round key.',
+    summary: 'Five variants in five sizes, plus the icon button and the round key.',
     lead: 'Buttons are the raised parts. They catch more light on hover, sink when pressed and keep their color while down.',
     classes: '.btn  .btn-signal  .btn-go  .btn-quiet  .btn-danger  .btn-icon  .key',
     examples: ['buttons'],
@@ -57,11 +57,11 @@ export const PAGES: ComponentsPage[] = [
     slug: 'fields',
     title: 'Fields',
     summary: 'Text fields, selects, input groups, the combobox, the date picker and file upload.',
-    lead: 'Fields are recessed wells that hold input. Focus, invalid and disabled are read from the input, so you set the attribute and the well follows.',
+    lead: 'Each input sits in a recessed well. Put aria-invalid or disabled on the input itself, and the well around it changes to match.',
     classes: '.field  .field-select  .field-area  .input-group  .combobox  .calendar  .dropzone',
     examples: ['inputs', 'inputGroups', 'combobox', 'upload'],
     rows: [
-      { cls: '.field', use: 'A text input.', notes: 'Invalid with aria-invalid="true". Disabled drops the well.' },
+      { cls: '.field', use: 'A text input.', notes: 'Add aria-invalid="true" when the value is wrong. A disabled field loses its well.' },
       { cls: '.field-select', use: 'A native select.', notes: 'Add it next to .field. It draws its own chevron.' },
       { cls: '.field-area', use: 'A multi-line input.', notes: 'Resizes vertically. Minimum height 108px.' },
       { cls: '.label, .hint, .hint-error', use: 'Text around a field.', notes: 'Tie them to the input with for and aria-describedby.' },
@@ -76,7 +76,7 @@ export const PAGES: ComponentsPage[] = [
     slug: 'selection',
     title: 'Selection',
     summary: 'Checkboxes, radios, switches, choice cards, segmented controls and the range slider.',
-    lead: 'Choosing something changes its depth. Checked parts and chosen cards sink in, and the chosen segment stands up.',
+    lead: 'A chosen card sinks into the page, and the chosen segment is the one raised part in its channel. Checkboxes, radios and switches stay recessed and mark the choice instead.',
     classes: '.check  .radio  .switch  .choice-card  .seg  .range',
     examples: ['selection'],
     rows: [
@@ -109,8 +109,8 @@ export const PAGES: ComponentsPage[] = [
   {
     slug: 'overlays',
     title: 'Overlays',
-    summary: 'Menus, dialogs, toasts and tooltips, the only parts with a long shadow.',
-    lead: 'Overlays sit above the page. Menus, dialogs and toasts are native popover and dialog elements, so Esc and outside clicks work without a script.',
+    summary: 'Menus, dialogs, sheets, toasts and tooltips. Only these parts cast a long shadow.',
+    lead: 'Menus, dialogs, sheets and toasts are native popover and dialog elements, so Esc and outside clicks close them without a script. Tooltips are pure CSS and show on hover or focus.',
     classes: '.menu  .dialog  .sheet  .toast  .tooltip  .lcd-action',
     examples: ['overlays'],
     rows: [
@@ -126,7 +126,7 @@ export const PAGES: ComponentsPage[] = [
     slug: 'navigation',
     title: 'Navigation',
     summary: 'Tabs, pagination, breadcrumbs, the command menu and the accordion.',
-    lead: 'Navigation stays flat. The current tab carries an ink indicator and the current breadcrumb is bold, so nothing competes with the buttons.',
+    lead: 'Tabs and breadcrumbs mark where you are with ink: a line under the current tab, bold type for the current page. They stay flat, so they never compete with buttons.',
     classes: '.tabs  .pager  .breadcrumbs  .command  .accordion  .desc-list',
     examples: ['tabs', 'command', 'accordion'],
     rows: [
@@ -143,7 +143,7 @@ export const PAGES: ComponentsPage[] = [
     slug: 'data',
     title: 'Data',
     summary: 'Nav items, tables, key hints, LCD readouts, avatar groups, timelines and charts.',
-    lead: 'Data stays flat. Rows, bars and stat blocks are never extruded, and only LCD readouts sit in a well.',
+    lead: 'Rows, bars and stats stay flat on the page. Only an LCD readout, the current nav item and a selected table row sink in.',
     classes: '.nav-item  .ktable  .kbd  .lcd  .avatar-group  .timeline  .bar-chart  .chart',
     examples: ['navigation', 'timeline', 'charts'],
     rows: [
@@ -159,4 +159,3 @@ export const PAGES: ComponentsPage[] = [
   },
 ];
 
-export const ORDER = PAGES.map((p) => p.slug);
