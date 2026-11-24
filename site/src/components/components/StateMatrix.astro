@@ -52,7 +52,7 @@ const heldNote = heldText ? `${heldText[0].toUpperCase()}${heldText.slice(1)} ${
     const over = max > 1;
     frame.toggleAttribute('data-more-start', over && scroll.scrollLeft > 1);
     frame.toggleAttribute('data-more-end', over && scroll.scrollLeft < max - 1);
-    hint.hidden = !over;
+    hint.hidden = max <= 24;
     if (over) scroll.tabIndex = 0;
     else scroll.removeAttribute('tabindex');
   };
