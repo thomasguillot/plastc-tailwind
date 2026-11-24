@@ -872,13 +872,15 @@ def jump_list():
 CB_SEEN = {}
 for row_ in CUSTOMERS: CB_SEEN.setdefault(row_[1], row_[2])
 CB_OPTS = "".join(f'<div role="option" id="cb1-o{n}" aria-selected="false" data-value="{name}"><span class="avatar !w-7 !h-7 !text-[11px]">{ini}</span>{name}</div>' for n, (name, ini) in enumerate(CB_SEEN.items()))
-screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("settings", "Settings"), ("sign-in", "Sign in")]
-viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in screens)
+screens = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("customers", "Customers"), ("reports", "Reports"), ("products", "Products"), ("settings", "Settings")]
+VIEWER_SCREENS = [("dashboard", "Dashboard"), ("invoices", "Invoices"), ("customers", "Customers"), ("reports", "Reports"), ("products", "Products"), ("settings", "Settings"), ("sign-in", "Sign in"), ("landing", "Landing page")]
+viewer_tabs = "".join(f'<button type="button" data-screen="{k}"{' aria-current="page"' if k == "dashboard" else ""}>{t}</button>' for k, t in VIEWER_SCREENS)
+viewer_options = "".join(f'<option value="{k}">{t}</option>' for k, t in VIEWER_SCREENS)
 VIEWER = f'''<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference screens">
-  <div class="flex flex-wrap items-center gap-x-3 gap-y-2.5 px-3 sm:px-4 py-2.5 border-b border-[color:var(--k-seam)]">
-    <p class="sm:hidden text-sm font-bold">Reference screens</p>
-    <div class="seg order-last sm:order-none" role="group" aria-label="Screens">{viewer_tabs}</div>
-    <a class="btn btn-quiet btn-sm ml-auto" href="screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab>{i("external")}<span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
+  <div class="flex items-center gap-3 px-3 sm:px-4 py-2.5 border-b border-[color:var(--k-seam)]">
+    <div class="hidden xl:block min-w-0"><div class="seg" role="group" aria-label="Screens">{viewer_tabs}</div></div>
+    <label class="xl:hidden flex-1 min-w-0 max-w-[280px]"><span class="sr-only">Screen</span><select class="field field-select !h-10 !text-sm" data-screen-select>{viewer_options}</select></label>
+    <a class="btn btn-quiet btn-sm ml-auto shrink-0" href="screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab>{i("external")}<span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
     <button type="button" class="btn btn-sm btn-icon" data-close-dialog aria-label="Close">{i("x")}</button>
   </div>
   <iframe class="flex-1 min-h-0 w-full border-0 bg-housing" title="Dashboard" data-screen-frame></iframe>
@@ -887,6 +889,10 @@ previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underlin
   <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
   <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
 </a>''' for k, t in screens)
+public_previews = "".join(f'''<a href="screens/{k}.html" class="group block no-underline text-ink" data-open-screen="{k}">
+  <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-housing"><iframe src="screens/{k}.html" title="{t} preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[900px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
+  <p class="flex items-center justify-between font-bold mt-3">{t}<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
+</a>''' for k, t in (("landing", "Landing page"), ("sign-in", "Sign in")))
 
 DEPTH_ROWS = (
     ("Plane", "--k-seam-line", "background:var(--k-housing);border:1px solid var(--k-seam);box-shadow:var(--k-seam-line)", "Flush. Panels, tabs, tables.", "box-shadow: var(--k-seam-line);"),
@@ -1100,16 +1106,13 @@ showcase = f'''<body>
 <section id="screens" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <h2 class="display text-[40px] md:text-[56px]">App screens</h2>
   <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">Full reference screens composed from the kit, on the same depth rules. Dense data stays flat and only the controls have depth. Try them on a phone too.</p>
-  <div class="grid gap-8 sm:grid-cols-2">{previews}</div>
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{previews}</div>
 </section>
 
 <section id="marketing" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
   <h2 class="display text-[40px] md:text-[56px]">Marketing sections</h2>
-  <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">A landing page for the invoicing app above: hero, features, pricing, questions, a call to action and a footer, built from the same parts.</p>
-  <a href="screens/landing.html" class="group block no-underline text-ink" data-open-screen="landing">
-    <div class="recessed rounded-[18px] p-2"><div class="relative overflow-hidden rounded-xl aspect-[16/10] md:aspect-[16/8] bg-housing"><iframe src="screens/landing.html" title="Landing page preview" tabindex="-1" aria-hidden="true" class="absolute top-0 left-0 w-[1440px] h-[1100px] origin-top-left scale-[var(--s)] pointer-events-none" style="--s:.25"></iframe></div></div>
-    <p class="flex items-center justify-between font-bold mt-3">Landing page<span class="text-ink-2 transition-transform duration-200 group-hover:translate-x-1">{i("right","w-4 h-4")}</span></p>
-  </a>
+  <p class="text-ink-2 text-lg max-w-[56ch] mt-5 mb-10">A landing page for the invoicing app above, and the sign-in it leads to: hero, features, pricing, questions, a call to action and a footer, built from the same parts.</p>
+  <div class="grid gap-8 sm:grid-cols-2">{public_previews}</div>
 </section>
 
 <section id="tokens" class="max-w-[1240px] mx-auto px-4 md:px-8 py-16 md:py-20">
@@ -1161,7 +1164,7 @@ showcase = f'''<body>
 </main>
 {VIEWER}
 {command_dialog([
-    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("chart", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', "")]),
+    ("Screens", [("home", "Dashboard", 'href="screens/dashboard.html" data-open-screen="dashboard"', ""), ("file", "Invoices", 'href="screens/invoices.html" data-open-screen="invoices"', ""), ("cog", "Settings", 'href="screens/settings.html" data-open-screen="settings"', ""), ("users", "Customers", 'href="screens/customers.html" data-open-screen="customers"', ""), ("chart", "Reports", 'href="screens/reports.html" data-open-screen="reports"', ""), ("box", "Products", 'href="screens/products.html" data-open-screen="products"', ""), ("key", "Sign in", 'href="screens/sign-in.html" data-open-screen="sign-in"', ""), ("send", "Landing page", 'href="screens/landing.html" data-open-screen="landing"', "")]),
     ("On this page", [("hash", label, f'href="#{k}"', "") for k, label in (("depth", "Depth"), ("components", "Components"), ("screens", "App screens"), ("marketing", "Marketing sections"), ("tokens", "Tokens"), ("install", "Install"))]),
     ("Actions", [HOUSING_CMD, ("down", "Download plastc.css", 'href="plastc.css" download', ""), ("copy", "Copy the import line", f"data-copy='{IMPORT}'", ""), ("external", "Source on GitHub", f'href="{REPO}"', "")]),
     ("Components", [("grid", title, f'href="#{gid}" data-keywords="{" ".join(re.findall(r"[.]([a-z][a-z0-9-]*)", classes))}"', "") for gid, title, classes in GROUPS]),

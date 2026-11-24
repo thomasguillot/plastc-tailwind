@@ -68,6 +68,7 @@
     $$('[data-screen]', viewer).forEach(b => b.dataset.screen === k ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
     const tab = $('[data-screen-tab]', viewer); if (tab) tab.href = `screens/${k}.html`;
     const b = $(`[data-screen="${k}"]`, viewer); frame.title = b ? b.textContent : 'Landing page';
+    const sel = $('[data-screen-select]', viewer); if (sel) sel.value = k;
   }
   function showScreen(k) {
     const url = `screens/${k}.html`;
@@ -78,6 +79,7 @@
     frame.addEventListener('load', () => {
       try { const m = frame.contentWindow.location.pathname.match(/screens\/([\w-]+?)(?:\.html)?$/); if (m) syncViewer(m[1]); } catch (e) {}
     });
+    const sel = $('[data-screen-select]', viewer); if (sel) sel.addEventListener('change', () => showScreen(sel.value));
     viewer.addEventListener('close', () => {
       try { const h = localStorage.getItem('plastc-housing'); if (h === 'light' || h === 'dark') setHousing(h); } catch (e) {}
     });
