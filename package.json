@@ -6,12 +6,15 @@
     "build": "cd site && python3 build.py && tailwindcss -i app.css -o dist.css --minify",
     "serve": "cd site && python3 -m http.server 8765"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Thomas Guillot",
+  "license": "MIT",
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.5",
     "tailwindcss": "^4.3.5"
   },
-  "private": true
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomasguillot/plastc-tailwind.git"
+  }
 }
