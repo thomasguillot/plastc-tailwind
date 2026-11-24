@@ -7,10 +7,10 @@ const groups = [
   { label: 'Marketing pages', options: MARKETING_SCREENS },
 ];
 ---
-<dialog class="dialog dialog-full" id="screen-viewer" aria-label="Reference pages">
+<dialog class="dialog dialog-full" id="screen-viewer" data-screens-base="/screens/" aria-label="Reference pages">
   <div class="flex items-center gap-3 px-3 sm:px-4 py-2.5 border-b border-[color:var(--k-seam)]">
     <label class="flex-1 min-w-0 max-w-[280px]"><span class="sr-only">Page</span><select class="field field-select !h-10 !text-sm" data-screen-select>{groups.map(({ label, options }) => <optgroup label={label}>{options.map(({ key, title }) => <option value={key}>{title}</option>)}</optgroup>)}</select></label>
-    <a class="btn btn-quiet btn-sm ml-auto shrink-0" href="screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab><Icon name="external" /><span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
+    <a class="btn btn-quiet btn-sm ml-auto shrink-0" href="/screens/dashboard.html" target="_blank" rel="noopener" data-screen-tab><Icon name="external" /><span class="hidden sm:inline">Open in new tab</span><span class="sr-only sm:hidden">Open in new tab</span></a>
     <button type="button" class="btn btn-sm btn-icon" data-close-dialog aria-label="Close"><Icon name="x" /></button>
   </div>
   <iframe class="flex-1 min-h-0 w-full border-0 bg-housing" title="Dashboard" data-screen-frame></iframe>

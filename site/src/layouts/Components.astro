@@ -1,10 +1,12 @@
 ---
 import Base from './Base.astro';
 import SkipLink from '../components/SkipLink.astro';
-import Wordmark from '../components/Wordmark.astro';
-import ThemeSeg from '../components/ThemeSeg.astro';
-import { GITHUB_SVG } from '../lib/icons';
-import { REPO, SITE } from '../data/site';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import CommandMenu from '../components/CommandMenu.astro';
+import ScreenViewer from '../components/showcase/ScreenViewer.astro';
+import { siteCommands } from '../data/commands';
+import { SITE } from '../data/site';
 import { PAGES } from '../components/components/pages';
 
 interface Props {
@@ -15,7 +17,6 @@ interface Props {
 const { title, description, current = '' } = Astro.props;
 const path = current ? `/components/${current}/` : '/components/';
 const nav = [{ slug: '', title: 'Overview' }, ...PAGES];
-const active = 'aria-[current=page]:!text-ink aria-[current=page]:!bg-[var(--k-housing-down)] aria-[current=page]:!shadow-[var(--k-recessed)]';
 ---
 <Base title={title} description={description} root="/">
 <Fragment slot="head"><link rel="canonical" href={`${SITE}${path}`}>
@@ -26,17 +27,7 @@ const active = 'aria-[current=page]:!text-ink aria-[current=page]:!bg-[var(--k-h
 <meta property="og:url" content={`${SITE}${path}`}>
 </Fragment>
 <SkipLink />
-<header class="max-w-[1240px] mx-auto px-4 md:px-8 pt-6 pb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
-  <Wordmark href="/" root="/" />
-  <nav class="order-3 md:order-none w-full md:w-auto flex flex-wrap gap-1 -mx-1 md:mx-0 md:ml-4" aria-label="Site">
-    <a class={`btn btn-quiet btn-sm ${active}`} href="/components/" aria-current="page">Components</a>
-    <a class="btn btn-quiet btn-sm" href="/#screens">Screens</a>
-    <a class="btn btn-quiet btn-sm" href={`${REPO}/blob/main/README.md`}>Docs</a>
-    <a class="btn btn-quiet btn-sm" href="/#install">Install</a>
-  </nav>
-  <a class="btn btn-quiet btn-sm ml-auto" href={REPO}><Fragment set:html={GITHUB_SVG} /><span class="sr-only sm:not-sr-only">GitHub</span></a>
-  <ThemeSeg />
-</header>
+<SiteHeader section="components" path={path} />
 
 <div class="max-w-[1240px] mx-auto px-4 md:px-8 pt-4 pb-16 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[200px_minmax(0,1fr)] gap-x-14 gap-y-8">
   <nav aria-label="Component groups" class="lg:sticky lg:top-6 lg:self-start">
@@ -45,7 +36,7 @@ const active = 'aria-[current=page]:!text-ink aria-[current=page]:!bg-[var(--k-h
   <main id="main" class="min-w-0"><slot /></main>
 </div>
 
-<footer class="max-w-[1240px] mx-auto px-4 md:px-8 py-10 border-t border-[color:var(--k-seam)] flex flex-wrap gap-4 justify-between items-center text-sm text-ink-2">
-  <p>© 2026 Thomas Guillot · MIT-Licensed · <a class="text-ink underline" href={REPO}>Source on GitHub</a></p><a href="#main" class="btn btn-quiet btn-sm">Back to top</a>
-</footer>
+<SiteFooter />
+<ScreenViewer />
+<CommandMenu groups={siteCommands()} />
 </Base>

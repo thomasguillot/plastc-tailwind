@@ -1,66 +1,27 @@
 ---
 import Base from '../layouts/Base.astro';
 import SkipLink from '../components/SkipLink.astro';
-import CommandMenu, { type CommandGroup } from '../components/CommandMenu.astro';
+import CommandMenu, { type CommandItem } from '../components/CommandMenu.astro';
 import ScreenViewer from '../components/showcase/ScreenViewer.astro';
-import HomeHeader from '../components/home/HomeHeader.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/home/Hero.astro';
 import Anatomy from '../components/home/Anatomy.astro';
 import LightDark from '../components/home/LightDark.astro';
 import Contrast from '../components/home/Contrast.astro';
 import Install from '../components/home/Install.astro';
-import HomeFooter from '../components/home/HomeFooter.astro';
-import { THEME_COMMAND } from '../data/commands';
-import { HOME_DESCRIPTION, LAYERS } from '../data/home';
-import { HOME_TITLE, IMPORT_LINE, REPO, SITE } from '../data/site';
+import SiteFooter from '../components/SiteFooter.astro';
+import { siteCommands } from '../data/commands';
+import { HOME_DESCRIPTION } from '../data/home';
+import { HOME_TITLE, SITE } from '../data/site';
 
-const screen = (key: string, text: string, icon: CommandGroup['items'][number]['icon'], hash = '') => ({ icon, text, attrs: { href: `screens/${key}.html${hash}`, 'data-open-screen': `${key}${hash}` } });
-const commands: CommandGroup[] = [
-  { label: 'Screens', items: [screen('dashboard', 'Dashboard', 'home'), screen('invoices', 'Invoices', 'file'), screen('settings', 'Settings', 'cog'), screen('customers', 'Customers', 'users'), screen('reports', 'Reports', 'chart'), screen('products', 'Products', 'box')] },
-  {
-    label: 'Marketing pages',
-    items: [
-      screen('landing', 'Landing page', 'send'),
-      screen('pricing', 'Pricing', 'tag'),
-      screen('blog', 'Blog', 'book'),
-      screen('article', 'Article', 'article'),
-      screen('about', 'About', 'info'),
-      screen('about', 'Careers', 'briefcase', '#careers'),
-      screen('contact', 'Contact', 'mail'),
-      screen('sign-in', 'Sign in', 'key'),
-      screen('404', '404', 'compass'),
-    ],
-  },
-  {
-    label: 'On this page',
-    items: [
-      ['anatomy', 'What one screen is made of'],
-      ['themes', 'Light and dark'],
-      ['contrast', 'Contrast, measured'],
-      ['install', 'Add it to your project'],
-    ].map(([k, label]) => ({ icon: 'hash' as const, text: label, attrs: { href: `#${k}` } })),
-  },
-  {
-    label: 'Actions',
-    items: [
-      THEME_COMMAND,
-      { icon: 'down', text: 'Download plastc.css', attrs: { href: 'plastc.css', download: true } },
-      { icon: 'copy', text: 'Copy the import line', attrs: { 'data-copy': IMPORT_LINE } },
-      { icon: 'external', text: 'Source on GitHub', attrs: { href: REPO } },
-    ],
-  },
-  {
-    label: 'Components',
-    items: [
-      { icon: 'grid', text: 'Browse all components', attrs: { href: '/components/' } },
-      ...LAYERS.map(({ link, classes }) => ({ icon: 'grid' as const, text: link.label, attrs: { href: link.href, 'data-keywords': classes.map((c) => c.replace(/^\./, '')).join(' ') } })),
-      { icon: 'grid', text: 'Selection', attrs: { href: '/components/selection/' } },
-      { icon: 'grid', text: 'Navigation', attrs: { href: '/components/navigation/' } },
-    ],
-  },
-];
+const onThisPage: CommandItem[] = [
+  ['anatomy', 'What one screen is made of'],
+  ['themes', 'Light and dark'],
+  ['contrast', 'Contrast, measured'],
+  ['install', 'Add it to your project'],
+].map(([k, label]) => ({ icon: 'hash' as const, text: label, attrs: { href: `#${k}` } }));
 ---
-<Base title={HOME_TITLE} description={HOME_DESCRIPTION}>
+<Base title={HOME_TITLE} description={HOME_DESCRIPTION} root="/">
 <Fragment slot="head"><link rel="canonical" href={`${SITE}/`}>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Plastc">
@@ -69,7 +30,7 @@ const commands: CommandGroup[] = [
 <meta property="og:url" content={`${SITE}/`}>
 </Fragment>
 <SkipLink />
-<HomeHeader />
+<SiteHeader path="/" />
 <main id="main">
 <Hero />
 <Anatomy />
@@ -77,9 +38,9 @@ const commands: CommandGroup[] = [
 <Contrast />
 <Install />
 </main>
-<HomeFooter />
+<SiteFooter />
 <ScreenViewer />
-<CommandMenu groups={commands} />
+<CommandMenu groups={siteCommands(onThisPage)} />
 </Base>
 
 <style is:global>
