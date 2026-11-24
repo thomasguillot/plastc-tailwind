@@ -10,10 +10,10 @@ import { CSS_KB, CSS_ON_GITHUB, IMPORT_LINE, VERSION } from '../../data/site';
       <div class="flex flex-wrap gap-3 mt-8"><a class="btn btn-lg" href="plastc.css" download><Icon name="down" />Download plastc.css</a><button type="button" class="btn btn-lg" data-copy={IMPORT_LINE}><Icon name="copy" />Copy the import</button></div>
       <p class="text-sm text-ink-2 mt-4 tabular-nums">v{VERSION} · {CSS_KB} KB · MIT-Licensed</p>
     </div>
-    <ol class="grid grid-cols-1 gap-6 list-none p-0 m-0">
-      <li><p class="font-bold mb-2">Add <code class="font-mono text-[14px]">plastc.css</code> to your project</p><p class="text-sm text-ink-2"><a class="text-ink underline" href="plastc.css" download>Download it</a>, or copy <a class="text-ink underline" href={CSS_ON_GITHUB}><code class="font-mono">src/plastc.css</code> on GitHub</a>. It holds the tokens, depth recipes and every component class.</p></li>
-      <li><p class="font-bold mb-2">Import it after Tailwind</p><pre class="code min-w-0">{IMPORT_LINE}</pre></li>
-      <li><p class="font-bold mb-2">Pick a theme</p><p class="text-sm text-ink-2">Light is the default. Add <code class="font-mono">data-theme="dark"</code> to <code class="font-mono">&lt;html&gt;</code>, or to any section, for dark.</p></li>
+    <ol class="grid grid-cols-1 gap-6 list-none p-0 m-0 [counter-reset:step]">
+      <li class="grid grid-cols-[auto_1fr] gap-x-4 items-start [counter-increment:step] before:content-[counter(step)] before:lcd before:grid before:place-items-center before:size-9 before:text-[16px] before:font-medium before:tabular-nums"><div class="min-w-0"><p class="font-bold mb-2">Add <code class="font-mono text-[14px]">plastc.css</code> to your project</p><p class="text-sm text-ink-2"><a class="text-ink underline" href="plastc.css" download>Download it</a>, or copy <a class="text-ink underline" href={CSS_ON_GITHUB}><code class="font-mono">src/plastc.css</code> on GitHub</a>. It holds the tokens, depth recipes and every component class.</p></div></li>
+      <li class="grid grid-cols-[auto_1fr] gap-x-4 items-start [counter-increment:step] before:content-[counter(step)] before:lcd before:grid before:place-items-center before:size-9 before:text-[16px] before:font-medium before:tabular-nums"><div class="min-w-0"><p class="font-bold mb-2">Import it after Tailwind</p><pre class="code min-w-0">{IMPORT_LINE}</pre></div></li>
+      <li class="grid grid-cols-[auto_1fr] gap-x-4 items-start [counter-increment:step] before:content-[counter(step)] before:lcd before:grid before:place-items-center before:size-9 before:text-[16px] before:font-medium before:tabular-nums"><div class="min-w-0"><p class="font-bold mb-2">Pick a theme</p><p class="text-sm text-ink-2">Light is the default. Add <code class="font-mono">data-theme="dark"</code> to <code class="font-mono">&lt;html&gt;</code>, or to any section, for dark.</p></div></li>
     </ol>
   </div>
 </section>
