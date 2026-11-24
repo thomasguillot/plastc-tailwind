@@ -48,7 +48,7 @@ I = {
     "external": '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     "code": '<path d="m8 7-5 5 5 5M16 7l5 5-5 5"/>',
 }
-GITHUB = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.01 8.01 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82a7.6 7.6 0 0 0-4 0C4.49 1.11 3.82 1.32 3.82 1.32c-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A8 8 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>'
+GITHUB = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>'
 def i(name, cls="", sw="1.8"):
     return ico(I[name], cls, sw)
 def line_chart(values, labels, highlight=9, cls="h-[220px] sm:h-[260px]"):
@@ -923,7 +923,7 @@ showcase = f'''<body>
     <h1 class="display text-[52px] sm:text-[76px] lg:text-[96px]">Every button a real button.</h1>
     <p class="text-lg text-ink-2 max-w-[46ch] mt-7 leading-relaxed">Plastc is a neumorphic UI library for Tailwind v4, with components, app screens and tokens. Depth goes only where your hand expects it. Parts you press stand up, parts that hold input sit in, and everything else stays flush and quiet.</p>
     <div class="flex flex-wrap gap-3 mt-9"><a class="btn btn-signal btn-xl" href="plastc.css" download>{i("down")}Get the CSS</a><a class="btn btn-xl" href="screens/dashboard.html" data-open-screen="dashboard">Open the dashboard</a></div>
-    <p class="text-sm text-ink-2 mt-4 tabular-nums">plastc.css · v{VERSION} · {CSS_KB} KB · MIT license</p>
+    <p class="text-sm text-ink-2 mt-4 tabular-nums">plastc.css · v{VERSION} · {CSS_KB} KB · MIT-Licensed</p>
   </div>
 
   <div class="relative mx-auto w-full max-w-[400px]">
@@ -1150,7 +1150,7 @@ showcase = f'''<body>
       <h2 class="display text-[40px] md:text-[56px]">Install</h2>
       <p class="text-ink-2 text-lg max-w-[44ch] mt-5">Plastc isn’t on npm yet. It’s one CSS file you add next to your Tailwind v4 entry stylesheet.</p>
       <div class="flex flex-wrap gap-3 mt-8"><a class="btn btn-signal btn-lg" href="plastc.css" download>{i("down")}Download plastc.css</a><button type="button" class="btn btn-lg" data-copy='{IMPORT}'>{i("copy")}Copy the import</button></div>
-      <p class="text-sm text-ink-2 mt-4 tabular-nums">v{VERSION} · {CSS_KB} KB · MIT license</p>
+      <p class="text-sm text-ink-2 mt-4 tabular-nums">v{VERSION} · {CSS_KB} KB · MIT-Licensed</p>
     </div>
     <ol class="grid grid-cols-1 gap-6 list-none p-0 m-0">
       <li><p class="font-bold mb-2">Add <code class="font-mono text-[14px]">plastc.css</code> to your project</p><p class="text-sm text-ink-2"><a class="text-ink underline" href="plastc.css" download>Download it</a>, or copy <a class="text-ink underline" href="{CSS_ON_GITHUB}"><code class="font-mono">src/plastc.css</code> on GitHub</a>. It holds the tokens, depth recipes and every component class.</p></li>
@@ -1172,7 +1172,7 @@ showcase = f'''<body>
 ])}
 
 <footer class="max-w-[1240px] mx-auto px-4 md:px-8 py-10 border-t border-[color:var(--k-seam)] flex flex-wrap gap-4 justify-between items-center text-sm text-ink-2">
-  <p>Plastc, a neumorphic UI library for Tailwind CSS v4. <a class="text-ink underline" href="{REPO}">Source on GitHub</a>, MIT license.</p><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
+  <p>© 2026 Thomas Guillot · MIT-Licensed · <a class="text-ink underline" href="{REPO}">Source on GitHub</a></p><a href="#top" class="btn btn-quiet btn-sm">Back to top</a>
 </footer>
 '''
 showcase = showcase.replace("<!--jump-->", jump_list())
