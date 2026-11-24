@@ -131,16 +131,19 @@
 
     const c = t.closest('[data-copy], [data-copy-from]');
     if (c) {
-      let text = c.dataset.copy;
-      if (c.dataset.copyFrom) {
-        const clone = document.getElementById(c.dataset.copyFrom).cloneNode(true);
-        clone.querySelectorAll('[data-demo-note]').forEach(n => n.remove());
-        clone.querySelectorAll('[data-toast]').forEach(n => n.removeAttribute('data-toast'));
-        clone.querySelectorAll('[data-open-dialog]').forEach(n => { n.setAttribute('commandfor', n.dataset.openDialog); n.setAttribute('command', 'show-modal'); n.removeAttribute('data-open-dialog'); });
-        text = dedent(clone.innerHTML);
-      }
-      const label = c.innerHTML;
-      const done = ok => { c.textContent = ok ? 'Copied' : 'Select and copy'; live(ok ? 'Copied to clipboard' : 'Copy failed'); setTimeout(() => c.innerHTML = label, 1400); };
+      const from = c.dataset.copyFrom && document.getElementById(c.dataset.copyFrom);
+      const text = from ? from.textContent : c.dataset.copy;
+      if (!copyLabels.has(c)) copyLabels.set(c, c.innerHTML);
+      const label = copyLabels.get(c);
+      const done = ok => {
+        if (!c.style.minWidth) c.style.minWidth = getComputedStyle(c).width;
+        const svg = (label.match(/<svg[\s\S]*?<\/svg>/) || [''])[0];
+        const icon = ok ? svg.replace(/(<svg[^>]*>)[\s\S]*<\/svg>/, '$1<path d="m5 12.5 4.5 4.5L19 7.5"/></svg>') : svg;
+        c.innerHTML = icon + (ok ? 'Copied' : 'Copy failed');
+        live(ok ? 'Copied to clipboard' : 'Copy failed. Select the text and copy it.');
+        clearTimeout(c._copyTimer);
+        c._copyTimer = setTimeout(() => { c.innerHTML = label; c.style.minWidth = ''; }, 1400);
+      };
       (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => done(true), () => done(false));
       return;
     }
@@ -180,11 +183,7 @@
     pager.querySelectorAll('[data-page-step]').forEach(b => { b.disabled = b.dataset.pageStep === '-1' ? cur === 1 : cur === total; });
   }
   const closePopovers = () => $$('[popover]:popover-open').forEach(p => p !== toastEl && p.hidePopover());
-  const dedent = html => {
-    const lines = html.replace(/^\n+|\s+$/g, '').split('\n');
-    const pad = Math.min(...lines.filter(l => l.trim()).map(l => l.match(/^ */)[0].length));
-    return lines.map(l => l.slice(pad)).join('\n');
-  };
+  const copyLabels = new WeakMap();
 
   /* ---------- tabs: click + arrow keys, with panels or table filters */
   function selectTab(tab, focus) {
@@ -445,7 +444,7 @@
   }
   function filterList(input, showAll) {
     const lb = listboxFor(input), q = showAll ? '' : input.value.trim().toLowerCase();
-    $$('[role=option]', lb).forEach(o => { o.hidden = !!q && !o.textContent.toLowerCase().includes(q); });
+    $$('[role=option]', lb).forEach(o => { o.hidden = !!q && !(o.textContent + ' ' + (o.dataset.keywords || '')).toLowerCase().includes(q); });
     $$('[role=group]', lb).forEach(g => { g.hidden = !$$('[role=option]', g).some(o => !o.hidden); });
     const vis = visibleOptions(lb), empty = $('.listbox-empty', lb);
     if (empty) empty.hidden = vis.length > 0;
